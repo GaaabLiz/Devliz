@@ -5,10 +5,10 @@ from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
 from pylizlib.qtfw.qconfig import TextListValidator, ExecutableValidator
 from qfluentwidgets import QConfig, ConfigItem, BoolValidator, qconfig, FolderValidator
 
-from devliz.project import version
+from devliz.project import version, name, authors
 
 # Devliz Application
-app = PylizApp("Devliz", version, "Devliz", "Gabliz")
+app = PylizApp(name, version, name, authors[0][0])
 
 # Application directories
 DEVLIZ_PATH_CATALOGUE = Path(app.get_path()).joinpath("Catalogue")
