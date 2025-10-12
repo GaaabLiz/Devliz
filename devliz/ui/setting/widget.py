@@ -5,6 +5,7 @@ from qfluentwidgets import SettingCardGroup, PushSettingCard, FluentIcon
 
 from devliz.application.app import app
 from devliz.ui.common.frame import DevlizQFrame
+from devliz.ui.setting.util import SettingGroupManager
 
 
 class WidgetSettingsScrollable(DevlizQFrame):
@@ -36,8 +37,6 @@ class WidgetSettingsScrollable(DevlizQFrame):
         self.__add_group_info(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
-        self.group_info = SettingCardGroup(self.tr("Informazioni"), self)
-        self.group_info.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
 
         # Informazioni applicazione
         self.card_info_app = PushSettingCard(
@@ -46,9 +45,7 @@ class WidgetSettingsScrollable(DevlizQFrame):
             title="Informazioni su Devliz",
             content=app.version
         )
-        self.card_info_app.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-        self.card_info_app.clicked.connect(self.signal_open_about_dialog_request.emit)
-        self.group_info.addSettingCard(self.card_info_app)
 
-        layout.addSpacerItem(QSpacerItem(1, 5))
-        layout.addWidget(self.group_info)
+        grp_manager = SettingGroupManager(self.tr("Informazioni"), self)
+        grp_manager.add_widget(self.card_info_app, self.signal_open_about_dialog_request)
+        grp_manager.install_group_on(layout)
