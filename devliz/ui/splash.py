@@ -31,5 +31,5 @@ class SplashWindow(FramelessWindow):
 
     def createSubInterface(self):
         loop = QEventLoop(self)
-        QTimer.singleShot(3000, loop.quit)
+        QTimer.singleShot(1000, loop.quit)
         loop.exec()
