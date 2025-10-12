@@ -6,7 +6,7 @@ from PySide6.QtGui import QShortcut, QKeySequence, QIcon
 from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
 from qframelesswindow.utils import getSystemAccentColor
 
-from devliz.ui.setting.widget import WidgetSettingsScrollable
+from devliz.view.widgets.setting_widget import WidgetSettingsScrollable
 
 
 class DashboardView(FluentWindow):

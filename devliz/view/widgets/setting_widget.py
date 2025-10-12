@@ -1,11 +1,10 @@
 from PySide6.QtCore import Signal, Qt
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QSizePolicy, QSpacerItem, QLabel
-from pylizlib.qtfw.widgets.text import BoldLabel
-from qfluentwidgets import SettingCardGroup, PushSettingCard, FluentIcon
+from PySide6.QtWidgets import QVBoxLayout
+from qfluentwidgets import PushSettingCard, FluentIcon
 
 from devliz.application.app import app
-from devliz.ui.common.frame import DevlizQFrame
-from devliz.ui.setting.util import SettingGroupManager
+from devliz.view.util.frame import DevlizQFrame
+from devliz.view.util.setting import SettingGroupManager
 
 
 class WidgetSettingsScrollable(DevlizQFrame):
