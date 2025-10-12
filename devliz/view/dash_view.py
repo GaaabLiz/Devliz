@@ -7,7 +7,7 @@ from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkT
 from qframelesswindow.utils import getSystemAccentColor
 
 from devliz.application.app import app
-from devliz.view.widgets.setting_widget import WidgetSettingsScrollable
+from devliz.view.widgets.setting import WidgetSettingsScrollable
 
 
 class DashboardView(FluentWindow):
