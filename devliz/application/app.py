@@ -45,7 +45,6 @@ class DevlizSettings(QConfig):
     catalogue_path = ConfigItem(SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
     backup_before_install = ConfigItem(SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
     git_bash_path = ConfigItem(SETTING_GROUP_SCRIPTS, "Git Bash path", DEFAULT_SETTING_PATH_GIT_BASH, ExecutableValidator())
-    # custom_scripts = AtomDevScriptsConfigItem(SETTING_GROUP_SCRIPTS, "Custom Scripts", AtomDevScripts([]))
     starred_dirs = ConfigItem(SETTING_GROUP_FAVORITES,"Cartelle preferite", DEFAULT_SETTING_STARRED_DIRS, TextListValidator())
     starred_files = ConfigItem(SETTING_GROUP_FAVORITES,"File preferiti", DEFAULT_SETTING_STARRED_FILES, TextListValidator())
     starred_exes = ConfigItem(SETTING_GROUP_FAVORITES, "Eseguibili Preferiti", DEFAULT_SETTING_STARRED_EXES, TextListValidator())
