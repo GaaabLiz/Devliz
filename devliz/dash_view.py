@@ -3,10 +3,10 @@ import sys
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QShortcut, QKeySequence, QIcon
-from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon
+from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
 from qframelesswindow.utils import getSystemAccentColor
 
-from devliz.ui.demo import WidgetDemo
+from devliz.ui.setting.widget import WidgetSettingsScrollable
 
 
 class DashboardView(FluentWindow):
@@ -22,15 +22,15 @@ class DashboardView(FluentWindow):
     def __init_window(self):
         self.resize(1100, 700)
         self.setWindowIcon(QIcon(':/resources/logo2.png'))
-        self.setWindowTitle('ATOM DEV')
+        self.setWindowTitle('Devliz')
         theme = Theme.LIGHT if not isDarkTheme() else Theme.DARK
         setTheme(theme, True, False)
         if sys.platform in ["win32", "darwin"]:
             setThemeColor(getSystemAccentColor(), save=True)
 
     def __init_widgets(self):
-        demo = WidgetDemo("Demo", self)
-        self.addSubInterface(demo, FluentIcon.DICTIONARY,'Demo')
+        self.widget_setting = WidgetSettingsScrollable(self)
+        self.addSubInterface(self.widget_setting, FluentIcon.SETTING, self.widget_setting.window_name, NavigationItemPosition.BOTTOM)
 
     def __init_shortcuts(self):
         shortcut = QShortcut(QKeySequence("F5"), self)
