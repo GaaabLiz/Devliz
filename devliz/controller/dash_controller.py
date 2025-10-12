@@ -1,7 +1,7 @@
 from loguru import logger
 
-from devliz.dash_model import DashboardModel
-from devliz.dash_view import DashboardView
+from devliz.model.dash_model import DashboardModel
+from devliz.view.dash_view import DashboardView
 from devliz.domain.data import DevlizData
 
 
