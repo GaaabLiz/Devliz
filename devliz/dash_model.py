@@ -60,7 +60,7 @@ class DashboardModel:
     def __get_tags(self) -> list[str]:
         return app_settings.get(DevlizSettings.config_tags)
 
-    def gen_atom_dev_data(self) -> DevlizData:
+    def gen_devliz_data(self) -> DevlizData:
         return DevlizData(
             monitored_software=self.__get_monitored_software(),
             monitored_services=self.__get_monitored_Services(),
