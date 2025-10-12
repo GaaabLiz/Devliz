@@ -6,6 +6,7 @@ from PySide6.QtGui import QShortcut, QKeySequence, QIcon
 from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
 from qframelesswindow.utils import getSystemAccentColor
 
+from devliz.application.app import app
 from devliz.view.widgets.setting_widget import WidgetSettingsScrollable
 
 
@@ -22,7 +23,7 @@ class DashboardView(FluentWindow):
     def __init_window(self):
         self.resize(1100, 700)
         self.setWindowIcon(QIcon(':/resources/logo2.png'))
-        self.setWindowTitle('Devliz')
+        self.setWindowTitle(app.name)
         theme = Theme.LIGHT if not isDarkTheme() else Theme.DARK
         setTheme(theme, True, False)
         if sys.platform in ["win32", "darwin"]:
