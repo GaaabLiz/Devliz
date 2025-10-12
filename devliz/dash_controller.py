@@ -15,7 +15,7 @@ class DashboardController:
     def __update_all(self):
         try:
             logger.info("Triggerato aggiornamento")
-            data = self.model.gen_atom_dev_data()
+            data = self.model.gen_devliz_data()
             self.cached_data = data
             # Widget Home
             self.view.widget_home.update_widget(data.monitored_software, data.monitored_services, data.starred_dirs, data.starred_files)
