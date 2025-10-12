@@ -1,8 +1,8 @@
 import sys
 
-from PyQt6.QtGui import QIcon, QKeySequence
+
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QShortcut
+from PySide6.QtGui import QShortcut, QKeySequence, QIcon
 from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon
 from qframelesswindow.utils import getSystemAccentColor
 

@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QFrame, QHBoxLayout
+
 from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QFrame, QHBoxLayout
 from qfluentwidgets import SubtitleLabel, setFont
 
 
