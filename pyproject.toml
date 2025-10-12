@@ -3,4 +3,8 @@ name = "devliz"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "loguru>=0.7.3",
+    "pylizlib>=0.3.17",
+    "pyside6-fluent-widgets[full]>=1.9.0",
+]
