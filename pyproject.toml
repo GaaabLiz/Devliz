@@ -5,6 +5,12 @@ description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
     "loguru>=0.7.3",
-    "pylizlib>=0.3.17",
-    "pyside6-fluent-widgets[full]>=1.9.0",
+    "pylizlib>=0.3.20",
+    "pyside6>=6.10.0",
+    "pyside6-fluent-widgets[full]>=1.9.1",
+]
+
+[project.optional-dependencies]
+qtfw = [
+    "pylizlib>=0.3.21",
 ]
