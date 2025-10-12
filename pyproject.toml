@@ -3,6 +3,9 @@ name = "devliz"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
+authors = [
+    {name = "Gabliz", email = "gabliz.dev@gmail.com"},
+]
 dependencies = [
     "loguru>=0.7.3",
     "pylizlib>=0.3.20",
