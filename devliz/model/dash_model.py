@@ -1,9 +1,7 @@
 from pathlib import Path
 from typing import List, Callable, Optional
 
-from PySide6.QtCore import Qt, Signal, QThread
-from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QLabel, QProgressBar, QVBoxLayout, QDialog
+
 from pylizlib.core.os.utils import WindowsOsUtils, is_software_installed
 from pylizlib.qtfw.domain.sw import SoftwareData
 from pylizlib.qtfw.util.progress import SimpleProgressManager
