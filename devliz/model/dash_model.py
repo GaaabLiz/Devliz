@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List, Callable, Optional
 
-
+from loguru import logger
 from pylizlib.core.os.utils import WindowsOsUtils, is_software_installed
 from pylizlib.qtfw.domain.sw import SoftwareData
 from pylizlib.qtfw.util.progress import SimpleProgressManager
@@ -16,23 +16,28 @@ class DashboardModel:
 
     def __init__(self, parent_widget=None):
         self.progress_manager = SimpleProgressManager(parent_widget)
+        self.cached_data: DevlizData | None = None
 
 
     def update(self):
         """Il tuo metodo che aggiorna lo stato"""
         # Le tue operazioni
-        operazioni = [
-            lambda status_callback=None: self.sleep(status_callback),
-            lambda status_callback=None: self.sleep(status_callback),
-        ]
+        try:
+            operazioni = [
+                lambda status_callback=None: self.sleep(status_callback),
+                lambda status_callback=None: self.sleep(status_callback, True),
+            ]
+            # Avvia con progress
+            self.progress_manager.start_operations(
+                operazioni,
+                callback=lambda success: print(f"Finito: {success}")
+            )
+        except Exception as e:
+            logger.error(f"Errore durante l'aggiornamento: {e}")
+            return
 
-        # Avvia con progress
-        self.progress_manager.start_operations(
-            operazioni,
-            callback=lambda success: print(f"Finito: {success}")
-        )
 
-    def sleep(self, status_callback=None):
+    def sleep(self, status_callback=None, fail: bool = False, ):
         import time
 
         status_callback("Eseguendo sleep 1...")
@@ -42,6 +47,8 @@ class DashboardModel:
         status_callback("Eseguendo sleep 3...")
         time.sleep(1)
         status_callback("Sleep completato.")
+        if fail:
+            raise Exception("Errore simulato durante l'operazione di sleep.")
 
     def __get_monitored_software(self) -> list[SoftwareData]:
         data_list: list[str] = app_settings.get(DevlizSettings.starred_exes)
