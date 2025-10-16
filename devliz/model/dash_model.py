@@ -1,111 +1,103 @@
 from pathlib import Path
-from typing import List, Callable, Optional
+from typing import List, Callable, Optional, Any
+from dataclasses import dataclass
 
 from loguru import logger
 from pylizlib.core.os.utils import WindowsOsUtils, is_software_installed
-from pylizlib.qtfw.domain.sw import SoftwareData
-from pylizlib.qtfw.util.progress import SimpleProgressManager
-from qfluentwidgets import FluentIcon, FluentStyleSheet, BodyLabel, ProgressBar
+from pylizlib.qt.handler.operation_core import Operation
+from pylizlib.qt.handler.operation_domain import RunnerInteraction, OperationInfo
+from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
+from pylizlib.qt.helper.operation import OperationDevDebug
+from PySide6.QtCore import QObject, Signal, Qt
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QDialog, QVBoxLayout
+from typing import Protocol
 
-from devliz.application.app import app_settings, DevlizSettings
-from devliz.domain.data import DevlizData, DevlizSnapshotData
+from pylizlib.qtfw.util.progress import SimpleProgressDialog
+from qfluentwidgets import StateToolTip, BodyLabel, ProgressBar, FluentStyleSheet
+
+from devliz.model.devliz_update import TaskGetMonitoredSoftware
+from devliz.view.dash_view import DashboardView
+
+
+# --- Metaclass to solve conflict between QObject and Protocol ---
+class QObjectProtocolMeta(type(QObject), type(Protocol)):
+    pass
 
 
 # noinspection PyMethodMayBeStatic
 class DashboardModel:
 
-    def __init__(self, parent_widget=None):
-        self.progress_manager = SimpleProgressManager(parent_widget)
-        self.cached_data: DevlizData | None = None
-
+    def __init__(self, view: DashboardView):
+        self.view = view
+        self.task1 = TaskGetMonitoredSoftware("nome1")
+        self.task2 = TaskGetMonitoredSoftware("nome2")
+        self.interaction = DashboardUpdaterInteraction()
+        self.current_operation_status = ""
 
     def update(self):
-        """Il tuo metodo che aggiorna lo stato"""
-        # Le tue operazioni
         try:
-            operazioni = [
-                lambda status_callback=None: self.sleep(status_callback),
-                lambda status_callback=None: self.sleep(status_callback, True),
+            tasks = [
+                self.task1,
+                self.task2,
+                self.task1,
+                self.task2,
             ]
-            # Avvia con progress
-            self.progress_manager.start_operations(
-                operazioni,
-                callback=lambda success: print(f"Finito: {success}")
+            op_info = OperationInfo(
+                name="Aggiornamento Dashboard",
+                description="Aggiornamento dati della dashboard"
             )
+            op = Operation(tasks, op_info, self.interaction)
+            runner = OperationRunner(self.interaction)
+            runner.add(op)
+            # runner.add(OperationDevDebug())
+            runner.start()
+
+
         except Exception as e:
-            logger.error(f"Errore durante l'aggiornamento: {e}")
+            logger.error(f"Errore durante il lancio dell'aggiornamento: {e}")
             return
 
 
-    def sleep(self, status_callback=None, fail: bool = False, ):
-        import time
+class DashboardUpdaterInteraction(QObject, RunnerInteraction, metaclass=QObjectProtocolMeta):
+    # Signals to safely update the UI from a background thread
+    update_progress_signal = Signal(int, str)
+    close_dialog_signal = Signal()
 
-        status_callback("Eseguendo sleep 1...")
-        time.sleep(1)
-        status_callback("Eseguendo sleep 2...")
-        time.sleep(1)
-        status_callback("Eseguendo sleep 3...")
-        time.sleep(1)
-        status_callback("Sleep completato.")
-        if fail:
-            raise Exception("Errore simulato durante l'operazione di sleep.")
+    def __init__(self):
+        super().__init__()
+        self.current_operation_status = ""
+        self.dialog = SimpleProgressDialog()
 
-    def __get_monitored_software(self) -> list[SoftwareData]:
-        data_list: list[str] = app_settings.get(DevlizSettings.starred_exes)
-        data_objs: list[SoftwareData] = []
-        for data in data_list:
-            obj = SoftwareData(
-                path=Path(data),
-                is_service=False,
-                icon=FluentIcon.APPLICATION,
-                installed=is_software_installed(Path(data)),
-                running=WindowsOsUtils.is_exe_running(Path(data)),
-                version=WindowsOsUtils.get_windows_exe_version(Path(data))
-            )
-            data_objs.append(obj)
-        return data_objs
+        # Connect signals to the dialog's slots
+        self.update_progress_signal.connect(self.dialog.update_progress)
+        self.close_dialog_signal.connect(self.dialog.close)
 
-    def __get_monitored_Services(self) -> list[SoftwareData]:
-        data_list: list[str] = app_settings.get(DevlizSettings.starred_services)
-        data_objs: list[SoftwareData] = []
-        for data in data_list:
-            service_path = WindowsOsUtils.get_service_executable_path(data)
-            if service_path is None:
-                continue
-            obj = SoftwareData(
-                path=Path(data),
-                is_service=True,
-                icon=FluentIcon.SETTING,
-                installed=service_path is not None,
-                running=WindowsOsUtils.is_service_running(data),
-                version=WindowsOsUtils.get_service_version(data)
-            )
-            data_objs.append(obj)
-        return data_objs
+    def on_runner_start(self):
+        logger.info(f"Aggiornamento Dashboard partito.")
+        self.dialog.show()
+
+    def on_op_update_progress(self, operation_id: str, progress: int):
+        logger.debug("Aggiornamento progresso operazione: " + str(progress))
+        # Emit signal instead of calling UI method directly
+        self.update_progress_signal.emit(progress, self.current_operation_status)
+
+    def on_runner_finish(self, statistics: 'RunnerStatistics'):
+        logger.info(f"Aggiornamento Dashboard Finito.")
+        # Emit signal instead of calling UI method directly
+        self.close_dialog_signal.emit()
+
+    def on_task_start(self, task_name: str):
+        logger.debug(f"Task {task_name} iniziato.")
+        self.update_progress_signal.emit(0, task_name)
+
+    def on_task_finished(self, task_name: str):
+        logger.debug(f"Task {task_name} completato.")
+
+    def on_op_finished(self, operation: Any):
+        op_obj: Operation = operation
+        logger.info(f"Operation {op_obj.info.name} completato.")
+        result1 = op_obj.get_task_result_by_id(op_obj.tasks[0].id)
+        print(result1)
 
 
-    def get_starred_exes(self) -> list[Path]:
-        return [Path(e) for e in app_settings.get(DevlizSettings.starred_exes)]
-
-    def get_starred_files(self) -> list[Path]:
-        return [Path(f) for f in app_settings.get(DevlizSettings.starred_files)]
-
-    def get_starred_dirs(self) -> list[Path]:
-        return [Path(d) for d in app_settings.get(DevlizSettings.starred_dirs)]
-
-    def __get_configs(self) -> DevlizSnapshotData:
-        return DevlizSnapshotData([])
-
-    def __get_tags(self) -> list[str]:
-        return app_settings.get(DevlizSettings.config_tags)
-
-    def gen_devliz_data(self) -> DevlizData:
-        return DevlizData(
-            monitored_software=self.__get_monitored_software(),
-            monitored_services=self.__get_monitored_Services(),
-            starred_dirs=self.get_starred_dirs(),
-            starred_files=self.get_starred_files(),
-            starred_exes=self.get_starred_exes(),
-            configurations=self.__get_configs(),
-            tags=self.__get_tags()
-        )
