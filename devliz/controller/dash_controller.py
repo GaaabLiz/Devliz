@@ -18,7 +18,6 @@ class DashboardController:
         try:
             logger.info("Triggerato aggiornamento")
             self.model.update()
-            logger.info("Aggiornamento completato")
         except Exception as e:
             # UiUtils.show_message("Attenzione", "Si è verificato un errore durante l'aggiornamento dei dati di DEVLIZ: " + str(e))
             logger.error("Errore aggiornamento:" + str(e))
