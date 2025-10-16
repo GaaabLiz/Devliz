@@ -31,13 +31,18 @@ class DevlizSnapshotData:
         return f"{size_gb:.2f} GB"
 
 
+@dataclass
+class DevlizSettingsData:
+    starred_dirs: list[Path] = None
+    starred_files: list[Path] = None
+    starred_exes: list[Path] = None
+    tags: list[str] = None
+
 
 @dataclass
 class DevlizData:
     monitored_software: list[SoftwareData] = None
     monitored_services: list[SoftwareData] = None
-    starred_dirs: list[Path] = None
-    starred_files: list[Path] = None
-    starred_exes: list[Path] = None
+    settings: DevlizSettingsData = None
     configurations: DevlizSnapshotData = None
-    tags: list[str] = None
+
