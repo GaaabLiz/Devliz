@@ -126,6 +126,11 @@ qtfw = [
     { name = "pylizlib" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "loguru", specifier = ">=0.7.3" },
@@ -135,6 +140,9 @@ requires-dist = [
     { name = "pyside6-fluent-widgets", extras = ["full"], specifier = ">=1.9.1" },
 ]
 provides-extras = ["qtfw"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.14.1" }]
 
 [[package]]
 name = "idna"
@@ -347,7 +355,7 @@ wheels = [
 
 [[package]]
 name = "pylizlib"
-version = "0.3.34"
+version = "0.3.35"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "psutil" },
@@ -358,9 +366,9 @@ dependencies = [
     { name = "ruff" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/9d/c3d0c0f103e62a82d1037bfa16e801eaff6616cc0745bc9e39109391d231/pylizlib-0.3.34.tar.gz", hash = "sha256:986dd82e4f9c65bfa87dca28f5c4869f6933ddedce52c2693aa0828d0014a117", size = 55027, upload-time = "2025-10-16T18:07:07.816Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/7e/f05afd5493b4a5f589d72703d6efc9da43e833e4a739ba7204e6b289a569/pylizlib-0.3.35.tar.gz", hash = "sha256:9943ba55a8126852cccd1b2876e810e1e4ef8591323ab0388c21449beff35f6c", size = 54151, upload-time = "2025-10-17T16:50:39.99Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/ec/cd6e4291e71974d194c64673d4362f217d3a1484ddd3bce6735daae6906d/pylizlib-0.3.34-py3-none-any.whl", hash = "sha256:7b20a3f5e6e6596c60e7364454f3472b8baeff94315f021106da3089026a9512", size = 74251, upload-time = "2025-10-16T18:07:06.86Z" },
+    { url = "https://files.pythonhosted.org/packages/17/32/b07355e7bdb5056b50d22340315a66d14d9e7b0bae2e8a471858f544c2fe/pylizlib-0.3.35-py3-none-any.whl", hash = "sha256:049238ebeeaf338bbf781083a11de07e82b22515212ec17dab2f2ecbf143ea55", size = 73134, upload-time = "2025-10-17T16:50:38.933Z" },
 ]
 
 [[package]]

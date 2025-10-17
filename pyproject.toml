@@ -17,3 +17,8 @@ dependencies = [
 qtfw = [
     "pylizlib>=0.3.21",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.1",
+]
