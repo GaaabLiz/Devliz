@@ -3,7 +3,6 @@ from loguru import logger
 from devliz.controller.catalogue_controller import CatalogueController
 from devliz.model.dash_model import DashboardModel
 from devliz.view.dash_view import DashboardView
-from devliz.domain.data import DevlizData
 
 
 class DashboardController:

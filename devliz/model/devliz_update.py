@@ -1,9 +1,7 @@
 from pathlib import Path
-from typing import Callable
 
 from pylizlib.core.os.utils import is_software_installed, WindowsOsUtils
-from pylizlib.qt.handler.operation_core import Operation, Task
-from pylizlib.qt.handler.operation_domain import OperationInfo
+from pylizlib.qt.handler.operation_core import Task
 from pylizlib.qtfw.domain.sw import SoftwareData
 from qfluentwidgets import FluentIcon
 

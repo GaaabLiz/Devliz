@@ -4,7 +4,6 @@ from qfluentwidgets import SplashScreen
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 
 from devliz.application.app import app
-from devliz.application.resources import resources_rc
 
 
 class SplashWindow(FramelessWindow):

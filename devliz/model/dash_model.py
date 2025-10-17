@@ -1,13 +1,9 @@
-from pathlib import Path
-from typing import List, Callable, Optional, Any
-from dataclasses import dataclass
 
 from loguru import logger
-from pylizlib.core.os.utils import WindowsOsUtils, is_software_installed
 from pylizlib.qt.handler.operation_core import Operation
 from pylizlib.qt.handler.operation_domain import OperationInfo
 from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
-from PySide6.QtCore import QObject, Signal, Qt
+from PySide6.QtCore import QObject
 
 from devliz.model.devliz_update import TaskGetMonitoredSoftware
 from devliz.view.dash_view import DashboardView
