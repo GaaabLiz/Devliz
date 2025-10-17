@@ -1,5 +1,7 @@
+import sys
 from pathlib import Path
 
+from loguru import logger
 from pylizlib.core.app.pylizapp import PylizApp
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
 from pylizlib.qtfw.qconfig import TextListValidator, ExecutableValidator
@@ -39,6 +41,18 @@ SETTING_GROUP_FAVORITES = "Preferiti"
 SETTING_GROUP_APP = "App"
 
 # GESTIONE RISORSE
+
+
+
+# GESTIONE LOGS
+logger.remove()
+logger.add(sys.stdout,level="DEBUG",format="{time:HH:mm:ss} | {level} | {message}", colorize=True)
+logger.add(
+    Path(DEVLIZ_PATH_LOGS).joinpath("devliz_{time:YYYY-MM-DD}.log").__str__(),
+    level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{function}:{line} - {message}",
+    rotation="00:00", retention="30 days", compression=None
+)
+logger.info("Devliz Application Started. Version: {}", version)
 
 
 # DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
