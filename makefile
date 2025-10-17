@@ -10,7 +10,7 @@
 # == PROJECT VARIABLES ==
 PYTHON_MAIN_PACKAGE = devliz
 QT_QRC_FILE := resources/resources.qrc
-QT_RESOURCE_PY := $(PYTHON_MAIN_PACKAGE)/resource/resources_rc.py
+QT_RESOURCE_PY := $(PYTHON_MAIN_PACKAGE)/application/resources/resources_rc.py
 
 # == FILES VARIABLES ==
 FILE_PROJECT_TOML := pyproject.toml
