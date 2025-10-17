@@ -10,6 +10,7 @@ from devliz.application.app import app
 from devliz.view.widgets.setting import WidgetSettingsScrollable
 
 
+
 class DashboardView(FluentWindow):
 
     f5_pressed = Signal()
