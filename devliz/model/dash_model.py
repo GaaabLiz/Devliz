@@ -23,6 +23,11 @@ class DashboardModel(QObject):
             description="Aggiornamento dati della dashboard",
             delay_each_task=1.0
         )
+        self.runner = OperationRunner()
+        self.runner.runner_start.connect(self.on_runner_started)
+        self.runner.runner_stop.connect(self.on_runner_stopped)
+        self.runner.runner_finish.connect(self.on_runner_finished)
+        self.runner.op_finished.connect(self.on_operation_finished)
 
     def update(self):
         try:
@@ -32,14 +37,10 @@ class DashboardModel(QObject):
                 self.task1,
                 self.task2,
             ]
+            self.runner.clear()
             op = Operation(tasks, self.operation_info)
-            runner = OperationRunner()
-            runner.runner_start.connect(self.on_runner_started)
-            runner.runner_stop.connect(self.on_runner_stopped)
-            runner.runner_finish.connect(self.on_runner_finished)
-            runner.op_finished.connect(self.on_operation_finished)
-            runner.add(op)
-            runner.start()
+            self.runner.add(op)
+            self.runner.start()
 
         except Exception as e:
             logger.error(f"Errore durante il lancio dell'aggiornamento: {e}")
