@@ -233,9 +233,9 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         # Aggiorna colonne e layout se serve
         self._distribuisci_colonne_perc()
 
-    def update_widget(self, data: DevlizSnapshotData):
-        UiUtils.clear_layout(self.layout)
+    def update_widget(self, snapshot_data: DevlizSnapshotData):
+        UiUtils.clear_layout(self.master_layout)
         self.__setup_label()
         self.__setup_action_bar()
-        self.__setup_table(data.configurations)
-        self.__setup_footer(data.count, data.get_mb_size)
+        self.__setup_table(snapshot_data.snapshot_list)
+        self.__setup_footer(snapshot_data.count, snapshot_data.get_mb_size)
