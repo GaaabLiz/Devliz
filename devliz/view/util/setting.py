@@ -10,7 +10,8 @@ class SettingGroupManager:
 
     def add_widget(self, widget, signal):
         widget.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-        widget.clicked.connect(signal.emit)
+        if signal is not None:
+            widget.clicked.connect(signal.emit)
         self.group.addSettingCard(widget)
 
     def install_group_on(self, layout):
