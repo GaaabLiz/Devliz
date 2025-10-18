@@ -34,9 +34,6 @@ class DevlizQFrame(QFrame):
         self.master_layout = QVBoxLayout(self.__main_content_widget)
         self.master_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.__qframe_label = SubtitleLabel(name, self)
-        setFont(self.__qframe_label, 24)
-        self.__qframe_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.__scroll_area = SingleDirectionScrollArea(orient=Qt.Orientation.Vertical)
         self.__scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -58,7 +55,10 @@ class DevlizQFrame(QFrame):
         return updating_label
 
     def get_label_title(self) -> SubtitleLabel:
-        return self.__qframe_label
+        __qframe_label = SubtitleLabel(self.window_name, self)
+        setFont(__qframe_label, 24)
+        __qframe_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        return __qframe_label
 
     def get_scroll_layout(self) -> QVBoxLayout:
         return self.scroll_layout
