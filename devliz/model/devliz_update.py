@@ -8,6 +8,7 @@ from pylizlib.qtfw.domain.sw import SoftwareData
 from qfluentwidgets import FluentIcon
 
 from devliz.application.app import app_settings, DevlizSettings
+from devliz.domain.data import DevlizSettingsData
 
 
 class TaskGetMonitoredSoftware(Task):
@@ -46,3 +47,16 @@ class TaskGetSnapshots(Task):
         list.append(SnapshotUtils.gen_random_snap(Path(r"C:\Users\Gabriele\Documents")))
         sleep(1)
         return list
+
+class TaskGetSettingsData(Task):
+
+    def __init__(self):
+        super().__init__("Recupero dati di configurazione")
+
+    def execute(self):
+        return DevlizSettingsData(
+            starred_exes=app_settings.get(DevlizSettings.starred_exes),
+            starred_files=app_settings.get(DevlizSettings.starred_files),
+            starred_dirs=app_settings.get(DevlizSettings.starred_dirs),
+            tags=app_settings.get(DevlizSettings.config_tags),
+        )
