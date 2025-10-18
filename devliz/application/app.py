@@ -28,6 +28,7 @@ DEFAULT_SETTING_STARRED_FILES = []
 DEFAULT_SETTING_STARRED_EXES = []
 DEFAULT_SETTING_STARRED_SERVICES = []
 DEFAULT_SETTING_CONFIGURATION_TAGS = []
+DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA = []
 DEFAULT_SETTING_PATH_GIT_BASH = PATH_DEFAULT_GIT_BASH.__str__()
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL = True
 
@@ -66,6 +67,7 @@ class DevlizSettings(QConfig):
     starred_exes = ConfigItem(SETTING_GROUP_FAVORITES, "Eseguibili Preferiti", DEFAULT_SETTING_STARRED_EXES, TextListValidator())
     starred_services = ConfigItem(SETTING_GROUP_FAVORITES, "Servizi Preferiti", DEFAULT_SETTING_STARRED_SERVICES, TextListValidator())
     debug_test_mode = ConfigItem(SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
+    snap_custom_data = ConfigItem(SETTING_GROUP_CONFIGS, "Snapshots custom data", DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA, TextListValidator())
 
 
 # CARICAMENTO IMPOSTAZIONI
