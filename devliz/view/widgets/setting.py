@@ -1,5 +1,6 @@
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QVBoxLayout
+from pylizlib.qtfw.widgets.card import MasterListSettingCard
 from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard
 
 from devliz.application.app import app, app_settings, DevlizSettings
@@ -31,7 +32,7 @@ class WidgetSettingsScrollable(DevlizQFrame):
 
 
     def __add_groups(self, layout: QVBoxLayout):
-        #self.__add_group_snapshot(layout)
+        self.__add_group_snapshot(layout)
         self.__add_group_info(layout)
 
     def __add_group_snapshot(self, layout: QVBoxLayout):
@@ -62,6 +63,24 @@ class WidgetSettingsScrollable(DevlizQFrame):
             deletion_content="Sei sicuro di voler eliminare questo tag?"
         )
 
+        # Tag configurazioni
+        self.card_snap_custom_data = MasterListSettingCard(
+            config_item=DevlizSettings.snap_custom_data,
+            item_type=MasterListSettingCard.Type.TEXT,
+            card_title="Snapshots - Dati personalizzati",
+            card_icon=FluentIcon.QUICK_NOTE,
+            main_btn=PushButton("Aggiungi variabile", self),
+            card_content="Aggiungi una o un più variabili personalizzate da assegnare agli snapshots",
+            parent=self,
+            dialog_title="Aggiungi variabile",
+            dialog_content="Inserisci il nome della variabile",
+            dialog_button_yes="Aggiungi",
+            dialog_button_no="Annulla",
+            dialog_error="La variabile non può essere vuota o già esistente",
+            deletion_title="Conferma eliminazione",
+            deletion_content="Sei sicuro di voler eliminare questa variabile?"
+        )
+
         # Backup pre-installazione
         self.card_backup_before_install = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
@@ -72,7 +91,8 @@ class WidgetSettingsScrollable(DevlizQFrame):
 
         grp_manager = SettingGroupManager(self.tr("Snapshots"), self)
         grp_manager.add_widget(self.card_general_catalogue, self.signal_ask_catalogue_path)
-        grp_manager.add_widget(self.card_fav_tags, self.signal_open_tags_dialog)
+        grp_manager.add_widget(self.card_fav_tags, None)
+        grp_manager.add_widget(self.card_snap_custom_data, None)
         grp_manager.add_widget(self.card_backup_before_install,None)
         grp_manager.install_group_on(layout)
 
