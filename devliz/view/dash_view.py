@@ -3,6 +3,7 @@ import sys
 
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QShortcut, QKeySequence, QIcon
+from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
 from qframelesswindow.utils import getSystemAccentColor
 
@@ -37,3 +38,6 @@ class DashboardView(FluentWindow):
     def __init_shortcuts(self):
         shortcut = QShortcut(QKeySequence("F5"), self)
         shortcut.activated.connect(self.f5_pressed.emit)
+
+    def set_state(self, state: UiWidgetMode):
+        self.widget_setting.set_state(state)

@@ -1,5 +1,6 @@
 
 from loguru import logger
+from pylizlib.qt.domain.view import UiWidgetMode
 from pylizlib.qt.handler.operation_core import Operation
 from pylizlib.qt.handler.operation_domain import OperationInfo
 from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
@@ -48,6 +49,7 @@ class DashboardModel(QObject):
 
     def on_runner_started(self):
         logger.debug("Aggiornamento Dashboard iniziato.")
+        self.view.set_state(UiWidgetMode.UPDATING)
 
     def on_runner_stopped(self):
         logger.debug("Aggiornamento Dashboard fermato.")
@@ -60,6 +62,7 @@ class DashboardModel(QObject):
             return
 
         logger.debug("Aggiornamento della dashboard completato con successo.")
+        self.view.set_state(UiWidgetMode.DISPLAYING)
 
     def on_operation_finished(self, operation: Operation):
         logger.info(f"Operazione {operation.info.name} completata.")
