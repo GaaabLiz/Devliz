@@ -8,6 +8,7 @@ from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkT
 from qframelesswindow.utils import getSystemAccentColor
 
 from devliz.application.app import app
+from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
 from devliz.view.widgets.setting import WidgetSettingsScrollable
 
 from devliz.application.resources import resources_rc
@@ -32,7 +33,9 @@ class DashboardView(FluentWindow):
             setThemeColor(getSystemAccentColor(), save=True)
 
     def __init_widgets(self):
+        self.widget_catalogue = SnapshotCatalogueWidget(self)
         self.widget_setting = WidgetSettingsScrollable(self)
+        self.addSubInterface(self.widget_catalogue, FluentIcon.BOOK_SHELF, self.widget_catalogue.window_name, NavigationItemPosition.TOP)
         self.addSubInterface(self.widget_setting, FluentIcon.SETTING, self.widget_setting.window_name, NavigationItemPosition.BOTTOM)
 
     def __init_shortcuts(self):
