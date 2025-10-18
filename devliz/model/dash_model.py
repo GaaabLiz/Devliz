@@ -56,13 +56,14 @@ class DashboardModel(QObject):
 
     def on_runner_finished(self, stats: RunnerStatistics):
         logger.info("Aggiornamento Dashboard completato.")
+        self.view.set_state(UiWidgetMode.DISPLAYING)
         if stats.has_ops_failed():
             error = stats.get_first_error()
             logger.error(f"Errore durante l'aggiornamento della dashboard: {error}")
             return
 
         logger.debug("Aggiornamento della dashboard completato con successo.")
-        self.view.set_state(UiWidgetMode.DISPLAYING)
+
 
     def on_operation_finished(self, operation: Operation):
         logger.info(f"Operazione {operation.info.name} completata.")
