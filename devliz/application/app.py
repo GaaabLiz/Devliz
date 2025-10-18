@@ -4,7 +4,8 @@ from pathlib import Path
 from loguru import logger
 from pylizlib.core.app.pylizapp import PylizApp
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
-from pylizlib.qtfw.qconfig import TextListValidator, ExecutableValidator
+from pylizlib.qtfw.domain.setting import QtFwQConfigItem
+from pylizlib.qtfw.model.qconfig import TextListValidator, ExecutableValidator
 from qfluentwidgets import QConfig, ConfigItem, BoolValidator, qconfig, FolderValidator
 
 from devliz.project import version, name, authors
@@ -58,16 +59,16 @@ logger.info("Devliz Application Started. Version: {}", version)
 
 # DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
 class DevlizSettings(QConfig):
-    config_tags = ConfigItem(SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
-    catalogue_path = ConfigItem(SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
-    backup_before_install = ConfigItem(SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
-    git_bash_path = ConfigItem(SETTING_GROUP_SCRIPTS, "Git Bash path", DEFAULT_SETTING_PATH_GIT_BASH, ExecutableValidator())
-    starred_dirs = ConfigItem(SETTING_GROUP_FAVORITES,"Cartelle preferite", DEFAULT_SETTING_STARRED_DIRS, TextListValidator())
-    starred_files = ConfigItem(SETTING_GROUP_FAVORITES,"File preferiti", DEFAULT_SETTING_STARRED_FILES, TextListValidator())
-    starred_exes = ConfigItem(SETTING_GROUP_FAVORITES, "Eseguibili Preferiti", DEFAULT_SETTING_STARRED_EXES, TextListValidator())
-    starred_services = ConfigItem(SETTING_GROUP_FAVORITES, "Servizi Preferiti", DEFAULT_SETTING_STARRED_SERVICES, TextListValidator())
-    debug_test_mode = ConfigItem(SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
-    snap_custom_data = ConfigItem(SETTING_GROUP_CONFIGS, "Snapshots custom data", DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA, TextListValidator())
+    config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
+    catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
+    backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
+    snap_custom_data = QtFwQConfigItem(False, SETTING_GROUP_CONFIGS, "Snapshots custom data", DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA, TextListValidator())
+    git_bash_path = QtFwQConfigItem(True, SETTING_GROUP_SCRIPTS, "Git Bash path", DEFAULT_SETTING_PATH_GIT_BASH, ExecutableValidator())
+    starred_dirs = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES,"Cartelle preferite", DEFAULT_SETTING_STARRED_DIRS, TextListValidator())
+    starred_files = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES,"File preferiti", DEFAULT_SETTING_STARRED_FILES, TextListValidator())
+    starred_exes = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES, "Eseguibili Preferiti", DEFAULT_SETTING_STARRED_EXES, TextListValidator())
+    starred_services = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES, "Servizi Preferiti", DEFAULT_SETTING_STARRED_SERVICES, TextListValidator())
+    debug_test_mode = QtFwQConfigItem(False, SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
 
 
 # CARICAMENTO IMPOSTAZIONI
