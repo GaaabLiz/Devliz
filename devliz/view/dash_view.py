@@ -43,4 +43,4 @@ class DashboardView(FluentWindow):
         shortcut.activated.connect(self.f5_pressed.emit)
 
     def set_state(self, state: UiWidgetMode):
-        self.widget_setting.set_state(state)
+        self.widget_catalogue.set_state(state)
