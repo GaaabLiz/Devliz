@@ -31,8 +31,9 @@ class DashboardController:
     def __handle_data_updated(self, data: DevlizData):
         print(data)
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots)
-        self.view.widget_catalogue.update_widget(snap_data)
         self.cached_data = data
+        self.view.widget_catalogue.update_widget(snap_data)
+
 
     def __handle_update_started(self):
         self.view.set_state(UiWidgetMode.UPDATING)

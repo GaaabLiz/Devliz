@@ -7,7 +7,7 @@ from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatisti
 from PySide6.QtCore import QObject, Signal
 
 from devliz.domain.data import DevlizData
-from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots
+from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots, TaskGetSettingsData
 from devliz.view.dash_view import DashboardView
 
 
@@ -22,15 +22,15 @@ class DashboardModel(QObject):
     def __init__(self, view: DashboardView):
         super().__init__()
         self.view = view
-        self.task1 = TaskGetMonitoredSoftware()
-        self.task2 = TaskGetMonitoredSoftware()
+        self.task_monitored_soft = TaskGetMonitoredSoftware()
+        self.task_settings = TaskGetSettingsData()
         self.task_snap = TaskGetSnapshots()
         self.operation_info = OperationInfo(
             name="Aggiornamento Dashboard",
             description="Aggiornamento dati della dashboard",
-            delay_each_task=1.0
+            delay_each_task=0.1
         )
-        self.runner = OperationRunner()
+        self.runner = OperationRunner(abort_all_on_error=True)
         self.runner.runner_start.connect(self.on_runner_started)
         self.runner.runner_stop.connect(self.on_runner_stopped)
         self.runner.runner_finish.connect(self.on_runner_finished)
@@ -39,7 +39,8 @@ class DashboardModel(QObject):
     def update(self):
         try:
             tasks = [
-                self.task1,
+                self.task_settings,
+                self.task_monitored_soft,
                 self.task_snap,
             ]
             self.runner.clear()
@@ -69,7 +70,13 @@ class DashboardModel(QObject):
         logger.debug("Aggiornamento della dashboard completato con successo.")
         op = stats.operations[0]
         snapshots = op.get_task_result_by_id(self.task_snap.id)
-        self.signal_on_updated_data_available.emit(DevlizData(snapshots=snapshots))
+        settings = op.get_task_result_by_id(self.task_settings.id)
+        data = DevlizData(
+            snapshots=snapshots,
+            monitored_software=op.get_task_result_by_id(self.task_monitored_soft.id),
+            settings=settings
+        )
+        self.signal_on_updated_data_available.emit(data)
 
 
     def on_operation_finished(self, operation: Operation):
