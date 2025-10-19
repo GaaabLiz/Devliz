@@ -18,15 +18,7 @@ class DashboardController:
 
         self.cached_data : DevlizData | None = None
 
-        self.catalogue = CatalogueController(self.view.widget_catalogue, self.model.get_cached_data, None)
-
-    def __update_all(self):
-        try:
-            logger.debug("Triggerato update.")
-            self.model.update()
-        except Exception as e:
-            UiUtils.show_message("Attenzione", "Si è verificato un errore durante l'aggiornamento dei dati di DEVLIZ: " + str(e))
-            logger.error("Errore aggiornamento:" + str(e))
+        self.catalogue = CatalogueController(self.view.widget_catalogue, self.model)
 
     def __handle_data_updated(self, data: DevlizData):
         print(data)
@@ -42,8 +34,7 @@ class DashboardController:
         self.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __connect_signals(self):
-        #self.signal_request_update.connect(self.__update_all)
-        self.view.f5_pressed.connect(lambda: self.__update_all())
+        self.view.f5_pressed.connect(self.model.update)
         self.model.signal_on_update_started.connect(self.__handle_update_started)
         self.model.signal_on_update_complete.connect(self.__handle_update_complete)
         self.model.signal_on_updated_data_available.connect(self.__handle_data_updated)
@@ -52,5 +43,5 @@ class DashboardController:
         logger.info("Devliz is starting...")
         self.view.show()
         self.__connect_signals()
-        self.__update_all()
+        self.model.update()
         self.catalogue.init()
