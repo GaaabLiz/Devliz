@@ -8,6 +8,7 @@ from pylizlib.core.os.utils import get_system_username
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import SegmentedWidget
 
+from devliz.application.app import app_settings, DevlizSettings
 from devliz.domain.data import DevlizData
 from devliz.view.widgets.catalogue_imp_tab_details import TabDetails
 from devliz.view.widgets.catalogue_imp_tab_directories import TabDirectories
@@ -29,8 +30,8 @@ class DialogConfigTabs(QWidget):
         self.vBoxLayout = QVBoxLayout(self)
 
         # Creo i tabs
-        self.tab_details = TabDetails(self.payload_data, devliz_data.settings.tags, devliz_data.settings.custom_snap_data)
-        self.tab_directories = TabDirectories(self.payload_data, devliz_data.settings.starred_dirs)
+        self.tab_details = TabDetails(self.payload_data, app_settings.get(DevlizSettings.config_tags), app_settings.get(DevlizSettings.snap_custom_data))
+        self.tab_directories = TabDirectories(self.payload_data, app_settings.get(DevlizSettings.starred_dirs))
 
         # Aggiungo i tabs al pivot
         self.__add_sub_interface(self.tab_details, "details", "Dettagli")

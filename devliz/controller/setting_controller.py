@@ -23,6 +23,7 @@ class SettingController:
             logger.trace(f"Percorso selezionato: {directory}")
             app_settings.set(DevlizSettings.catalogue_path, Path(directory))
             self.view.card_general_catalogue.setContent(directory)
+            self.dash_model.snap_catalogue.set_catalogue_path(Path(directory))
             self.dash_model.update()
         else:
             logger.trace("Nessun percorso selezionato.")
