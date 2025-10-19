@@ -207,11 +207,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
             self.filtered = []
             self.is_filtered = True
             for config in self._all_data:
+                custom_data: dict[str, str] = config.data if config.data is not None else {}
                 if (text in config.name.lower() or
                     text in config.desc.lower() or
-                    #text in config.machineModel.lower() or # TODO
-                    #text in config.machineFamily.value.lower() or # TODO
-                    any(text in tag.lower() for tag in config.tags)):
+                    any(text in tag.lower() for tag in config.tags) or
+                    any(text in str(value).lower() for value in custom_data.values())):
                     self.filtered.append(config)
         self.__update_table_data(self.filtered)
 
@@ -224,7 +224,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         # Pulisce e reinserisce i dati filtrati nella tabella
         self.table.setRowCount(len(data))
         for i, config in enumerate(data):
-            sttt = config.get_for_table_array()
+            sttt = config.get_for_table_array(app_settings.get(DevlizSettings.snap_custom_data))
             for j in range(6):
                 item = QTableWidgetItem(str(sttt[j]))
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
