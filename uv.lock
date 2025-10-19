@@ -355,7 +355,7 @@ wheels = [
 
 [[package]]
 name = "pylizlib"
-version = "0.3.38"
+version = "0.3.43"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "psutil" },
@@ -366,9 +366,9 @@ dependencies = [
     { name = "ruff" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6b/10/015f4eb2ca2f24805a4c5c90198984b0b3dad80edac0eeaa57616e95c87f/pylizlib-0.3.38.tar.gz", hash = "sha256:530a262b66b0bd87d505e9277107cdcbebddc72284895ae3da64e54effbebf81", size = 55251, upload-time = "2025-10-18T12:25:26.425Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/d6/f3b4ad23a5dd66b91f4a06e6325bfe739a11a471cdd42f752bab84d8dbf7/pylizlib-0.3.43.tar.gz", hash = "sha256:b04906c53a4d0f81199211cfb288076ea324155e4eed8a04461f58eed5b98446", size = 56085, upload-time = "2025-10-19T11:18:54.858Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/bb/a298bc3b3fbd00331a7e5e525001ef71bc98640e2558fc0eb5003548c5fb/pylizlib-0.3.38-py3-none-any.whl", hash = "sha256:811c3a29728a1221452a29727c78699fb2844ead3607a152341b53dace0d1d99", size = 74938, upload-time = "2025-10-18T12:25:25.159Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/59/364d9c97f286dc03b16c80f26763521a45077a7f9891581036cc20e152b7/pylizlib-0.3.43-py3-none-any.whl", hash = "sha256:f1365f4a2a806c4ac115e3f657a81d060b5167cc7d2db0e5c75aed07df3b55d0", size = 75835, upload-time = "2025-10-19T11:18:53.368Z" },
 ]
 
 [[package]]
