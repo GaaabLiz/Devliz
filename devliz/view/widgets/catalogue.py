@@ -160,7 +160,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         menu.addAction(Action(FluentIcon.DOWN, "Installa", triggered=lambda: self.signal_install_requested.emit(config)))
         menu.addAction(Action(FluentIcon.EDIT, "Modifica", triggered=lambda: self.signal_edit_requested.emit(config)))
         #menu.addAction(Action(FluentIcon.UPDATE, "Aggiorna cartelle", triggered=lambda: self.signal_update_dirs_to_locals_requested.emit(config)))
-        #menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
         menu.addAction(Action(FluentIcon.DELETE, "Cancella", triggered=lambda: self.signal_delete_requested.emit(config)))
         global_pos = self.table.viewport().mapToGlobal(pos)
         menu.exec(global_pos)
