@@ -56,4 +56,5 @@ class TaskGetSettingsData(Task):
             starred_files=app_settings.get(DevlizSettings.starred_files),
             starred_dirs=app_settings.get(DevlizSettings.starred_dirs),
             tags=app_settings.get(DevlizSettings.config_tags),
+            custom_snap_data=app_settings.get(DevlizSettings.snap_custom_data),
         )
