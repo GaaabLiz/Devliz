@@ -16,6 +16,7 @@ class WidgetSettings(DevlizQFrame):
     signal_request_update = Signal()
     signal_ask_catalogue_path = Signal()
     signal_open_tags_dialog = Signal()
+    signal_clear_backups_request = Signal()
 
     def __init__(self, parent=None):
         super().__init__(name="Settings", parent=parent)

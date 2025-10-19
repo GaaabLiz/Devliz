@@ -1,12 +1,17 @@
+from pathlib import Path
+
 from PySide6.QtCore import Signal, QObject
 from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
 from pylizlib.qtfw.util.ui import UiUtils
 
+from devliz.application.app import app_settings, DevlizSettings
 from devliz.controller.catalogue_controller import CatalogueController
+from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.model.dash_model import DashboardModel
 from devliz.view.dash_view import DashboardView
+from devliz.view.widgets.setting import WidgetSettings
 
 
 class DashboardController:
@@ -19,12 +24,15 @@ class DashboardController:
         self.cached_data : DevlizData | None = None
 
         self.catalogue = CatalogueController(self.view.widget_catalogue, self.model)
+        self.settings = SettingController(self.view.widget_setting, self.model)
 
     def __handle_data_updated(self, data: DevlizData):
         print(data)
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots)
         self.cached_data = data
         self.view.widget_catalogue.update_widget(snap_data)
+
+        self.model.snap_catalogue.path_catalogue = Path(app_settings.get(DevlizSettings.catalogue_path))
 
 
     def __handle_update_started(self):
