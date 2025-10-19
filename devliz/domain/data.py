@@ -37,6 +37,7 @@ class DevlizSettingsData:
     starred_files: list[Path] = None
     starred_exes: list[Path] = None
     tags: list[str] = None
+    custom_snap_data: list[str] = None
 
 
 @dataclass
