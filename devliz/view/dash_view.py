@@ -7,7 +7,7 @@ from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
 from qframelesswindow.utils import getSystemAccentColor
 
-from devliz.application.app import app
+from devliz.application.app import app, RESOURCE_ID_LOGO
 from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
 from devliz.view.widgets.setting import WidgetSettingsScrollable
 
@@ -25,7 +25,7 @@ class DashboardView(FluentWindow):
 
     def __init_window(self):
         self.resize(1100, 700)
-        self.setWindowIcon(QIcon(':/resources/logo2.png'))
+        self.setWindowIcon(QIcon(RESOURCE_ID_LOGO))
         self.setWindowTitle(app.name)
         theme = Theme.LIGHT if not isDarkTheme() else Theme.DARK
         setTheme(theme, True, False)

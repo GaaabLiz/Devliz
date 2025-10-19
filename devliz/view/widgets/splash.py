@@ -3,8 +3,9 @@ from PySide6.QtGui import QIcon
 from qfluentwidgets import SplashScreen
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 
-from devliz.application.app import app
+from devliz.application.app import app, RESOURCE_ID_LOGO
 
+from devliz.application.resources import resources_rc
 
 class SplashWindow(FramelessWindow):
 
@@ -12,7 +13,7 @@ class SplashWindow(FramelessWindow):
         super().__init__()
         self.resize(700, 600)
         self.setWindowTitle(app.name)
-        self.setWindowIcon(QIcon(':/resources/logo2.png'))
+        self.setWindowIcon(QIcon(RESOURCE_ID_LOGO))
 
         # 1. Create a splash screen
         self.splashScreen = SplashScreen(self.windowIcon(), self)

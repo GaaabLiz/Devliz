@@ -45,7 +45,7 @@ SETTING_GROUP_FAVORITES = "Preferiti"
 SETTING_GROUP_APP = "App"
 
 # GESTIONE RISORSE
-
+RESOURCE_ID_LOGO = ':/resources/logo2.png'
 
 
 # GESTIONE LOGS
