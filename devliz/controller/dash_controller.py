@@ -27,7 +27,8 @@ class DashboardController:
         self.settings = SettingController(self.view.widget_setting, self.model)
 
     def __handle_data_updated(self, data: DevlizData):
-        print(data)
+        logger.debug("Updated dashboard data received in controller. Updating view...")
+        logger.debug(data)
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots)
         self.cached_data = data
         self.view.widget_catalogue.update_widget(snap_data)
