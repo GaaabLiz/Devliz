@@ -14,11 +14,14 @@ class TabDetails(QWidget):
             self,
             payload_data: Snapshot | None = None,
             tags: list[str] = [],
+            custom_data_keys: list[str] = [],
     ):
         super().__init__()
         self.payload_data: Snapshot | None = payload_data
         self.tags = tags
         self.layout = QVBoxLayout(self)
+        self.custom_data_keys = custom_data_keys
+        self.custom_data_inputs = {}
 
         # Form layout
         self.form_layout = QFormLayout()
@@ -61,20 +64,6 @@ class TabDetails(QWidget):
         self.form_desc_input.setMaximumWidth(250)
         self.form_layout.addRow(self.form_desc_label, self.form_desc_input)
 
-        # Campo famiglia macchine
-        self.form_family_label = BodyLabel("Famiglia macchine:", self)
-        self.form_family_combo = ComboBox()
-        items = ['UNKNOWN', "EASY", "FLEX", "SPEEDY"]
-        self.form_family_combo.addItems(items)
-        self.form_family_combo.setMaximumWidth(250)
-        self.form_layout.addRow(self.form_family_label, self.form_family_combo)
-
-        # Campo Modello
-        self.form_model_label = BodyLabel("Modello:", self)
-        self.form_model_input = LineEdit()
-        self.form_model_input.setMaximumWidth(250)
-        self.form_layout.addRow(self.form_model_label, self.form_model_input)
-
         # Campo tags
         self.form_tags_label = BodyLabel("Tags:", self)
         self.form_tags_input = MultiSelectionComboBox(self)
@@ -83,39 +72,58 @@ class TabDetails(QWidget):
         self.form_tags_input.setPlaceholderText("Aggiungi tag...")
         self.form_layout.addRow(self.form_tags_label, self.form_tags_input)
 
+        # Campi custom
+        for key in self.custom_data_keys:
+            label = BodyLabel(f"{key.capitalize()}:", self)
+            line_edit = LineEdit()
+            line_edit.setMaximumWidth(250)
+            self.form_layout.addRow(label, line_edit)
+            self.custom_data_inputs[key] = line_edit
+
     def __populate_fields(self):
         if not self.payload_data:
             return
         self.form_id_value.setText(self.payload_data.id)
         self.form_name_input.setText(self.payload_data.name)
         self.form_desc_input.setText(self.payload_data.desc)
-        self.form_family_combo.setCurrentText(self.payload_data.machineFamily.value)
-        self.form_model_input.setText(self.payload_data.machineModel)
         self.form_tags_input.setCheckedItems(self.payload_data.tags)
+        if hasattr(self.payload_data, 'custom_data') and self.payload_data.custom_data:
+            for key, widget in self.custom_data_inputs.items():
+                widget.setText(self.payload_data.custom_data.get(key, ""))
 
     def _capture_initial_state(self):
         self._initial = {
             "name": self.form_name_input.text(),
             "desc": self.form_desc_input.text(),
-            "family": self.form_family_combo.currentText(),
-            "model": self.form_model_input.text(),
             "tags": set(self.form_tags_input.get_items()),
+            "custom_data": {
+                key: widget.text() for key, widget in self.custom_data_inputs.items()
+            }
         }
 
     def _connect_change_signals(self):
         self.form_name_input.textChanged.connect(self._on_changed)
         self.form_desc_input.textChanged.connect(self._on_changed)
-        self.form_family_combo.currentTextChanged.connect(self._on_changed)
-        self.form_model_input.textChanged.connect(self._on_changed)
         self.form_tags_input.selectionChanged.connect(lambda _: self._on_changed())
+        for widget in self.custom_data_inputs.values():
+            widget.textChanged.connect(self._on_changed)
 
     def _on_changed(self):
         current = {
             "name": self.form_name_input.text(),
             "desc": self.form_desc_input.text(),
-            "family": self.form_family_combo.currentText(),
-            "model": self.form_model_input.text(),
             "tags": set(self.form_tags_input.get_items()),
+            "custom_data": {
+                key: widget.text() for key, widget in self.custom_data_inputs.items()
+            }
         }
         changed = (current != self._initial)
         self.signal_data_changed.emit(changed)
+
+    def get_custom_data(self) -> dict[str, str]:
+        """
+        Restituisce un dizionario con i dati personalizzati inseriti nel form.
+
+        :return: Un dizionario con chiave-valore dei dati personalizzati.
+        """
+        return {key: widget.text() for key, widget in self.custom_data_inputs.items()}

@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QStackedWidget
 from loguru import logger
 from pylizlib.core.data.gen import gen_random_string
 from pylizlib.core.os.snap import Snapshot, SnapDirAssociation
+from pylizlib.core.os.utils import get_system_username
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import SegmentedWidget
 
@@ -28,7 +29,7 @@ class DialogConfigTabs(QWidget):
         self.vBoxLayout = QVBoxLayout(self)
 
         # Creo i tabs
-        self.tab_details = TabDetails(self.payload_data, devliz_data.settings.tags)
+        self.tab_details = TabDetails(self.payload_data, devliz_data.settings.tags, devliz_data.settings.custom_snap_data)
         self.tab_directories = TabDirectories(self.payload_data, devliz_data.settings.starred_dirs)
 
         # Aggiungo i tabs al pivot
@@ -64,9 +65,9 @@ class DialogConfigTabs(QWidget):
                 desc=self.tab_details.form_desc_input.text(),
                 tags=self.tab_details.form_tags_input.get_items(),
                 date_created=datetime.datetime.now(),
-                author="TODO", # TODO: Aggiungere l'autore reale
+                author=get_system_username(),
                 directories=assoc,
-                data=None # TODO: Aggiungere i dati reali
+                data=self.tab_details.get_custom_data()
             )
             return data
         except Exception as e:

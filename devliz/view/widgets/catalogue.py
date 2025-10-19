@@ -43,7 +43,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
 
     def __setup_action_bar(self):
         search_line_edit = SearchLineEdit(self)
-        #search_line_edit.textChanged.connect(self._text_changed_filter)
+        search_line_edit.textChanged.connect(self._text_changed_filter)
 
         self.action_import = Action(FluentIcon.ADD, 'Importa', triggered=lambda: self.signal_import_requested.emit())
         self.action_edit = Action(FluentIcon.EDIT, 'Modifica', enabled=False, triggered=lambda: self.signal_edit_requested.emit())
@@ -209,8 +209,8 @@ class SnapshotCatalogueWidget(DevlizQFrame):
             for config in self._all_data:
                 if (text in config.name.lower() or
                     text in config.desc.lower() or
-                    #text in config.machineModel.lower() or
-                    #text in config.machineFamily.value.lower() or
+                    #text in config.machineModel.lower() or # TODO
+                    #text in config.machineFamily.value.lower() or # TODO
                     any(text in tag.lower() for tag in config.tags)):
                     self.filtered.append(config)
         self.__update_table_data(self.filtered)
