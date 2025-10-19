@@ -5,6 +5,8 @@ from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.widgets.input import MultiSelectionComboBox
 from qfluentwidgets import BodyLabel, LineEdit, ComboBox
 
+from devliz.application.app import SNAPSHOT_ID_SIZE
+
 
 class TabDetails(QWidget):
 
@@ -47,7 +49,7 @@ class TabDetails(QWidget):
         # Campo id
         self.form_id_label = BodyLabel("ID:", self)
         self.form_id_value = LineEdit()
-        self.form_id_value.setText(gen_random_string(10))
+        self.form_id_value.setText(gen_random_string(SNAPSHOT_ID_SIZE))
         self.form_id_value.setReadOnly(True)
         self.form_id_value.setMaximumWidth(250)
         self.form_layout.addRow(self.form_id_label, self.form_id_value)
@@ -87,9 +89,9 @@ class TabDetails(QWidget):
         self.form_name_input.setText(self.payload_data.name)
         self.form_desc_input.setText(self.payload_data.desc)
         self.form_tags_input.setCheckedItems(self.payload_data.tags)
-        if hasattr(self.payload_data, 'custom_data') and self.payload_data.custom_data:
+        if hasattr(self.payload_data, 'data') and self.payload_data.data:
             for key, widget in self.custom_data_inputs.items():
-                widget.setText(self.payload_data.custom_data.get(key, ""))
+                widget.setText(self.payload_data.data.get(key, ""))
 
     def _capture_initial_state(self):
         self._initial = {
