@@ -1,3 +1,4 @@
+import os
 from typing import Callable
 
 from PySide6.QtCore import Signal
@@ -75,8 +76,12 @@ class CatalogueController:
         except Exception as e:
             UiUtils.show_message("Errore di eliminazione", "Si è verificato un errore durante l'eliminazione: " + str(e))
 
-    def __open_snap_directory(self, path):
-        pass
+    def __open_snap_directory(self, snap: Snapshot):
+        path = self.dash_model.snap_catalogue.get_snap_directory_path(snap)
+        if path.exists():
+            os.startfile(path)
+        else:
+            UiUtils.show_message("Attenzione", "La cartella non esiste più in " + path.__str__())
 
     def __duplicate_snapshot(self, snap: Snapshot):
         try:
