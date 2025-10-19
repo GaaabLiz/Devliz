@@ -8,7 +8,7 @@ from devliz.view.util.frame import DevlizQFrame
 from devliz.view.util.setting import SettingGroupManager
 
 
-class WidgetSettingsScrollable(DevlizQFrame):
+class WidgetSettings(DevlizQFrame):
 
     signal_open_dir_request = Signal(str)
     signal_close_and_clear_request = Signal()

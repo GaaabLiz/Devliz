@@ -9,7 +9,7 @@ from qframelesswindow.utils import getSystemAccentColor
 
 from devliz.application.app import app, RESOURCE_ID_LOGO
 from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
-from devliz.view.widgets.setting import WidgetSettingsScrollable
+from devliz.view.widgets.setting import WidgetSettings
 
 from devliz.application.resources import resources_rc
 
@@ -34,7 +34,7 @@ class DashboardView(FluentWindow):
 
     def __init_widgets(self):
         self.widget_catalogue = SnapshotCatalogueWidget(self)
-        self.widget_setting = WidgetSettingsScrollable(self)
+        self.widget_setting = WidgetSettings(self)
         self.addSubInterface(self.widget_catalogue, FluentIcon.BOOK_SHELF, self.widget_catalogue.window_name, NavigationItemPosition.TOP)
         self.addSubInterface(self.widget_setting, FluentIcon.SETTING, self.widget_setting.window_name, NavigationItemPosition.BOTTOM)
 
