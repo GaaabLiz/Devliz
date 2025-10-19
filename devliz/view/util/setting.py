@@ -35,3 +35,6 @@ class SettingGroupManager:
     def install_group_on(self, layout):
         layout.addSpacerItem(QSpacerItem(1, 5))
         layout.addWidget(self.group)
+
+    def install_spacer_on(self, layout):
+        layout.addSpacerItem(QSpacerItem(1, 10))

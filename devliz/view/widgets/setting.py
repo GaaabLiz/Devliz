@@ -34,6 +34,7 @@ class WidgetSettingsScrollable(DevlizQFrame):
     def __add_groups(self, layout: QVBoxLayout):
         self.__add_group_snapshot(layout)
         self.__add_group_favorites(layout)
+        self.__add_group_app(layout)
         self.__add_group_info(layout)
 
     def __add_group_snapshot(self, layout: QVBoxLayout):
@@ -189,6 +190,32 @@ class WidgetSettingsScrollable(DevlizQFrame):
         grp_manager.add_widget(setting_fav_files, self.card_fav_files, None)
         grp_manager.add_widget(setting_fav_exe, self.card_fav_exes, None)
         grp_manager.add_widget(setting_fav_services, self.card_fav_services, None)
+        grp_manager.install_group_on(layout)
+
+
+
+    def __add_group_app(self, layout: QVBoxLayout):
+
+        # Directory di lavoro
+        self.card_working_folder = PushSettingCard(
+            text="Apri Cartella",
+            icon=FluentIcon.FOLDER,
+            title="Cartella di lavoro di " + app.name,
+            content=app.path.__str__()
+        )
+
+        # Cancella backups
+        size_str = "0 MB" # TODO
+        self.card_clear_backups = PushSettingCard(
+            text="Cancella backups",
+            icon=FluentIcon.DELETE,
+            title="Cancella Backups di " +  app.name,
+            content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione. (Attualmente: " + size_str + ")"
+        )
+
+        grp_manager = SettingGroupManager(self.tr("Applicazione"), self)
+        grp_manager.add_widget(None, self.card_working_folder, self.signal_open_dir_request)
+        grp_manager.add_widget(None, self.card_clear_backups, None)
         grp_manager.install_group_on(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
