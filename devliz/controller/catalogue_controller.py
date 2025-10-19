@@ -1,3 +1,5 @@
+from typing import Callable
+
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget
 from loguru import logger
@@ -14,11 +16,11 @@ class CatalogueController:
 
     def __init__(
             self,
-            cached_data: DevlizData,
             catalogue_widget: SnapshotCatalogueWidget,
+            get_cached_data: Callable[[], DevlizData | None],
             signal_update: Signal | None = None
     ):
-        self.cached_data: DevlizData | None = cached_data
+        self.get_cached_data = get_cached_data
         self.view = catalogue_widget
         self.signal_update = signal_update
 
@@ -26,7 +28,7 @@ class CatalogueController:
         self.view.signal_import_requested.connect(lambda: self.__open_config_dialog(False, None))
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
-        dialog = DialogConfig(self.cached_data, edit_mode, snap)
+        dialog = DialogConfig(self.get_cached_data(), edit_mode, snap)
         try:
             if dialog.exec():
                 #ConfigManager.create(dialog.output_data, edit_mode)

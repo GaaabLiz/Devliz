@@ -18,7 +18,7 @@ class DashboardController:
 
         self.cached_data : DevlizData | None = None
 
-        self.catalogue = CatalogueController(self.cached_data, self.view.widget_catalogue, None)
+        self.catalogue = CatalogueController(self.view.widget_catalogue, self.model.get_cached_data, None)
 
     def __update_all(self):
         try:

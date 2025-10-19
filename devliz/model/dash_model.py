@@ -21,6 +21,7 @@ class DashboardModel(QObject):
 
     def __init__(self, view: DashboardView):
         super().__init__()
+        self.cached_data: DevlizData | None = None
         self.view = view
         self.task_monitored_soft = TaskGetMonitoredSoftware()
         self.task_settings = TaskGetSettingsData()
@@ -35,6 +36,9 @@ class DashboardModel(QObject):
         self.runner.runner_stop.connect(self.on_runner_stopped)
         self.runner.runner_finish.connect(self.on_runner_finished)
         self.runner.op_finished.connect(self.on_operation_finished)
+
+    def get_cached_data(self) -> DevlizData | None:
+        return self.cached_data
 
     def update(self):
         try:
@@ -77,6 +81,7 @@ class DashboardModel(QObject):
             settings=settings
         )
         self.signal_on_updated_data_available.emit(data)
+        self.cached_data = data
 
 
     def on_operation_finished(self, operation: Operation):
