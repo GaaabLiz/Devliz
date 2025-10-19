@@ -38,7 +38,9 @@ class CatalogueController:
             if dialog.exec():
                 print(dialog.output_data)
                 if edit_mode:
-                    self.dash_model.snap_catalogue.edit(dialog.output_data)
+                    old = snap
+                    new = dialog.output_data
+                    self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
                 else:
                     self.dash_model.snap_catalogue.add(dialog.output_data)
                 titolo = "Configurazione creata" if not edit_mode else "Configurazione modificata"
@@ -54,6 +56,7 @@ class CatalogueController:
             w = MessageBox("Installa configurazione", "Sei sicuro di voler installare lo snapshot selezionato ? Tutte le directory presenti attualmente verranno rimpiazzate con quelle contenute nello snapshot.", parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.install(snap)
+                self.dash_model.update()
         except Exception as e:
             UiUtils.show_message("Errore di installazione", "Si è verificato un errore durante l'installazione: " + str(e))
 
@@ -68,6 +71,7 @@ class CatalogueController:
             w = MessageBox("Elimina configurazione", "Sei sicuro di voler eliminare lo snapshot selezionato ?\n\n Verranno eliminati tutti i file associati in ", parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.delete(snap)
+                self.dash_model.update()
         except Exception as e:
             UiUtils.show_message("Errore di eliminazione", "Si è verificato un errore durante l'eliminazione: " + str(e))
 
@@ -79,5 +83,6 @@ class CatalogueController:
             w = MessageBox("Duplica configurazione", "Sei sicuro di voler duplicare la configurazione selezionata ?", parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
+                self.dash_model.update()
         except Exception as e:
             UiUtils.show_message("Errore di duplicazione", "Si è verificato un errore durante la duplicazione: " + str(e))
