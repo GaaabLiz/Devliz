@@ -1,7 +1,7 @@
 from pathlib import Path
 from time import sleep
 
-from pylizlib.core.os.snap import Snapshot, SnapshotUtils
+from pylizlib.core.os.snap import Snapshot, SnapshotUtils, SnapshotCatalogue
 from pylizlib.core.os.utils import is_software_installed, WindowsOsUtils
 from pylizlib.qt.handler.operation_core import Task
 from pylizlib.qtfw.domain.sw import SoftwareData
@@ -38,15 +38,12 @@ class TaskGetMonitoredSoftware(Task):
 
 class TaskGetSnapshots(Task):
 
-    def __init__(self):
+    def __init__(self, catalogue: SnapshotCatalogue):
         super().__init__("Recupero snapshots salvati")
+        self.catalogue = catalogue
 
     def execute(self):
-        list = []
-        list.append(SnapshotUtils.gen_random_snap(Path(r"C:\Users\Gabriele\Documents")))
-        list.append(SnapshotUtils.gen_random_snap(Path(r"C:\Users\Gabriele\Documents")))
-        sleep(1)
-        return list
+        return self.catalogue.get_all()
 
 class TaskGetSettingsData(Task):
 

@@ -1,11 +1,14 @@
+from pathlib import Path
 
 from loguru import logger
+from pylizlib.core.os.snap import SnapshotCatalogue
 from pylizlib.qt.domain.view import UiWidgetMode
 from pylizlib.qt.handler.operation_core import Operation
 from pylizlib.qt.handler.operation_domain import OperationInfo
 from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
 from PySide6.QtCore import QObject, Signal
 
+from devliz.application.app import app_settings, DevlizSettings
 from devliz.domain.data import DevlizData
 from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots, TaskGetSettingsData
 from devliz.view.dash_view import DashboardView
@@ -23,9 +26,10 @@ class DashboardModel(QObject):
         super().__init__()
         self.cached_data: DevlizData | None = None
         self.view = view
+        self.snap_catalogue = SnapshotCatalogue(Path(app_settings.get(DevlizSettings.catalogue_path)))
         self.task_monitored_soft = TaskGetMonitoredSoftware()
         self.task_settings = TaskGetSettingsData()
-        self.task_snap = TaskGetSnapshots()
+        self.task_snap = TaskGetSnapshots(self.snap_catalogue)
         self.operation_info = OperationInfo(
             name="Aggiornamento Dashboard",
             description="Aggiornamento dati della dashboard",
@@ -36,6 +40,7 @@ class DashboardModel(QObject):
         self.runner.runner_stop.connect(self.on_runner_stopped)
         self.runner.runner_finish.connect(self.on_runner_finished)
         self.runner.op_finished.connect(self.on_operation_finished)
+
 
     def get_cached_data(self) -> DevlizData | None:
         return self.cached_data
