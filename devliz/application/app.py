@@ -32,6 +32,8 @@ DEFAULT_SETTING_CONFIGURATION_TAGS = []
 DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA = []
 DEFAULT_SETTING_PATH_GIT_BASH = PATH_DEFAULT_GIT_BASH.__str__()
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL = True
+DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT = False
+DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE = True
 
 # DEFINIZIONI COSTANTI DELLE CONFIGURAZIONI
 SNAPSHOT_ID_SIZE = 20
@@ -62,6 +64,8 @@ class DevlizSettings(QConfig):
     config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
     catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
     backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
+    backup_before_edit = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Edit", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT, BoolValidator())
+    backup_before_delete = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Delete", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE, BoolValidator())
     snap_custom_data = QtFwQConfigItem(False, SETTING_GROUP_CONFIGS, "Snapshots custom data", DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA, TextListValidator())
     git_bash_path = QtFwQConfigItem(True, SETTING_GROUP_SCRIPTS, "Git Bash path", DEFAULT_SETTING_PATH_GIT_BASH, ExecutableValidator())
     starred_dirs = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES,"Cartelle preferite", DEFAULT_SETTING_STARRED_DIRS, TextListValidator())

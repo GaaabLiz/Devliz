@@ -94,11 +94,31 @@ class WidgetSettingsScrollable(DevlizQFrame):
             configItem=setting_backup_before_install
         )
 
+        # Backup pre-modifica
+        setting_backup_before_edit = DevlizSettings.backup_before_edit
+        self.card_backup_before_edit = SwitchSettingCard(
+            icon=FluentIcon.BASKETBALL,
+            title="Abilita backup pre-modifica",
+            content="Esegui il backup delle cartelle locali (presenti su questo pc) contenute nella configurazione prima di modificarle",
+            configItem=setting_backup_before_edit
+        )
+
+        # Backup pre-eliminazione
+        setting_backup_before_delete = DevlizSettings.backup_before_delete
+        self.card_backup_before_delete= SwitchSettingCard(
+            icon=FluentIcon.BASKETBALL,
+            title="Abilita backup pre-eliminazione",
+            content="Esegui il backup delle cartelle locali (presenti su questo pc) contenute nella configurazione prima di eliminarle",
+            configItem=setting_backup_before_delete
+        )
+
         grp_manager = SettingGroupManager(self.tr("Snapshots"), self)
         grp_manager.add_widget(setting_catalogue, self.card_general_catalogue, self.signal_ask_catalogue_path)
         grp_manager.add_widget(setting_tags, self.card_fav_tags, None)
         grp_manager.add_widget(setting_custom_data, self.card_snap_custom_data, None)
         grp_manager.add_widget(setting_backup_before_install, self.card_backup_before_install,None)
+        grp_manager.add_widget(setting_backup_before_edit, self.card_backup_before_edit, None)
+        grp_manager.add_widget(setting_backup_before_delete, self.card_backup_before_delete, None)
         grp_manager.install_group_on(layout)
 
 
