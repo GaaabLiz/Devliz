@@ -1,5 +1,6 @@
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QVBoxLayout
+from pylizlib.core.data.unit import get_normalized_gb_mb_str
 from pylizlib.qtfw.widgets.card import MasterListSettingCard
 from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard
 
@@ -10,7 +11,7 @@ from devliz.view.util.setting import SettingGroupManager
 
 class WidgetSettings(DevlizQFrame):
 
-    signal_open_dir_request = Signal(str)
+    signal_open_dir_request = Signal()
     signal_close_and_clear_request = Signal()
     signal_open_about_dialog_request = Signal()
     signal_request_update = Signal()
@@ -206,17 +207,18 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Cancella backups
-        size_str = "0 MB" # TODO
+        size_str = get_normalized_gb_mb_str(0)
         self.card_clear_backups = PushSettingCard(
             text="Cancella backups",
             icon=FluentIcon.DELETE,
             title="Cancella Backups di " +  app.name,
-            content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione. (Attualmente: " + size_str + ")"
+            #content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione. (Attualmente: " + size_str + ")"
+            content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione."
         )
 
         grp_manager = SettingGroupManager(self.tr("Applicazione"), self)
         grp_manager.add_widget(None, self.card_working_folder, self.signal_open_dir_request)
-        grp_manager.add_widget(None, self.card_clear_backups, None)
+        grp_manager.add_widget(None, self.card_clear_backups, self.signal_clear_backups_request)
         grp_manager.install_group_on(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
