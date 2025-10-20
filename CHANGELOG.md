@@ -64,6 +64,7 @@
 - Bump version to 1.0.0
 - Enable snapshots custom data option by default
 - Add GitHub Actions workflow for automated build and release process
+- Update build configuration and streamline release process
 
 ### 🐛 Bug Fixes
 
@@ -116,6 +117,10 @@
 - Simplify label creation in frame.py by moving it to get_label_title method
 - Rename configurations to snapshots in DevlizSnapshotData for clarity
 - Update update_widget method to use snapshot_data for clarity
+
+### 📚 Documentation
+
+- Update changelog for 1.0.0
 
 ### ⚙️ Miscellaneous Tasks
 
