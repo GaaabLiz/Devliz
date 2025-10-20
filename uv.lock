@@ -355,7 +355,7 @@ wheels = [
 
 [[package]]
 name = "pylizlib"
-version = "0.3.49"
+version = "0.3.53"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "psutil" },
@@ -366,9 +366,9 @@ dependencies = [
     { name = "ruff" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/23/8d/051ad64e88755d98f5a792d1d77f66e1f349580c1eaece80b06caefef3c4/pylizlib-0.3.49.tar.gz", hash = "sha256:46f615df8e2402b554602f8c8ccd82b3287a79b134a387e9fe86c47407238978", size = 57345, upload-time = "2025-10-19T16:22:50.963Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f3/b6/d620c6225e89da2e97826e7cad24516b0a223ccd6c34b0b4dde8b87dbb57/pylizlib-0.3.53.tar.gz", hash = "sha256:4c6c1d717f269ff83e55146bbcc69306bcbd4670c067915a1433bb7e8b02eafa", size = 57802, upload-time = "2025-10-20T17:20:46.042Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e9/bf/3e6d5014def9ad20a5e17b459acbd44ffccb243f59462b8bf153746de5b7/pylizlib-0.3.49-py3-none-any.whl", hash = "sha256:586cefef6b6795a431a1a66505698ed86819ea178d263e2785736a2a336b1909", size = 77167, upload-time = "2025-10-19T16:22:49.551Z" },
+    { url = "https://files.pythonhosted.org/packages/14/2b/ea4c86b85c78cb805580e0a996a4039301fb8b1d53c1dd66c9de8dcdd4f3/pylizlib-0.3.53-py3-none-any.whl", hash = "sha256:d8dd694731592415509b254e1596c108c2811c5de3bf8abecaffb65064e49332", size = 78176, upload-time = "2025-10-20T17:20:44.642Z" },
 ]
 
 [[package]]
@@ -3266,7 +3266,7 @@ wheels = [
 
 [[package]]
 name = "typer"
-version = "0.19.2"
+version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -3274,9 +3274,9 @@ dependencies = [
     { name = "shellingham" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/21/ca/950278884e2ca20547ff3eb109478c6baf6b8cf219318e6bc4f666fad8e8/typer-0.19.2.tar.gz", hash = "sha256:9ad824308ded0ad06cc716434705f691d4ee0bfd0fb081839d2e426860e7fdca", size = 104755, upload-time = "2025-09-23T09:47:48.256Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8f/28/7c85c8032b91dbe79725b6f17d2fffc595dff06a35c7a30a37bef73a1ab4/typer-0.20.0.tar.gz", hash = "sha256:1aaf6494031793e4876fb0bacfa6a912b551cf43c1e63c800df8b1a866720c37", size = 106492, upload-time = "2025-10-20T17:03:49.445Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/22/35617eee79080a5d071d0f14ad698d325ee6b3bf824fc0467c03b30e7fa8/typer-0.19.2-py3-none-any.whl", hash = "sha256:755e7e19670ffad8283db353267cb81ef252f595aa6834a0d1ca9312d9326cb9", size = 46748, upload-time = "2025-09-23T09:47:46.777Z" },
+    { url = "https://files.pythonhosted.org/packages/78/64/7713ffe4b5983314e9d436a90d5bd4f63b6054e2aca783a3cfc44cb95bbf/typer-0.20.0-py3-none-any.whl", hash = "sha256:5b463df6793ec1dca6213a3cf4c0f03bc6e322ac5e16e13ddd622a889489784a", size = 47028, upload-time = "2025-10-20T17:03:47.617Z" },
 ]
 
 [[package]]
