@@ -3,6 +3,7 @@ from pathlib import Path
 
 from loguru import logger
 from pylizlib.core.app.pylizapp import PylizApp
+from pylizlib.core.os.snap import SnapshotSettings
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
 from pylizlib.qtfw.domain.setting import QtFwQConfigItem
 from pylizlib.qtfw.model.qconfig import TextListValidator, ExecutableValidator
@@ -35,9 +36,6 @@ DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL = True
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT = False
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE = True
 
-# DEFINIZIONI COSTANTI DELLE CONFIGURAZIONI
-SNAPSHOT_ID_SIZE = 20
-
 # DEFINIZIONE DEI GRUPPI DI IMPOSTAZIONI
 SETTING_GROUP_CONFIGS = "Configurazioni"
 SETTING_GROUP_SCRIPTS = "Scripts"
@@ -46,7 +44,6 @@ SETTING_GROUP_APP = "App"
 
 # GESTIONE RISORSE
 RESOURCE_ID_LOGO = ':/resources/logo2.png'
-
 
 # GESTIONE LOGS
 logger.remove()
@@ -78,3 +75,14 @@ class DevlizSettings(QConfig):
 # CARICAMENTO IMPOSTAZIONI
 app_settings = DevlizSettings()
 qconfig.load(DEVLIZ_PATH_JSON_SETTING_FILE, app_settings)
+
+# IMPSOTAZIONE DEGLI SNAPSHOTS
+snap_settings = SnapshotSettings(
+    backup_path=DEVLIZ_PATH_BACKUPS,
+    backup_pre_install=app_settings.get(DevlizSettings.backup_before_install),
+    backup_pre_delete=app_settings.get(DevlizSettings.backup_before_delete),
+    backup_pre_modify=app_settings.get(DevlizSettings.backup_before_edit),
+    install_with_everyone_full_control=True,
+    snap_id_length=20,
+    folder_id_length=6
+)
