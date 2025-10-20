@@ -5,7 +5,7 @@ from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.widgets.input import MultiSelectionComboBox
 from qfluentwidgets import BodyLabel, LineEdit, ComboBox
 
-from devliz.application.app import SNAPSHOT_ID_SIZE
+from devliz.application.app import snap_settings
 
 
 class TabDetails(QWidget):
@@ -49,7 +49,7 @@ class TabDetails(QWidget):
         # Campo id
         self.form_id_label = BodyLabel("ID:", self)
         self.form_id_value = LineEdit()
-        self.form_id_value.setText(gen_random_string(SNAPSHOT_ID_SIZE))
+        self.form_id_value.setText(gen_random_string(snap_settings.snap_id_length))
         self.form_id_value.setReadOnly(True)
         self.form_id_value.setMaximumWidth(250)
         self.form_layout.addRow(self.form_id_label, self.form_id_value)
