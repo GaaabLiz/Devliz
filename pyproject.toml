@@ -13,6 +13,15 @@ dependencies = [
     "pyside6-fluent-widgets[full]>=1.9.1",
 ]
 
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["devliz*"]
+
+
 [project.optional-dependencies]
 qtfw = [
     "pylizlib>=0.3.21",

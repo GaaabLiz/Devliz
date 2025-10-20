@@ -52,7 +52,6 @@ jobs:
 
       - name: Install dependencies and build package
         run: |
-          uv sync --all-groups
           uv build
 
 #      - name: Generate release notes between tags
