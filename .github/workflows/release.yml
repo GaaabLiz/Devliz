@@ -194,7 +194,7 @@ jobs:
         run: |
           uv sync --all-groups
           uv add --group dev pyinstaller
-          uv run pyinstaller --onefile --icon=resources/logo2.ico --name devliz-${{ github.ref_name }}-windows.exe devliz/main.py
+          uv run pyinstaller --onefile --icon=resources/logo2.ico --hide-console --name devliz-${{ github.ref_name }}-windows.exe devliz/main.py
 
       - name: Upload Windows executable to release
         uses: softprops/action-gh-release@v2
