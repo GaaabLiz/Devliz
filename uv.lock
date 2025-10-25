@@ -125,6 +125,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "loguru" },
+    { name = "loguru-logging-intercept" },
     { name = "pylizlib" },
     { name = "pyside6" },
     { name = "pyside6-fluent-widgets", extra = ["full"] },
@@ -144,6 +145,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "loguru", specifier = ">=0.7.3" },
+    { name = "loguru-logging-intercept", specifier = ">=0.1.5" },
     { name = "pylizlib", specifier = ">=0.3.20" },
     { name = "pylizlib", marker = "extra == 'qtfw'", specifier = ">=0.3.21" },
     { name = "pyside6", specifier = ">=6.10.0" },
@@ -177,6 +179,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559, upload-time = "2024-12-06T11:20:56.608Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0c/29/0348de65b8cc732daa3e33e67806420b2ae89bdce2b04af740289c5c6c8c/loguru-0.7.3-py3-none-any.whl", hash = "sha256:31a33c10c8e1e10422bfd431aeb5d351c7cf7fa671e3c4df004162264b28220c", size = 61595, upload-time = "2024-12-06T11:20:54.538Z" },
+]
+
+[[package]]
+name = "loguru-logging-intercept"
+version = "0.1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "loguru" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/32/9d/12d76dfcac97943d439d760acb960d423e0f2b66530d2038374c9f192afa/loguru_logging_intercept-0.1.5.tar.gz", hash = "sha256:581038bf1310fbb06cda48afbd373e72bbc01d51c4df058f49081ab7a7c5f984", size = 3194, upload-time = "2024-12-29T04:28:05.648Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/ee/78df4f27c14490613886d0a03959f363002cb76378266987805d92adac91/loguru_logging_intercept-0.1.5-py3-none-any.whl", hash = "sha256:d0e0397fe83e4f1122cbd37bf5d73f8c878099b6fb52a236d5123654f46fc0c5", size = 3548, upload-time = "2024-12-29T04:28:03.542Z" },
 ]
 
 [[package]]

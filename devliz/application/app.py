@@ -1,7 +1,9 @@
+import logging
 import sys
 from pathlib import Path
 
 from loguru import logger
+from loguru_logging_intercept import setup_loguru_logging_intercept
 from pylizlib.core.app.pylizapp import PylizApp
 from pylizlib.core.os.snap import SnapshotSettings
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
@@ -47,13 +49,19 @@ RESOURCE_ID_LOGO = ':/resources/logo2.png'
 
 # GESTIONE LOGS
 logger.remove()
-logger.add(sys.stdout,level="DEBUG",format="{time:HH:mm:ss} | {level} | {message}", colorize=True)
+if sys.stdout:
+    logger.add(sys.stdout,level="DEBUG",format="{time:HH:mm:ss} | {level} | {message}", colorize=True)
 logger.add(
     Path(DEVLIZ_PATH_LOGS).joinpath("devliz_{time:YYYY-MM-DD}.log").__str__(),
     level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{function}:{line} - {message}",
     rotation="00:00", retention="30 days", compression=None
 )
-logger.info("Devliz Application Started. Version: {}", version)
+setup_loguru_logging_intercept(
+    level=logging.DEBUG,
+    modules="pylizlib"
+)
+logger.info("Devliz Application Started. Version: {}", app.version)
+
 
 
 # DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
