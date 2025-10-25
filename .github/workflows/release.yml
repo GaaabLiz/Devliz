@@ -194,13 +194,21 @@ jobs:
         run: |
           uv sync --all-groups
           uv add --group dev pyinstaller
-          uv run pyinstaller --onefile --icon=resources/logo2.ico --hide-console --name devliz-${{ github.ref_name }}-windows.exe devliz/main.py
+          uv run pyinstaller --windowed --icon=resources/logo2.ico --name Devliz.exe devliz/main.py
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup
+
+      - name: Create Setup Installer with Inno Setup
+        run: |
+          ISCC.exe installer.iss
 
       - name: Upload Windows executable to release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/devliz-${{ github.ref_name }}-windows.exe
+            Output/devliz-setup.exe
           append_body: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
