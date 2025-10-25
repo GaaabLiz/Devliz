@@ -6,18 +6,12 @@
 #    $$ |\$  /$$ |$$ |  $$ |$$ |\$$\  $$ |      $$ |        $$ |  $$ |      $$ |
 #    $$ | \_/ $$ |$$ |  $$ |$$ | \$$\ $$$$$$$$\ $$ |      $$$$$$\ $$$$$$$$\ $$$$$$$$\
 #    \__|     \__|\__|  \__|\__|  \__|\________|\__|      \______|\________|\________|
+#
+#                                   VERSION 1.0.1
 
-# == PROJECT VARIABLES ==
-PYTHON_MAIN_PACKAGE = devliz
-QT_QRC_FILE := resources/resources.qrc
-QT_RESOURCE_PY := $(PYTHON_MAIN_PACKAGE)/application/resources/resources_rc.py
+include project.mk
 
-# == FILES VARIABLES ==
-FILE_PROJECT_TOML := pyproject.toml
-FILE_PROJECT_PY_GENERATED := $(PYTHON_MAIN_PACKAGE)/project.py
 
-# == EXTERNAL COMMANDS VARIABLES ==
-QT_COMMAND_GEN_RES := pyside6-rcc
 
 
 
@@ -30,6 +24,7 @@ QT_COMMAND_GEN_RES := pyside6-rcc
 
 # Rule to create a virtual environment and install dependencies
 install-env:
+	uv sync
 	uv sync --all-extras
 
 
@@ -47,8 +42,8 @@ install-env:
 clean-build:
 	- rm -rf dist
 	- rm -rf build
-	- rm -rf pylizlib.egg-info
-	- rm -rf pyliz.spec
+	- rm -rf $(PYTHON_MAIN_PACKAGE).egg-info
+	- rm -rf $(PYTHON_MAIN_PACKAGE).spec
 
 # Command to clean Python cache files
 clean-cache:
@@ -61,11 +56,11 @@ clean-docs:
 
 # Command to clean all generated files
 clean-generated:
-	@echo "clean-generated not implemented yet"
+	@echo "CLeaning generated files..."
 	- rm -f $(FILE_PROJECT_PY_GENERATED)
 
 # Aggregate clean command
-clean: clean-build clean-cache clean-docs clean-generated
+clean: clean-build clean-cache clean-generated
 
 
 
@@ -78,14 +73,54 @@ clean: clean-build clean-cache clean-docs clean-generated
 #     | |__| | |____| |\  | |____| | \ \  / ____ \| |  | |____
 #      \_____|______|_| \_|______|_|  \_\/_/    \_\_|  |______|
 
-build:
-	uv run pyinstaller --windowed --icon=resources/logo.ico --name=pyliz pylizlib/core/cli.py
-
-docs-gen:
-	pdoc -o docs -d markdown pylizlib
-
 gen-project-py:
 	pyliz gen-project-py $(FILE_PROJECT_TOML) $(FILE_PROJECT_PY_GENERATED)
 
 gen-qt-res-py:
 	$(QT_COMMAND_GEN_RES) $(QT_QRC_FILE) -o $(QT_RESOURCE_PY); \
+
+installer:
+	ISCC.exe $(INNO_SETUP_FILE)
+
+build-uv:
+	uv build
+
+build-exe:
+	uv run pyinstaller --windowed --icon=$(FILE_MAIN_LOGO_ICO) --name=$(APP_NAME) $(FILE_MAIN)
+
+docs-gen:
+	pdoc -o docs -d markdown $(PYTHON_MAIN_PACKAGE)
+
+build-app: clean gen-project-py build-uv build-exe
+
+build-installer: build-app installer
+
+
+
+
+
+#     __      _______  _____
+#     \ \    / / ____|/ ____|
+#      \ \  / / |    | (___
+#       \ \/ /| |     \___ \
+#        \  / | |____ ____) |
+#         \/   \_____|_____/
+#
+#
+
+upgrade-patch:
+	uv version --bump patch
+	pyliz gen-project-py $(FILE_PROJECT_TOML) $(FILE_PROJECT_PY_GENERATED)
+	@VERSION=$$(uv version --short); \
+	if [ -f $(INNO_SETUP_FILE) ]; then \
+		echo "Inno setup script found. upgrading version to $$VERSION..."; \
+		sed -i "s/#define $(INNO_SETUP_VERSION_VARIABLE) \"[^\"]*\"/#define $(INNO_SETUP_VERSION_VARIABLE) \"$$VERSION\"/" $(INNO_SETUP_FILE); \
+	fi; \
+	git commit -am "bump: Bump version to $$VERSION"; \
+	git push
+
+
+upgrade-patch-push-tag: upgrade-patch
+	git pull
+	git tag $$(uv version --short)
+	git push origin $$(uv version --short)
