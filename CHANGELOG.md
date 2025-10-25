@@ -1,4 +1,4 @@
-## [1.0.0] - 2025-10-20
+## [0.1.1] - 2025-10-25
 
 ### 🚀 Features
 
@@ -65,6 +65,14 @@
 - Enable snapshots custom data option by default
 - Add GitHub Actions workflow for automated build and release process
 - Update build configuration and streamline release process
+- Hide console window in Windows executable build
+- Update project version to 0.1.0
+- Refactor makefile and add project.mk for improved build management
+- Update .gitignore to include Output directory
+- Downgrade project version to 0.1.0 and add pyinstaller as a dependency
+- Add Inno Setup script for PySide6 installer
+- Integrate loguru-logging-intercept for enhanced logging management
+- Add theme selection options to application settings
 
 ### 🐛 Bug Fixes
 
@@ -75,6 +83,7 @@
 
 - Updated deps versions
 - Updated uv.lock
+- Bump version to 0.1.1
 
 ### 🚜 Refactor
 
@@ -120,6 +129,7 @@
 
 ### 📚 Documentation
 
+- Update changelog for 1.0.0
 - Update changelog for 1.0.0
 
 ### ⚙️ Miscellaneous Tasks
