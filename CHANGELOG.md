@@ -1,18 +1,4 @@
-## [0.1.3] - 2025-10-25
-
-### 🚀 Features
-
-- Update release workflow to create Windows installer with Inno Setup
-
-### 💼 Other
-
-- Bump version to 0.1.2
-- Bump version to 0.1.3
-
-### 📚 Documentation
-
-- Update changelog for 0.1.1
-## [0.1.1] - 2025-10-25
+## [0.1.0] - 2025-10-25
 
 ### 🚀 Features
 
@@ -87,6 +73,7 @@
 - Add Inno Setup script for PySide6 installer
 - Integrate loguru-logging-intercept for enhanced logging management
 - Add theme selection options to application settings
+- Update release workflow to create Windows installer with Inno Setup
 
 ### 🐛 Bug Fixes
 
@@ -98,6 +85,11 @@
 - Updated deps versions
 - Updated uv.lock
 - Bump version to 0.1.1
+- Bump version to 0.1.2
+- Bump version to 0.1.3
+- Downgrade version to 0.1.0
+- Downgrade version to 0.1.0
+- Downgrade version to 0.1.0
 
 ### 🚜 Refactor
 
@@ -145,6 +137,8 @@
 
 - Update changelog for 1.0.0
 - Update changelog for 1.0.0
+- Update changelog for 0.1.1
+- Update changelog for 0.1.3
 
 ### ⚙️ Miscellaneous Tasks
 
