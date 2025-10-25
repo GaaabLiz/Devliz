@@ -2,7 +2,7 @@ from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QVBoxLayout
 from pylizlib.core.data.unit import get_normalized_gb_mb_str
 from pylizlib.qtfw.widgets.card import MasterListSettingCard
-from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard
+from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard, OptionsSettingCard
 
 from devliz.application.app import app, app_settings, DevlizSettings
 from devliz.view.util.frame import DevlizQFrame
@@ -216,9 +216,19 @@ class WidgetSettings(DevlizQFrame):
             content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione."
         )
 
+        # Tema applicazione
+        self.card_theme = OptionsSettingCard(
+            DevlizSettings.themeMode,
+            icon=FluentIcon.BRUSH,
+            title="Tema dell'applicazione",
+            content="Seleziona il tema dell'applicazione",
+            texts=["Chiaro", "Scuro"],
+        )
+
         grp_manager = SettingGroupManager(self.tr("Applicazione"), self)
         grp_manager.add_widget(None, self.card_working_folder, self.signal_open_dir_request)
         grp_manager.add_widget(None, self.card_clear_backups, self.signal_clear_backups_request)
+        grp_manager.add_widget(None, self.card_theme, None)
         grp_manager.install_group_on(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
