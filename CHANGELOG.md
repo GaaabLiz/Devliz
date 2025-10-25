@@ -1,3 +1,17 @@
+## [0.1.3] - 2025-10-25
+
+### 🚀 Features
+
+- Update release workflow to create Windows installer with Inno Setup
+
+### 💼 Other
+
+- Bump version to 0.1.2
+- Bump version to 0.1.3
+
+### 📚 Documentation
+
+- Update changelog for 0.1.1
 ## [0.1.1] - 2025-10-25
 
 ### 🚀 Features
