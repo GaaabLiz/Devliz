@@ -1,10 +1,12 @@
 from pathlib import Path
 
 from PySide6.QtCore import Signal, Qt, QMargins
+from PySide6.QtGui import QActionGroup
 from PySide6.QtWidgets import QHBoxLayout, QWidget, QTableWidgetItem, QHeaderView
-from pylizlib.core.os.snap import Snapshot
+from pylizlib.core.os.snap import Snapshot, SnapshotSortKey, SnapshotUtils
 from pylizlib.qt.util.ui import UiUtils
-from qfluentwidgets import SearchLineEdit, Action, FluentIcon, CommandBar, TableWidget, setFont, BodyLabel, RoundMenu
+from qfluentwidgets import SearchLineEdit, Action, FluentIcon, CommandBar, TableWidget, setFont, BodyLabel, RoundMenu, \
+    TransparentDropDownPushButton, CheckableMenu, MenuIndicatorType
 
 from devliz.application.app import app_settings, DevlizSettings
 from devliz.domain.data import DevlizData, DevlizSnapshotData
@@ -15,6 +17,7 @@ from devliz.view.util.frame import DevlizQFrame
 class SnapshotCatalogueWidget(DevlizQFrame):
 
     signal_import_requested = Signal()
+    signal_sort_requested = Signal(SnapshotSortKey)
     signal_edit_requested = Signal(Snapshot)
     signal_install_requested = Signal(Snapshot)
     signal_delete_requested = Signal(Snapshot)
@@ -27,7 +30,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         super().__init__(name="Catalogo", parent=parent)
 
         # Inizializzo le variabili
-        self.all_data: list[Snapshot] = []
+        self._all_data: list[Snapshot] = []
         self.filtered: list[Snapshot] = []
         self.is_filtered: bool = False
         self.current_selected: Snapshot | None = None
@@ -42,29 +45,59 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.master_layout.addWidget(self.get_label_title())
 
     def __setup_action_bar(self):
-        search_line_edit = SearchLineEdit(self)
-        search_line_edit.textChanged.connect(self._text_changed_filter)
+        self.search_line_edit = SearchLineEdit(self)
+        self.search_line_edit.textChanged.connect(self._text_changed_filter)
 
         self.action_import = Action(FluentIcon.ADD, 'Importa', triggered=lambda: self.signal_import_requested.emit())
         self.action_edit = Action(FluentIcon.EDIT, 'Modifica', enabled=False, triggered=lambda: self.signal_edit_requested.emit())
+
+        menu_combobox_sort = TransparentDropDownPushButton("Ordina", self, FluentIcon.SCROLL)
+        menu_combobox_sort.setMenu(self.__get_sort_menu())
+        menu_combobox_sort.setFixedHeight(34)
 
         left_command_bar = CommandBar()
         left_command_bar.setMinimumWidth(300)
         left_command_bar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         left_command_bar.addAction(self.action_import)
+        left_command_bar.addWidget(menu_combobox_sort)
         # left_command_bar.addSeparator()
         # left_command_bar.addAction(self.action_edit)
 
         lay = QHBoxLayout()
         lay.addWidget(left_command_bar)  # Sinistra
         lay.addStretch(1)  # Riempie lo spazio centrale
-        lay.addWidget(search_line_edit)  # Destra
+        lay.addWidget(self.search_line_edit)  # Destra
 
         container = QWidget()
         container.setLayout(lay)
 
         self.master_layout.addWidget(container)
 
+    def __get_sort_menu(self, pos=None):
+        menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
+
+        action_sort_name = Action(FluentIcon.QUICK_NOTE, "Nome", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
+        action_sort_author = Action(FluentIcon.PEOPLE, "Autore", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
+        action_sort_date_create = Action(FluentIcon.CALENDAR, "Data creazione", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_CREATED))
+        action_sort_date_modify = Action(FluentIcon.EDIT, "Data modifica", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
+
+        action_sort_group = QActionGroup(self)
+        action_sort_group.addAction(action_sort_name)
+        action_sort_group.addAction(action_sort_author)
+        action_sort_group.addAction(action_sort_date_create)
+        action_sort_group.addAction(action_sort_date_modify)
+
+        menu.addActions([
+            action_sort_name,
+            action_sort_author,
+            action_sort_date_create,
+            action_sort_date_modify
+        ])
+
+        if pos is not None:
+            menu.exec(pos, ani=True)
+
+        return menu
 
     def __setup_table(self, data: list[Snapshot] | None = None):
         self._all_data = data if data is not None else []
@@ -223,8 +256,9 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def __update_table_data(self, data: list[Snapshot]):
         # Pulisce e reinserisce i dati filtrati nella tabella
         self.table.setRowCount(len(data))
+        custom_data = app_settings.get(DevlizSettings.snap_custom_data)
         for i, config in enumerate(data):
-            sttt = config.get_for_table_array(app_settings.get(DevlizSettings.snap_custom_data))
+            sttt = config.get_for_table_array(custom_data)
             for j in range(6):
                 item = QTableWidgetItem(str(sttt[j]))
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
@@ -232,6 +266,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
 
         # Aggiorna colonne e layout se serve
         self._distribuisci_colonne_perc()
+
+    def sort(self, method: SnapshotSortKey):
+        self.search_line_edit.clear()
+        self._all_data = SnapshotUtils.sort_snapshots(self.__get_actual_data(), method)
+        self.__update_table_data(self._all_data)
 
     def update_widget(self, snapshot_data: DevlizSnapshotData):
         UiUtils.clear_layout(self.master_layout)
