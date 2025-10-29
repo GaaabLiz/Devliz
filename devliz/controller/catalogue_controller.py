@@ -4,7 +4,7 @@ from typing import Callable
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget
 from loguru import logger
-from pylizlib.core.os.snap import Snapshot
+from pylizlib.core.os.snap import Snapshot, SnapshotSortKey
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
@@ -32,6 +32,7 @@ class CatalogueController:
         self.view.signal_delete_requested.connect(self.__delete_snapshot)
         self.view.signal_open_folder_requested.connect(self.__open_snap_directory)
         self.view.signal_duplicate_requested.connect(self.__duplicate_snapshot)
+        self.view.signal_sort_requested.connect(self.view.sort)
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
