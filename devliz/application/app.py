@@ -56,10 +56,7 @@ logger.add(
     level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{function}:{line} - {message}",
     rotation="00:00", retention="30 days", compression=None
 )
-setup_loguru_logging_intercept(
-    level=logging.DEBUG,
-    modules="pylizlib"
-)
+setup_loguru_logging_intercept(level=logging.DEBUG, modules="pylizlib")
 logger.info("{} Application Started. Version: {}", app.name, app.version)
 
 
