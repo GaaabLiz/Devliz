@@ -8,7 +8,7 @@ from pylizlib.qt.util.ui import UiUtils
 from qfluentwidgets import SearchLineEdit, Action, FluentIcon, CommandBar, TableWidget, setFont, BodyLabel, RoundMenu, \
     TransparentDropDownPushButton, CheckableMenu, MenuIndicatorType
 
-from devliz.application.app import app_settings, DevlizSettings
+from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.view.util.frame import DevlizQFrame
 
@@ -113,7 +113,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.table.setColumnCount(6)
         self.table.setRowCount(len(data))
 
-        snap_custom_data = app_settings.get(DevlizSettings.snap_custom_data)
+        snap_custom_data = app_settings.get(AppSettings.snap_custom_data)
         for i, config in enumerate(data):
             sttt = config.get_for_table_array(snap_custom_data)
             for j in range(6):
@@ -158,7 +158,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
 
     def __setup_footer(self, count: int = 0, size: str = "0"):
         lay = QHBoxLayout()
-        left_label = BodyLabel(app_settings.get(DevlizSettings.catalogue_path), self)
+        left_label = BodyLabel(app_settings.get(AppSettings.catalogue_path), self)
         setFont(left_label, 12)
         left_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
@@ -256,7 +256,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def __update_table_data(self, data: list[Snapshot]):
         # Pulisce e reinserisce i dati filtrati nella tabella
         self.table.setRowCount(len(data))
-        custom_data = app_settings.get(DevlizSettings.snap_custom_data)
+        custom_data = app_settings.get(AppSettings.snap_custom_data)
         for i, config in enumerate(data):
             sttt = config.get_for_table_array(custom_data)
             for j in range(6):

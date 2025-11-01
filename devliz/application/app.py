@@ -65,7 +65,7 @@ logger.info("Devliz Application Started. Version: {}", app.version)
 
 
 # DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
-class DevlizSettings(QConfig):
+class AppSettings(QConfig):
     config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
     catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
     backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
@@ -81,15 +81,15 @@ class DevlizSettings(QConfig):
 
 
 # CARICAMENTO IMPOSTAZIONI
-app_settings = DevlizSettings()
+app_settings = AppSettings()
 qconfig.load(PATH_JSON_SETTING_FILE, app_settings)
 
 # IMPSOTAZIONE DEGLI SNAPSHOTS
 snap_settings = SnapshotSettings(
     backup_path=PATH_BACKUPS,
-    backup_pre_install=app_settings.get(DevlizSettings.backup_before_install),
-    backup_pre_delete=app_settings.get(DevlizSettings.backup_before_delete),
-    backup_pre_modify=app_settings.get(DevlizSettings.backup_before_edit),
+    backup_pre_install=app_settings.get(AppSettings.backup_before_install),
+    backup_pre_delete=app_settings.get(AppSettings.backup_before_delete),
+    backup_pre_modify=app_settings.get(AppSettings.backup_before_edit),
     install_with_everyone_full_control=True,
     snap_id_length=20,
     folder_id_length=6

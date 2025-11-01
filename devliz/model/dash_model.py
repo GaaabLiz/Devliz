@@ -8,7 +8,7 @@ from pylizlib.qt.handler.operation_domain import OperationInfo
 from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
 from PySide6.QtCore import QObject, Signal
 
-from devliz.application.app import app_settings, DevlizSettings, PATH_BACKUPS, snap_settings
+from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, snap_settings
 from devliz.domain.data import DevlizData
 from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots
 from devliz.view.dash_view import DashboardView
@@ -27,7 +27,7 @@ class DashboardModel(QObject):
         self.cached_data: DevlizData | None = None
         self.view = view
         self.snap_catalogue = SnapshotCatalogue(
-            path_catalogue=Path(app_settings.get(DevlizSettings.catalogue_path)),
+            path_catalogue=Path(app_settings.get(AppSettings.catalogue_path)),
             settings=snap_settings
         )
         self.task_monitored_soft = TaskGetMonitoredSoftware()

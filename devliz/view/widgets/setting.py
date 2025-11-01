@@ -4,7 +4,7 @@ from pylizlib.core.data.unit import get_normalized_gb_mb_str
 from pylizlib.qtfw.widgets.card import MasterListSettingCard
 from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard, OptionsSettingCard
 
-from devliz.application.app import app, app_settings, DevlizSettings
+from devliz.application.app import app, app_settings, AppSettings
 from devliz.view.util.frame import DevlizQFrame
 from devliz.view.util.setting import SettingGroupManager
 
@@ -42,7 +42,7 @@ class WidgetSettings(DevlizQFrame):
     def __add_group_snapshot(self, layout: QVBoxLayout):
 
         # Percorso catalogo generale
-        setting_catalogue = DevlizSettings.catalogue_path
+        setting_catalogue = AppSettings.catalogue_path
         self.card_general_catalogue = PushSettingCard(
             text="Scegli directory",
             icon=FluentIcon.BOOK_SHELF,
@@ -51,7 +51,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Tag configurazioni
-        setting_tags = DevlizSettings.config_tags
+        setting_tags = AppSettings.config_tags
         self.card_fav_tags = MasterListSettingCard(
             config_item=setting_tags,
             item_type=MasterListSettingCard.Type.TEXT,
@@ -70,7 +70,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # custom data snapshots
-        setting_custom_data = DevlizSettings.snap_custom_data
+        setting_custom_data = AppSettings.snap_custom_data
         self.card_snap_custom_data = MasterListSettingCard(
             config_item=setting_custom_data,
             item_type=MasterListSettingCard.Type.TEXT,
@@ -89,7 +89,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Backup pre-installazione
-        setting_backup_before_install = DevlizSettings.backup_before_install
+        setting_backup_before_install = AppSettings.backup_before_install
         self.card_backup_before_install = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
             title="Abilita backup pre-installazione",
@@ -98,7 +98,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Backup pre-modifica
-        setting_backup_before_edit = DevlizSettings.backup_before_edit
+        setting_backup_before_edit = AppSettings.backup_before_edit
         self.card_backup_before_edit = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
             title="Abilita backup pre-modifica",
@@ -107,7 +107,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Backup pre-eliminazione
-        setting_backup_before_delete = DevlizSettings.backup_before_delete
+        setting_backup_before_delete = AppSettings.backup_before_delete
         self.card_backup_before_delete= SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
             title="Abilita backup pre-eliminazione",
@@ -128,7 +128,7 @@ class WidgetSettings(DevlizQFrame):
     def __add_group_favorites(self, layout: QVBoxLayout):
 
         # Cartelle preferite
-        setting_fav_dirs = DevlizSettings.starred_dirs
+        setting_fav_dirs = AppSettings.starred_dirs
         self.card_fav_dirs = MasterListSettingCard(
             config_item=setting_fav_dirs,
             item_type=MasterListSettingCard.Type.FOLDER,
@@ -141,7 +141,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # File preferite
-        setting_fav_files = DevlizSettings.starred_files
+        setting_fav_files = AppSettings.starred_files
         self.card_fav_files = MasterListSettingCard(
             config_item=setting_fav_files,
             item_type=MasterListSettingCard.Type.FILE,
@@ -155,7 +155,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Eseguibili preferiti
-        setting_fav_exe = DevlizSettings.starred_exes
+        setting_fav_exe = AppSettings.starred_exes
         self.card_fav_exes = MasterListSettingCard(
             config_item=setting_fav_exe,
             item_type=MasterListSettingCard.Type.FILE,
@@ -169,7 +169,7 @@ class WidgetSettings(DevlizQFrame):
         )
 
         # Servizi preferiti
-        setting_fav_services = DevlizSettings.starred_services
+        setting_fav_services = AppSettings.starred_services
         self.card_fav_services = MasterListSettingCard(
             config_item=setting_fav_services,
             item_type=MasterListSettingCard.Type.TEXT,
@@ -218,7 +218,7 @@ class WidgetSettings(DevlizQFrame):
 
         # Tema applicazione
         self.card_theme = OptionsSettingCard(
-            DevlizSettings.themeMode,
+            AppSettings.themeMode,
             icon=FluentIcon.BRUSH,
             title="Tema dell'applicazione",
             content="Seleziona il tema dell'applicazione",

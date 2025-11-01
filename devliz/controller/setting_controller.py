@@ -9,7 +9,7 @@ from pylizlib.qtfw.util.ui import UiUtils
 from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
-from devliz.application.app import app_settings, DevlizSettings, PATH_BACKUPS, RESOURCE_ID_LOGO, app
+from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, RESOURCE_ID_LOGO, app
 from devliz.model.dash_model import DashboardModel
 from devliz.view.widgets.setting import WidgetSettings
 
@@ -30,7 +30,7 @@ class SettingController:
         directory = QFileDialog.getExistingDirectory(None, "Seleziona la cartella del catalogo")
         if directory:
             logger.trace(f"Percorso selezionato: {directory}")
-            app_settings.set(DevlizSettings.catalogue_path, Path(directory))
+            app_settings.set(AppSettings.catalogue_path, Path(directory))
             self.view.card_general_catalogue.setContent(directory)
             self.dash_model.snap_catalogue.set_catalogue_path(Path(directory))
             self.dash_model.update()

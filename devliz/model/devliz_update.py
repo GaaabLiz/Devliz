@@ -7,7 +7,7 @@ from pylizlib.qt.handler.operation_core import Task
 from pylizlib.qtfw.domain.sw import SoftwareData
 from qfluentwidgets import FluentIcon
 
-from devliz.application.app import app_settings, DevlizSettings
+from devliz.application.app import app_settings, AppSettings
 
 
 class TaskGetMonitoredSoftware(Task):
@@ -16,7 +16,7 @@ class TaskGetMonitoredSoftware(Task):
         super().__init__("Recupero Software Monitorati")
 
     def execute(self):
-        data_list: list[str] = app_settings.get(DevlizSettings.starred_exes)
+        data_list: list[str] = app_settings.get(AppSettings.starred_exes)
         data_objs: list[SoftwareData] = []
         # for i in range(1, 50000000):
         #     progress = int((i / 50000000) * 100)

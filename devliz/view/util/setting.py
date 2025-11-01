@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QSizePolicy, QSpacerItem
 from pylizlib.qtfw.domain.setting import QtFwQConfigItem
 from qfluentwidgets import SettingCardGroup, ConfigItem
 
-from devliz.application.app import DevlizSettings, app_settings
+from devliz.application.app import AppSettings, app_settings
 
 
 class SettingGroupManager:
@@ -11,7 +11,7 @@ class SettingGroupManager:
         self.group_enabled = group_enabled
         self.group = SettingCardGroup(name, parent)
         self.group.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-        self.debug_test_mode = app_settings.get(DevlizSettings.debug_test_mode)
+        self.debug_test_mode = app_settings.get(AppSettings.debug_test_mode)
 
 
     def add_widget(self, setting: QtFwQConfigItem | None, widget, signal):
