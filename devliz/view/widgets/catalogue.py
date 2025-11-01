@@ -24,6 +24,8 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_open_folder_requested = Signal(Path)
     signal_update_dirs_to_locals_requested = Signal()
     signal_duplicate_requested = Signal(Snapshot)
+    signal_search_internal_content_all = Signal()
+    signal_search_internal_content_single = Signal(Snapshot)
 
 
     def __init__(self, parent=None):
@@ -55,10 +57,13 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         menu_combobox_sort.setMenu(self.__get_sort_menu())
         menu_combobox_sort.setFixedHeight(34)
 
+        self.action_search_internal_all = Action(FluentIcon.SEARCH, "Cerca contenuto", triggered=lambda: self.signal_search_internal_content_all.emit())
+
         left_command_bar = CommandBar()
-        left_command_bar.setMinimumWidth(300)
+        left_command_bar.setMinimumWidth(600)
         left_command_bar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         left_command_bar.addAction(self.action_import)
+        left_command_bar.addAction(self.action_search_internal_all)
         left_command_bar.addWidget(menu_combobox_sort)
         # left_command_bar.addSeparator()
         # left_command_bar.addAction(self.action_edit)
