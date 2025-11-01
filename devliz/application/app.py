@@ -52,7 +52,7 @@ logger.remove()
 if sys.stdout:
     logger.add(sys.stdout,level="DEBUG",format="{time:HH:mm:ss} | {level} | {message}", colorize=True)
 logger.add(
-    Path(PATH_LOGS).joinpath("devliz_{time:YYYY-MM-DD}.log").__str__(),
+    Path(PATH_LOGS).joinpath("{time:YYYY-MM-DD}.log").__str__(),
     level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{function}:{line} - {message}",
     rotation="00:00", retention="30 days", compression=None
 )
@@ -60,7 +60,7 @@ setup_loguru_logging_intercept(
     level=logging.DEBUG,
     modules="pylizlib"
 )
-logger.info("Devliz Application Started. Version: {}", app.version)
+logger.info("{} Application Started. Version: {}", app.name, app.version)
 
 
 

@@ -237,7 +237,7 @@ class WidgetSettings(DevlizQFrame):
         self.card_info_app = PushSettingCard(
             text="Informazioni",
             icon=FluentIcon.APPLICATION,
-            title="Informazioni su Devliz",
+            title=f"Informazioni su {app.name}",
             content=app.version
         )
 

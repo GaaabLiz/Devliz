@@ -49,7 +49,7 @@ class DashboardController:
         self.model.signal_on_updated_data_available.connect(self.__handle_data_updated)
 
     def start(self):
-        logger.info("Devliz is starting...")
+        logger.info("Application is starting...")
         self.view.show()
         self.__connect_signals()
         self.model.update()
