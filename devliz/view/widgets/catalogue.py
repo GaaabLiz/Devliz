@@ -14,6 +14,12 @@ from devliz.view.util.frame import DevlizQFrame
 
 
 
+class SnapshotCatalogueUiBuilder:
+
+    def __init__(self, parent):
+        self.parent = parent
+
+
 class SnapshotCatalogueWidget(DevlizQFrame):
 
     signal_import_requested = Signal()
@@ -44,7 +50,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.__setup_footer()
 
     def __setup_label(self):
-        self.master_layout.addWidget(self.get_label_title())
+        self.install_label_title()
 
     def __setup_action_bar(self):
         self.search_line_edit = SearchLineEdit(self)

@@ -23,7 +23,7 @@ class WidgetSettings(DevlizQFrame):
         super().__init__(name="Settings", parent=parent)
 
         # Label titolo
-        self.master_layout.addWidget(self.get_label_title())
+        self.install_label_title()
 
         # Aggiungo i widgets
         self.__add_groups(self.get_scroll_layout())
