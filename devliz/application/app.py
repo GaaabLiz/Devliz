@@ -13,20 +13,20 @@ from qfluentwidgets import QConfig, ConfigItem, BoolValidator, qconfig, FolderVa
 
 from devliz.project import version, name, authors
 
-# Devliz Application
+# Application object
 app = PylizApp(name, version, name, authors[0][0])
 
 # Application directories
-DEVLIZ_PATH_CATALOGUE = Path(app.get_path()).joinpath("Catalogue")
-DEVLIZ_PATH_SCRIPTS = Path(app.get_path()).joinpath("Scripts")
-DEVLIZ_PATH_TRASH = Path(app.get_path()).joinpath("Trash")
-DEVLIZ_PATH_LOGS = Path(app.get_path()).joinpath("Logs")
-DEVLIZ_PATH_TEMP = Path(app.get_path()).joinpath("Temp")
-DEVLIZ_PATH_BACKUPS = Path(app.get_path()).joinpath("Backups")
-DEVLIZ_PATH_JSON_SETTING_FILE = Path(app.get_path()).joinpath("Settings.json")
+PATH_CATALOGUE = Path(app.get_path()).joinpath("Catalogue")
+PATH_SCRIPTS = Path(app.get_path()).joinpath("Scripts")
+PATH_TRASH = Path(app.get_path()).joinpath("Trash")
+PATH_LOGS = Path(app.get_path()).joinpath("Logs")
+PATH_TEMP = Path(app.get_path()).joinpath("Temp")
+PATH_BACKUPS = Path(app.get_path()).joinpath("Backups")
+PATH_JSON_SETTING_FILE = Path(app.get_path()).joinpath("Settings.json")
 
 # VALORI DI DEFAULT DELLE IMPOSTAZIONI
-DEFAULT_SETTING_CATALOGUE_PATH = DEVLIZ_PATH_CATALOGUE.__str__()
+DEFAULT_SETTING_CATALOGUE_PATH = PATH_CATALOGUE.__str__()
 DEFAULT_SETTING_STARRED_DIRS = []
 DEFAULT_SETTING_STARRED_FILES = []
 DEFAULT_SETTING_STARRED_EXES = []
@@ -52,7 +52,7 @@ logger.remove()
 if sys.stdout:
     logger.add(sys.stdout,level="DEBUG",format="{time:HH:mm:ss} | {level} | {message}", colorize=True)
 logger.add(
-    Path(DEVLIZ_PATH_LOGS).joinpath("devliz_{time:YYYY-MM-DD}.log").__str__(),
+    Path(PATH_LOGS).joinpath("devliz_{time:YYYY-MM-DD}.log").__str__(),
     level="DEBUG", format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {module}:{function}:{line} - {message}",
     rotation="00:00", retention="30 days", compression=None
 )
@@ -82,11 +82,11 @@ class DevlizSettings(QConfig):
 
 # CARICAMENTO IMPOSTAZIONI
 app_settings = DevlizSettings()
-qconfig.load(DEVLIZ_PATH_JSON_SETTING_FILE, app_settings)
+qconfig.load(PATH_JSON_SETTING_FILE, app_settings)
 
 # IMPSOTAZIONE DEGLI SNAPSHOTS
 snap_settings = SnapshotSettings(
-    backup_path=DEVLIZ_PATH_BACKUPS,
+    backup_path=PATH_BACKUPS,
     backup_pre_install=app_settings.get(DevlizSettings.backup_before_install),
     backup_pre_delete=app_settings.get(DevlizSettings.backup_before_delete),
     backup_pre_modify=app_settings.get(DevlizSettings.backup_before_edit),

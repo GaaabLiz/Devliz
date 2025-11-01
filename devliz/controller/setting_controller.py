@@ -9,7 +9,7 @@ from pylizlib.qtfw.util.ui import UiUtils
 from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
-from devliz.application.app import app_settings, DevlizSettings, DEVLIZ_PATH_BACKUPS, RESOURCE_ID_LOGO, app
+from devliz.application.app import app_settings, DevlizSettings, PATH_BACKUPS, RESOURCE_ID_LOGO, app
 from devliz.model.dash_model import DashboardModel
 from devliz.view.widgets.setting import WidgetSettings
 
@@ -54,7 +54,7 @@ class SettingController:
         try:
             w = MessageBox("Pulizia cartella di backup", "Sei sicuro di voler pulire la cartella di backup ? Questa operazione eliminerà tutti i file presenti nella cartella di backup.", parent=self.view)
             if  w.exec_():
-                shutil.rmtree(DEVLIZ_PATH_BACKUPS)
+                shutil.rmtree(PATH_BACKUPS)
         except Exception as e:
             logger.error(f"Errore durante la pulizia della cartella di backup: {str(e)}")
             UiUtils.show_message("Errore", "Si è verificato un errore durante la pulizia della cartella di backup: " + str(e))
