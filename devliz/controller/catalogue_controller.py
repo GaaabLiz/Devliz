@@ -8,6 +8,7 @@ from pylizlib.core.os.snap import Snapshot, SnapshotSortKey
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
+from devliz.controller.catalogue_searcher_controller import CatalogueSearcherController
 from devliz.domain.data import DevlizData
 from devliz.model.dash_model import DashboardModel
 from devliz.view.util.frame import DevlizQFrame
@@ -33,6 +34,7 @@ class CatalogueController:
         self.view.signal_open_folder_requested.connect(self.__open_snap_directory)
         self.view.signal_duplicate_requested.connect(self.__duplicate_snapshot)
         self.view.signal_sort_requested.connect(self.view.sort)
+        self.view.signal_search_internal_content_all.connect(self.__open_snapshot_searcher)
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
@@ -52,6 +54,10 @@ class CatalogueController:
         except Exception as e:
             logger.error(str(e))
             UiUtils.show_message("Attenzione", "Si è verificato un errore: " + str(e))
+
+    def __open_snapshot_searcher(self):
+        controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
+        controller.open()
 
     def __install_snapshot(self, snap: Snapshot):
         try:
