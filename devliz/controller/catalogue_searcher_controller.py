@@ -16,6 +16,11 @@ class CatalogueSearcherController:
         # Connect signals
         self.view.action_start.triggered.connect(self._perform_search)
         self.view.action_stop.triggered.connect(self._stop_search)
+        self.view.signal_delete_requested.connect(self._on_delete_requested)
+
+    def _on_delete_requested(self, row: int):
+        """Handles the request to delete a snapshot from the table."""
+        self.model.table_model.remove_snapshot(row)
 
     def _perform_search(self):
         """Triggers a search in the model."""
@@ -41,4 +46,5 @@ class CatalogueSearcherController:
         self.view.action_stop.setEnabled(False)
 
     def open(self):
+        self.model.load_snapshots_from_catalogue()
         self.view.exec_()
