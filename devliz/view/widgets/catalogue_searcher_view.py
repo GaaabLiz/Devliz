@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractItemModel, Qt
+from PySide6.QtCore import QAbstractItemModel, Qt, Signal
 from PySide6.QtGui import QActionGroup
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView
 from qfluentwidgets import (
@@ -16,11 +16,13 @@ from qfluentwidgets import (
     BodyLabel,
     ProgressBar,
     CaptionLabel,
-    ComboBox
+    ComboBox,
+    RoundMenu
 )
 
 
 class CatalogueSearcherView(QDialog):
+    signal_delete_requested = Signal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -50,7 +52,7 @@ class CatalogueSearcherView(QDialog):
         self.extensions_button = TransparentDropDownPushButton("Estensioni", self, FluentIcon.FILTER)
         self.extensions_button.setMenu(self.__create_extensions_menu())
 
-        self.search_type_button = TransparentDropDownPushButton("Tipo", self, FluentIcon.TAG)
+        self.search_type_button = TransparentDropDownPushButton("Tipo", self, FluentIcon.FONT)
         self.search_type_button.setMenu(self.__create_search_type_menu())
 
         self.action_regex_builder = Action(FluentIcon.CODE, "Regex Builder", self)
@@ -100,8 +102,10 @@ class CatalogueSearcherView(QDialog):
         # Results table
         self.results_table = TableView(self)
         self.results_table.verticalHeader().hide()
+        self.results_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.results_table.customContextMenuRequested.connect(self._show_context_menu)
         self.results_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-        self.column_percents = [0.5, 0.25, 0.0625, 0.1875]
+        self.column_percents = [0.25, 0.25, 0.15, 0.1625, 0.1875]
         self._distribuisci_colonne_perc()
         self.results_table.resizeEvent = self._table_resize_event
 
@@ -131,6 +135,17 @@ class CatalogueSearcherView(QDialog):
 
         # Apply Fluent Design stylesheet
         FluentStyleSheet.DIALOG.apply(self)
+
+    def _show_context_menu(self, pos):
+        index = self.results_table.indexAt(pos)
+        if not index.isValid():
+            return
+
+        menu = RoundMenu(parent=self)
+        delete_action = Action(FluentIcon.DELETE, "Elimina")
+        delete_action.triggered.connect(lambda: self.signal_delete_requested.emit(index.row()))
+        menu.addAction(delete_action)
+        menu.exec(self.results_table.viewport().mapToGlobal(pos))
 
     def __create_extensions_menu(self):
         menu = CheckableMenu(parent=self)
@@ -206,6 +221,7 @@ class CatalogueSearcherView(QDialog):
         self.search_bar.setEnabled(is_enabled)
         self.extensions_button.setEnabled(is_enabled)
         self.search_type_button.setEnabled(is_enabled)
+        self.action_regex_builder.setEnabled(is_enabled)
 
         if active:
             self.status_card.show()
