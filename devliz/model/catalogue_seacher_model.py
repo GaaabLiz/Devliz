@@ -1,3 +1,5 @@
+from time import sleep
+
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, Signal, QObject
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot, SnapshotSearchParams, SnapshotSearchType, SnapshotSearcher
 from pylizlib.qt.handler.operation_core import Operation, Task
@@ -57,6 +59,17 @@ class SearchResultsTableModel(QAbstractTableModel):
             self.beginRemoveRows(QModelIndex(), row, row)
             del self._data[row]
             self.endRemoveRows()
+
+    def reset_search_state(self):
+        """Resets the progress and status data for all rows."""
+        if not self._data:
+            return
+        self._progress_data.clear()
+        self._status_data.clear()
+        # Emit dataChanged for all rows and the relevant columns (status, progress)
+        top_left = self.index(0, 1)
+        bottom_right = self.index(self.rowCount() - 1, 3)
+        self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.DisplayRole])
 
     def get_data(self):
         return self._data
@@ -134,7 +147,7 @@ class CatalogueSearcherModel(QObject):
         self._op_id_to_snap_id.clear()
         for snap in self.table_model.get_data():
             current_task = SnapSearchTask(params=params, snapshot=snap, catalogue=self.catalogue)
-            op = Operation([current_task], OperationInfo(delay_each_task=1.0, name=f"Search in {snap.name})", description="Searching snapshot contents"))
+            op = Operation([current_task], OperationInfo(delay_each_task=0.0, name=f"Search in {snap.name})", description="Searching snapshot contents"))
             self._op_id_to_snap_id[op.id] = snap.id
             ops.append(op)
         return ops
@@ -145,6 +158,7 @@ class CatalogueSearcherModel(QObject):
         self.table_model.update_data(snapshots)
 
     def search(self, text: str, search_type: str, extensions: list[str]):
+        self.table_model.reset_search_state()
         self._current_message = "Avvio..."
         self._current_progress = 0
         self._current_eta = "--:--"
