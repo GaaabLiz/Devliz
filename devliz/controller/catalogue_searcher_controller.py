@@ -1,5 +1,7 @@
 import os
 
+from qfluentwidgets import MessageBox
+
 from pylizlib.core.os.snap import SnapshotCatalogue
 
 from devliz.model.catalogue_seacher_model import CatalogueSearcherModel
@@ -41,8 +43,17 @@ class CatalogueSearcherController:
 
     def _perform_search(self):
         """Triggers a search in the model."""
-        self.view.set_operation_status(True)
         search_text = self.view.search_bar.text()
+        if not search_text.strip():
+            m = MessageBox(
+                "Testo mancante",
+                "Per favore, inserisci un testo prima di avviare la ricerca.",
+                self.view
+            )
+            m.exec()
+            return
+
+        self.view.set_operation_status(True)
         search_type = self.view.get_selected_search_type()
         extensions = self.view.get_selected_extensions()
 

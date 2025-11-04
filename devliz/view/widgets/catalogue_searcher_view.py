@@ -148,7 +148,7 @@ class CatalogueSearcherView(QDialog):
             return
 
         menu = RoundMenu(parent=self)
-        delete_action = Action(FluentIcon.DELETE, "Elimina")
+        delete_action = Action(FluentIcon.DELETE, "Rimuovi dalla ricerca")
         delete_action.triggered.connect(lambda: self.signal_delete_requested.emit(index.row()))
         menu.addAction(delete_action)
         menu.exec(self.results_table.viewport().mapToGlobal(pos))
