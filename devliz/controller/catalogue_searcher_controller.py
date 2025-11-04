@@ -12,6 +12,7 @@ class CatalogueSearcherController:
 
         # Connect view and model
         self.view.setModel(self.model.table_model)
+        self.view.tree_view.setModel(self.model.tree_model_manager.model)
 
         # Connect signals
         self.model.signal_search_finished.connect(self._on_search_finished)

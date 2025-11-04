@@ -120,9 +120,7 @@ class CatalogueSearcherView(QDialog):
         self.right_layout = QVBoxLayout(self.right_widget)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.setSpacing(5)
-        self.tree_view_label = SubtitleLabel("Dettagli Valori", self)
         self.tree_view = TreeView(self)
-        self.right_layout.addWidget(self.tree_view_label)
         self.right_layout.addWidget(self.tree_view)
 
         # Add widgets to main layout

@@ -1,10 +1,13 @@
 from time import sleep
 
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, Signal, QObject
-from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot, SnapshotSearchParams, SnapshotSearchType, SnapshotSearcher
+from PySide6.QtGui import QStandardItemModel, QStandardItem
+
+from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot, SnapshotSearchParams, SnapshotSearchType, SnapshotSearcher, \
+    SnapshotSearchResult
 from pylizlib.qt.handler.operation_core import Operation, Task
 from pylizlib.qt.handler.operation_domain import OperationInfo, OperationStatus
-from pylizlib.qt.handler.operation_runner import OperationRunner
+from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics, RunnerStatistics
 
 
 class SearchResultsTableModel(QAbstractTableModel):
@@ -113,8 +116,44 @@ class SnapSearchTask(Task):
         return results
 
 
-class CatalogueSearcherModel(QObject):
+class SearchResultsTreeModel:
+    def __init__(self):
+        self.model = QStandardItemModel()
+        self.model.setHorizontalHeaderLabels(['Risultati'])
 
+    def clear(self):
+        self.model.clear()
+        self.model.setHorizontalHeaderLabels(['Risultati'])
+
+    def populate_from_results(self, results: list[SnapshotSearchResult]):
+        self.clear()
+
+        results_by_snapshot = {}
+        for res in results:
+            if res.snapshot_name not in results_by_snapshot:
+                results_by_snapshot[res.snapshot_name] = []
+            results_by_snapshot[res.snapshot_name].append(res)
+
+        for snapshot_name, snapshot_results in results_by_snapshot.items():
+            snapshot_item = QStandardItem(f"{snapshot_name} ({len(snapshot_results)})")
+            snapshot_item.setEditable(False)
+
+            files_in_snapshot = {}
+            for res in snapshot_results:
+                file_path_str = str(res.file_path)
+                if file_path_str not in files_in_snapshot:
+                    files_in_snapshot[file_path_str] = []
+                files_in_snapshot[file_path_str].append(res)
+
+            for file_path_str, file_results in files_in_snapshot.items():
+                file_item = QStandardItem(file_path_str)
+                file_item.setEditable(False)
+                snapshot_item.appendRow(file_item)
+
+            self.model.appendRow(snapshot_item)
+
+
+class CatalogueSearcherModel(QObject):
     signal_search_started = Signal()
     signal_search_stopped = Signal()
     signal_search_finished = Signal()
@@ -124,6 +163,7 @@ class CatalogueSearcherModel(QObject):
         super().__init__()
         self.catalogue = catalogue
         self.table_model = SearchResultsTableModel()
+        self.tree_model_manager = SearchResultsTreeModel()
         self.runner = OperationRunner()
 
         self._current_message = "In attesa..."
@@ -132,7 +172,7 @@ class CatalogueSearcherModel(QObject):
 
         self.runner.runner_start.connect(self.signal_search_started)
         self.runner.runner_stop.connect(self.signal_search_stopped)
-        self.runner.runner_finish.connect(self.signal_search_finished)
+        self.runner.runner_finish.connect(self.on_runner_finished)
         self.runner.op_update_status.connect(self.on_operation_status_changed)
         self.runner.op_update_progress.connect(self.on_operation_progress_changed)
         self.runner.task_start.connect(self.on_task_start)
@@ -147,7 +187,8 @@ class CatalogueSearcherModel(QObject):
         self._op_id_to_snap_id.clear()
         for snap in self.table_model.get_data():
             current_task = SnapSearchTask(params=params, snapshot=snap, catalogue=self.catalogue)
-            op = Operation([current_task], OperationInfo(delay_each_task=0.0, name=f"Search in {snap.name})", description="Searching snapshot contents"))
+            op = Operation([current_task], OperationInfo(delay_each_task=0.0, name=f"Search in {snap.name})",
+                                                 description="Searching snapshot contents"))
             self._op_id_to_snap_id[op.id] = snap.id
             ops.append(op)
         return ops
@@ -159,6 +200,7 @@ class CatalogueSearcherModel(QObject):
 
     def search(self, text: str, search_type: str, extensions: list[str]):
         self.table_model.reset_search_state()
+        self.tree_model_manager.clear()
         self._current_message = "Avvio..."
         self._current_progress = 0
         self._current_eta = "--:--"
@@ -204,3 +246,13 @@ class CatalogueSearcherModel(QObject):
     def on_eta_update(self, op_id: str, eta: str):
         self._current_eta = eta
         self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+
+    def on_runner_finished(self, statistics: RunnerStatistics):
+        self.signal_search_finished.emit()
+        all_results = []
+        for op in self.runner._all_operations:
+            task_results = op.get_task_results()
+            if task_results and task_results[0]:
+                all_results.extend(task_results[0])
+
+        self.tree_model_manager.populate_from_results(all_results)
