@@ -14,9 +14,13 @@ class CatalogueSearcherController:
         self.view.setModel(self.model.table_model)
 
         # Connect signals
+        self.model.signal_search_finished.connect(self._on_search_finished)
         self.view.action_start.triggered.connect(self._perform_search)
         self.view.action_stop.triggered.connect(self._stop_search)
         self.view.signal_delete_requested.connect(self._on_delete_requested)
+
+        # Connect the status card update signal directly to the view's slot
+        self.model.signal_status_card_update.connect(self.view.update_status_card)
 
     def _on_delete_requested(self, row: int):
         """Handles the request to delete a snapshot from the table."""
@@ -42,6 +46,12 @@ class CatalogueSearcherController:
         self.model.stop_search()
 
         # Toggle button states
+        self.view.action_start.setEnabled(True)
+        self.view.action_stop.setEnabled(False)
+
+    def _on_search_finished(self):
+        """Handles the completion of the search operation."""
+        self.view.set_operation_status(False)
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
 
