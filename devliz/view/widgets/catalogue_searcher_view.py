@@ -158,20 +158,23 @@ class CatalogueSearcherView(QDialog):
         self.action_ext_log = Action(".log", self, checkable=True)
         self.action_ext_ini = Action(".ini", self, checkable=True)
         self.action_ext_json = Action(".json", self, checkable=True)
+        self.action_ext_xml = Action(".xml", self, checkable=True)
 
         # Set default checked state
         self.action_ext_txt.setChecked(True)
         self.action_ext_log.setChecked(True)
         self.action_ext_ini.setChecked(True)
         self.action_ext_json.setChecked(True)
+        self.action_ext_xml.setChecked(True)
 
         # Add actions to the group
         action_group.addAction(self.action_ext_txt)
         action_group.addAction(self.action_ext_log)
         action_group.addAction(self.action_ext_ini)
         action_group.addAction(self.action_ext_json)
+        action_group.addAction(self.action_ext_xml)
 
-        menu.addActions([self.action_ext_txt, self.action_ext_log, self.action_ext_ini, self.action_ext_json])
+        menu.addActions([self.action_ext_txt, self.action_ext_log, self.action_ext_ini, self.action_ext_json, self.action_ext_xml])
         return menu
 
     def __create_search_type_menu(self):
@@ -211,6 +214,8 @@ class CatalogueSearcherView(QDialog):
             extensions.append(".ini")
         if self.action_ext_json.isChecked():
             extensions.append(".json")
+        if self.action_ext_xml.isChecked():
+            extensions.append(".xml")
         return extensions
 
     def get_selected_search_type(self) -> str:
