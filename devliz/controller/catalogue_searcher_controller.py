@@ -1,3 +1,5 @@
+import os
+
 from pylizlib.core.os.snap import SnapshotCatalogue
 
 from devliz.model.catalogue_seacher_model import CatalogueSearcherModel
@@ -19,6 +21,7 @@ class CatalogueSearcherController:
         self.view.action_start.triggered.connect(self._perform_search)
         self.view.action_stop.triggered.connect(self._stop_search)
         self.view.signal_delete_requested.connect(self._on_delete_requested)
+        self.view.signal_file_double_clicked.connect(self._on_file_double_clicked)
 
         # Connect the status card update signal directly to the view's slot
         self.model.signal_status_card_update.connect(self.view.update_status_card)
@@ -26,6 +29,15 @@ class CatalogueSearcherController:
     def _on_delete_requested(self, row: int):
         """Handles the request to delete a snapshot from the table."""
         self.model.table_model.remove_snapshot(row)
+
+    def _on_file_double_clicked(self, file_path: str):
+        if os.path.isfile(file_path):
+            try:
+                os.startfile(file_path)
+            except Exception as e:
+                print(f"Error opening file {file_path}: {e}")
+        elif os.path.isdir(file_path):
+            print(f"Cannot open directory: {file_path}")
 
     def _perform_search(self):
         """Triggers a search in the model."""

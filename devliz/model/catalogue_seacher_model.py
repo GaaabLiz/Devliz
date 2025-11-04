@@ -7,7 +7,7 @@ from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot, SnapshotSearchPar
     SnapshotSearchResult
 from pylizlib.qt.handler.operation_core import Operation, Task
 from pylizlib.qt.handler.operation_domain import OperationInfo, OperationStatus
-from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics, RunnerStatistics
+from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
 
 
 class SearchResultsTableModel(QAbstractTableModel):
@@ -17,6 +17,7 @@ class SearchResultsTableModel(QAbstractTableModel):
         self._data: list[Snapshot] = []
         self._progress_data = {}
         self._status_data = {}
+        self._results_count_data = {}
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
@@ -36,7 +37,7 @@ class SearchResultsTableModel(QAbstractTableModel):
         elif col == 1:
             return self._status_data.get(snapshot.id, "Pending")
         elif col == 2:
-            return ""  # Valori trovati
+            return self._results_count_data.get(snapshot.id, "")
         elif col == 3:
             progress = self._progress_data.get(snapshot.id, 0)
             return f"{progress}%"
@@ -69,7 +70,8 @@ class SearchResultsTableModel(QAbstractTableModel):
             return
         self._progress_data.clear()
         self._status_data.clear()
-        # Emit dataChanged for all rows and the relevant columns (status, progress)
+        self._results_count_data.clear()
+        # Emit dataChanged for all rows and the relevant columns (status, progress, results)
         top_left = self.index(0, 1)
         bottom_right = self.index(self.rowCount() - 1, 3)
         self.dataChanged.emit(top_left, bottom_right, [Qt.ItemDataRole.DisplayRole])
@@ -82,7 +84,6 @@ class SearchResultsTableModel(QAbstractTableModel):
         self._progress_data[snap_id] = progress
         for i, snapshot in enumerate(self._data):
             if snapshot.id == snap_id:
-                # Progress is in column 3
                 index = self.index(i, 3)
                 self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
                 return
@@ -92,8 +93,16 @@ class SearchResultsTableModel(QAbstractTableModel):
         self._status_data[snap_id] = status
         for i, snapshot in enumerate(self._data):
             if snapshot.id == snap_id:
-                # Status is in column 1
                 index = self.index(i, 1)
+                self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
+                return
+
+    def update_results_for_snapshot(self, snap_id: str, count: str):
+        """Finds a snapshot by its ID and updates its results count."""
+        self._results_count_data[snap_id] = count
+        for i, snapshot in enumerate(self._data):
+            if snapshot.id == snap_id:
+                index = self.index(i, 2)
                 self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
                 return
 
@@ -173,6 +182,7 @@ class CatalogueSearcherModel(QObject):
         self.runner.runner_start.connect(self.signal_search_started)
         self.runner.runner_stop.connect(self.signal_search_stopped)
         self.runner.runner_finish.connect(self.on_runner_finished)
+        self.runner.op_finished.connect(self.on_operation_finished)
         self.runner.op_update_status.connect(self.on_operation_status_changed)
         self.runner.op_update_progress.connect(self.on_operation_progress_changed)
         self.runner.task_start.connect(self.on_task_start)
@@ -256,3 +266,21 @@ class CatalogueSearcherModel(QObject):
                 all_results.extend(task_results[0])
 
         self.tree_model_manager.populate_from_results(all_results)
+
+    def on_operation_finished(self, op: Operation):
+        if op.id not in self._op_id_to_snap_id:
+            return
+
+        snap_id = self._op_id_to_snap_id[op.id]
+        count_str = ""
+        if op.is_completed():
+            task_results = op.get_task_results()
+            if task_results and isinstance(task_results[0], list):
+                count = len(task_results[0])
+                count_str = str(count)
+            else:
+                count_str = "0"
+        elif op.is_failed():
+            count_str = "?"
+
+        self.table_model.update_results_for_snapshot(snap_id, count_str)

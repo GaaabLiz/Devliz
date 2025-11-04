@@ -1,4 +1,4 @@
-from PySide6.QtCore import QAbstractItemModel, Qt, Signal
+from PySide6.QtCore import QAbstractItemModel, Qt, Signal, QModelIndex
 from PySide6.QtGui import QActionGroup
 from PySide6.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView
 from qfluentwidgets import (
@@ -23,6 +23,7 @@ from qfluentwidgets import (
 
 class CatalogueSearcherView(QDialog):
     signal_delete_requested = Signal(int)
+    signal_file_double_clicked = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -121,6 +122,7 @@ class CatalogueSearcherView(QDialog):
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.setSpacing(5)
         self.tree_view = TreeView(self)
+        self.tree_view.doubleClicked.connect(self._on_tree_view_double_clicked)
         self.right_layout.addWidget(self.tree_view)
 
         # Add widgets to main layout
@@ -133,6 +135,12 @@ class CatalogueSearcherView(QDialog):
 
         # Apply Fluent Design stylesheet
         FluentStyleSheet.DIALOG.apply(self)
+
+    def _on_tree_view_double_clicked(self, index: QModelIndex):
+        item = self.tree_view.model().itemFromIndex(index)
+        if item and item.parent():  # It's a child item (file path)
+            file_path = item.text()
+            self.signal_file_double_clicked.emit(file_path)
 
     def _show_context_menu(self, pos):
         index = self.results_table.indexAt(pos)
