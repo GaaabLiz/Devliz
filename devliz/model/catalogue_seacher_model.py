@@ -92,6 +92,7 @@ class SnapSearchTask(Task):
 
     def execute(self):
         def on_progress(file_name: str, total_files: int, current_file: int):
+            self.task_update_message.emit(self.name, f"Scansione: {file_name}")
             if total_files > 0:
                 self.gen_update_task_progress(current_file, total_files)
 
@@ -112,7 +113,7 @@ class CatalogueSearcherModel(QObject):
         self.table_model = SearchResultsTableModel()
         self.runner = OperationRunner()
 
-        self._current_message = "Ricerca in corso..."
+        self._current_message = "In attesa..."
         self._current_progress = 0
         self._current_eta = "--:--"
 
@@ -121,6 +122,7 @@ class CatalogueSearcherModel(QObject):
         self.runner.runner_finish.connect(self.signal_search_finished)
         self.runner.op_update_status.connect(self.on_operation_status_changed)
         self.runner.op_update_progress.connect(self.on_operation_progress_changed)
+        self.runner.task_update_message.connect(self.on_task_update_message)
         self.runner.runner_update_progress.connect(self.on_runner_progress)
         self.runner.op_eta_update.connect(self.on_eta_update)
 
@@ -142,7 +144,7 @@ class CatalogueSearcherModel(QObject):
         self.table_model.update_data(snapshots)
 
     def search(self, text: str, search_type: str, extensions: list[str]):
-        self._current_message = "Ricerca in corso..."
+        self._current_message = "Avvio..."
         self._current_progress = 0
         self._current_eta = "--:--"
         self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
@@ -170,6 +172,10 @@ class CatalogueSearcherModel(QObject):
         if op_id in self._op_id_to_snap_id:
             snap_id = self._op_id_to_snap_id[op_id]
             self.table_model.update_progress_for_snapshot(snap_id, progress)
+
+    def on_task_update_message(self, task_name: str, message: str):
+        self._current_message = message
+        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
 
     def on_runner_progress(self, progress: int):
         self._current_progress = progress
