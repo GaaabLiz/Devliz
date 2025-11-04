@@ -122,6 +122,7 @@ class CatalogueSearcherModel(QObject):
         self.runner.runner_finish.connect(self.signal_search_finished)
         self.runner.op_update_status.connect(self.on_operation_status_changed)
         self.runner.op_update_progress.connect(self.on_operation_progress_changed)
+        self.runner.task_start.connect(self.on_task_start)
         self.runner.task_update_message.connect(self.on_task_update_message)
         self.runner.runner_update_progress.connect(self.on_runner_progress)
         self.runner.op_eta_update.connect(self.on_eta_update)
@@ -172,6 +173,11 @@ class CatalogueSearcherModel(QObject):
         if op_id in self._op_id_to_snap_id:
             snap_id = self._op_id_to_snap_id[op_id]
             self.table_model.update_progress_for_snapshot(snap_id, progress)
+
+    def on_task_start(self, task_name: str):
+        self._current_message = "Ricerca in corso..."
+        self._current_eta = "--:--"
+        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
 
     def on_task_update_message(self, task_name: str, message: str):
         self._current_message = message
