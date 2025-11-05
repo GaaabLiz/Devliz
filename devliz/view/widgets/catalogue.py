@@ -51,15 +51,13 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.search_line_edit.textChanged.connect(self.model.filter)
 
         self.action_import = Action(FluentIcon.ADD, 'Importa', triggered=lambda: self.signal_import_requested.emit())
-        self.action_edit = Action(FluentIcon.EDIT, 'Modifica', enabled=False,
-                                  triggered=lambda: self.signal_edit_requested.emit())
+        self.action_edit = Action(FluentIcon.EDIT, 'Modifica', enabled=False,triggered=lambda: self.signal_edit_requested.emit())
 
         menu_combobox_sort = TransparentDropDownPushButton("Ordina", self, FluentIcon.SCROLL)
         menu_combobox_sort.setMenu(self.__get_sort_menu())
         menu_combobox_sort.setFixedHeight(34)
 
-        self.action_search_internal_all = Action(FluentIcon.SEARCH, "Cerca contenuto",
-                                                 triggered=lambda: self.signal_search_internal_content_all.emit())
+        self.action_search_internal_all = Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_all.emit())
 
         left_command_bar = CommandBar()
         left_command_bar.setMinimumWidth(600)
@@ -81,16 +79,10 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def __get_sort_menu(self, pos=None):
         menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
-        action_sort_name = Action(FluentIcon.QUICK_NOTE, "Nome", checkable=True,
-                                  triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
-        action_sort_author = Action(FluentIcon.PEOPLE, "Autore", checkable=True,
-                                    triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
-        action_sort_date_create = Action(FluentIcon.CALENDAR, "Data creazione", checkable=True,
-                                         triggered=lambda: self.signal_sort_requested.emit(
-                                             SnapshotSortKey.DATE_CREATED))
-        action_sort_date_modify = Action(FluentIcon.EDIT, "Data modifica", checkable=True,
-                                         triggered=lambda: self.signal_sort_requested.emit(
-                                             SnapshotSortKey.DATE_MODIFIED))
+        action_sort_name = Action(FluentIcon.QUICK_NOTE, "Nome", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
+        action_sort_author = Action(FluentIcon.PEOPLE, "Autore", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
+        action_sort_date_create = Action(FluentIcon.CALENDAR, "Data creazione", checkable=True,triggered=lambda: self.signal_sort_requested.emit( SnapshotSortKey.DATE_CREATED))
+        action_sort_date_modify = Action(FluentIcon.EDIT, "Data modifica", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
 
         action_sort_group = QActionGroup(self)
         action_sort_group.addAction(action_sort_name)
@@ -166,15 +158,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
             return
 
         menu = RoundMenu()
-        menu.addAction(
-            Action(FluentIcon.DOWN, "Installa", triggered=lambda: self.signal_install_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.DOWN, "Installa", triggered=lambda: self.signal_install_requested.emit(config)))
         menu.addAction(Action(FluentIcon.EDIT, "Modifica", triggered=lambda: self.signal_edit_requested.emit(config)))
-        menu.addAction(Action(FluentIcon.SEARCH, "Cerca contenuto",
-                              triggered=lambda: self.signal_search_internal_content_single.emit(config)))
-        menu.addAction(
-            Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
-        menu.addAction(
-            Action(FluentIcon.DELETE, "Cancella", triggered=lambda: self.signal_delete_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_single.emit(config)))
+        menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.DELETE, "Cancella", triggered=lambda: self.signal_delete_requested.emit(config)))
         global_pos = self.table.viewport().mapToGlobal(pos)
         menu.exec(global_pos)
 
