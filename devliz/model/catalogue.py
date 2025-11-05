@@ -2,6 +2,7 @@ from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
 from pylizlib.core.os.snap import Snapshot, SnapshotSortKey, SnapshotUtils
 
 from devliz.application.app import app_settings, AppSettings
+from devliz.domain.data import DevlizSnapshotData
 
 
 class SnapshotTableModel(QAbstractTableModel):
@@ -114,3 +115,11 @@ class CatalogueModel:
                     (config.data and any(text in str(value).lower() for value in config.data.values())))
             ]
             self.table_model.set_snapshots(self._filtered_snapshots)
+
+    def count(self) -> int:
+        """Returns the count of snapshots in the current view (filtered or not)."""
+        return len(self._all_snapshots)
+
+    def get_mb_size(self) -> str:
+        """Returns the total size of all snapshots in MB."""
+        return DevlizSnapshotData(snapshot_list=self._all_snapshots).get_mb_size

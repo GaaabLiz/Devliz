@@ -190,8 +190,8 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.model.sort(method)
 
     def reload_data(self):
-        #self.footer_stats_label.setText(f"Totale configurazioni: {snapshot_data.count} ({snapshot_data.get_mb_size})") #TODO: asdasda
-        self.footer_stats_label.setText(f"Totale configurazioni: ")
+        self.footer_stats_label.setText(f"Totale configurazioni: {self.model.count()} ({self.model.get_mb_size()})")
+
         # Aggiorna il path se necessario e le intestazioni della tabella
         new_path = app_settings.get(AppSettings.catalogue_path)
         if self.footer_path_label.text() != new_path:
