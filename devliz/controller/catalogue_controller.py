@@ -35,6 +35,7 @@ class CatalogueController:
         self.view.signal_duplicate_requested.connect(self.__duplicate_snapshot)
         self.view.signal_sort_requested.connect(self.view.sort)
         self.view.signal_search_internal_content_all.connect(self.__open_snapshot_searcher)
+        self.view.signal_search_internal_content_single.connect(self.__open_snapshot_searcher_single)
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
@@ -58,6 +59,10 @@ class CatalogueController:
     def __open_snapshot_searcher(self):
         controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
         controller.open()
+
+    def __open_snapshot_searcher_single(self, snapshot: Snapshot):
+        controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
+        controller.open(snapshot=snapshot)
 
     def __install_snapshot(self, snap: Snapshot):
         try:

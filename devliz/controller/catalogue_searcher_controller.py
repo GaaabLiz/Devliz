@@ -2,7 +2,7 @@ import os
 
 from qfluentwidgets import MessageBox
 
-from pylizlib.core.os.snap import SnapshotCatalogue
+from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
 from devliz.model.catalogue_seacher_model import CatalogueSearcherModel
 from devliz.view.widgets.catalogue_searcher_view import CatalogueSearcherView
@@ -79,6 +79,6 @@ class CatalogueSearcherController:
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
 
-    def open(self):
-        self.model.load_snapshots_from_catalogue()
+    def open(self, snapshot: Snapshot | None = None):
+        self.model.load_snapshots_from_catalogue(snapshot)
         self.view.exec_()
