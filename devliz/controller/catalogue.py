@@ -1,4 +1,6 @@
 import os
+
+import os
 from typing import Callable
 
 from PySide6.QtCore import Signal
