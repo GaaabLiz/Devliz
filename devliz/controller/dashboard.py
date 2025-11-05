@@ -6,7 +6,7 @@ from pylizlib.qt.domain.view import UiWidgetMode
 from pylizlib.qtfw.util.ui import UiUtils
 
 from devliz.application.app import app_settings, AppSettings
-from devliz.controller.catalogue_controller import CatalogueController
+from devliz.controller.catalogue import CatalogueController
 from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.model.dashboard import DashboardModel
