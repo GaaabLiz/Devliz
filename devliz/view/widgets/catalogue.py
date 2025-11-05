@@ -8,7 +8,6 @@ from qfluentwidgets import SearchLineEdit, Action, FluentIcon, CommandBar, setFo
     TransparentDropDownPushButton, CheckableMenu, MenuIndicatorType, TableView
 
 from devliz.application.app import app_settings, AppSettings
-from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
 from devliz.view.util.frame import DevlizQFrame
 
@@ -31,11 +30,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_search_internal_content_all = Signal()
     signal_search_internal_content_single = Signal(Snapshot)
 
-    def __init__(self, parent=None):
+    def __init__(self, model: CatalogueModel, parent=None):
         super().__init__(name="Catalogo", parent=parent)
 
         # Il modello è l'unica fonte di verità per i dati
-        self.model = CatalogueModel()
+        self.model = model
 
         # Aggiungo i widgets
         self.__setup_label()
@@ -190,15 +189,15 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.search_line_edit.clear()
         self.model.sort(method)
 
-    def update_widget(self, snapshot_data: DevlizSnapshotData):
-        # Aggiorna il modello e il footer senza ricreare i widget
-        self.model.set_snapshots(snapshot_data.snapshot_list)
-        self.footer_stats_label.setText(f"Totale configurazioni: {snapshot_data.count} ({snapshot_data.get_mb_size})")
-        
+    def reload_data(self):
+        #self.footer_stats_label.setText(f"Totale configurazioni: {snapshot_data.count} ({snapshot_data.get_mb_size})") #TODO: asdasda
+        self.footer_stats_label.setText(f"Totale configurazioni: ")
         # Aggiorna il path se necessario e le intestazioni della tabella
         new_path = app_settings.get(AppSettings.catalogue_path)
         if self.footer_path_label.text() != new_path:
             self.footer_path_label.setText(new_path)
-        
-        self.model.table_model.update_headers()
+
         self._distribuisci_colonne_perc()
+
+        
+

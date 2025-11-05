@@ -4,6 +4,7 @@ from PySide6.QtCore import Signal, QObject
 from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
 from pylizlib.qtfw.util.ui import UiUtils
+from qfluentwidgets import FluentIcon, NavigationItemPosition
 
 from devliz.application.app import app_settings, AppSettings
 from devliz.controller.catalogue import CatalogueController
@@ -18,29 +19,36 @@ class DashboardController:
 
     def __init__(self, /):
         super().__init__()
+
         self.view = DashboardView()
         self.model = DashboardModel(self.view)
 
+        self.catalogue = CatalogueController(self.model)
+        self.settings = SettingController(self.model)
+
+        self.view.addSubInterface(self.catalogue.view, FluentIcon.BOOK_SHELF, self.catalogue.view.window_name, NavigationItemPosition.TOP)
+        self.view.addSubInterface(self.settings.view, FluentIcon.SETTING, self.settings.view.window_name,NavigationItemPosition.BOTTOM)
+
+
         self.cached_data : DevlizData | None = None
 
-        self.catalogue = CatalogueController(self.view.widget_catalogue, self.model)
-        self.settings = SettingController(self.view.widget_setting, self.model)
+
 
     def __handle_data_updated(self, data: DevlizData):
         logger.debug("Updated dashboard data received in controller. Updating view...")
         logger.debug(data)
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots) # TODO: sistemare
         self.cached_data = data
-        self.view.widget_catalogue.update_widget(snap_data)
+        self.catalogue.update_data(snap_data)
 
         self.model.snap_catalogue.path_catalogue = Path(app_settings.get(AppSettings.catalogue_path))
 
 
     def __handle_update_started(self):
-        self.view.set_state(UiWidgetMode.UPDATING)
+        self.catalogue.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
-        self.view.set_state(UiWidgetMode.DISPLAYING)
+        self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __connect_signals(self):
         self.view.f5_pressed.connect(self.model.update)

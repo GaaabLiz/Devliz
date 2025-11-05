@@ -16,8 +16,8 @@ from devliz.view.widgets.setting import WidgetSettings
 
 class SettingController:
 
-    def __init__(self, view: WidgetSettings, dash_model: DashboardModel):
-        self.view = view
+    def __init__(self, dash_model: DashboardModel):
+        self.view = WidgetSettings()
         self.dash_model = dash_model
 
         self.view.signal_request_update.connect(self.dash_model.update)

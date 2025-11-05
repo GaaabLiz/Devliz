@@ -1,32 +1,27 @@
 import os
 
 import os
-from typing import Callable
 
-from PySide6.QtCore import Signal
-from PySide6.QtWidgets import QWidget
 from loguru import logger
-from pylizlib.core.os.snap import Snapshot, SnapshotSortKey
+from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
 from devliz.controller.catalogue_searcher_controller import CatalogueSearcherController
-from devliz.domain.data import DevlizData
+from devliz.domain.data import DevlizSnapshotData
+from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
-from devliz.view.util.frame import DevlizQFrame
 from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
 from devliz.view.widgets.catalogue_imp_dialog import DialogConfig
 
 
 class CatalogueController:
 
-    def __init__(
-            self,
-            catalogue_widget: SnapshotCatalogueWidget,
-            dash_model: DashboardModel
-    ):
-        self.view = catalogue_widget
+    def __init__(self,dash_model: DashboardModel):
         self.dash_model = dash_model
+        self.model = CatalogueModel()
+        self.view = SnapshotCatalogueWidget(self.model)
+
 
     def init(self):
         self.view.signal_import_requested.connect(lambda: self.__open_config_dialog(False, None))
@@ -38,6 +33,11 @@ class CatalogueController:
         self.view.signal_sort_requested.connect(self.view.sort)
         self.view.signal_search_internal_content_all.connect(self.__open_snapshot_searcher)
         self.view.signal_search_internal_content_single.connect(self.__open_snapshot_searcher_single)
+
+    def update_data(self, snapshot_data: DevlizSnapshotData):
+        self.model.set_snapshots(snapshot_data.snapshot_list)
+        self.model.table_model.update_headers()
+        self.view.reload_data()
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)

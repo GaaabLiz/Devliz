@@ -8,8 +8,6 @@ from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkT
 from qframelesswindow.utils import getSystemAccentColor
 
 from devliz.application.app import app, RESOURCE_ID_LOGO
-from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
-from devliz.view.widgets.setting import WidgetSettings
 
 from devliz.application.resources import resources_rc
 
@@ -20,7 +18,6 @@ class DashboardView(FluentWindow):
     def __init__(self):
         super().__init__()
         self.__init_window()
-        self.__init_widgets()
         self.__init_shortcuts()
 
     def __init_window(self):
@@ -31,12 +28,6 @@ class DashboardView(FluentWindow):
         setTheme(theme, True, False)
         if sys.platform in ["win32", "darwin"]:
             setThemeColor(getSystemAccentColor(), save=True)
-
-    def __init_widgets(self):
-        self.widget_catalogue = SnapshotCatalogueWidget(self)
-        self.widget_setting = WidgetSettings(self)
-        self.addSubInterface(self.widget_catalogue, FluentIcon.BOOK_SHELF, self.widget_catalogue.window_name, NavigationItemPosition.TOP)
-        self.addSubInterface(self.widget_setting, FluentIcon.SETTING, self.widget_setting.window_name, NavigationItemPosition.BOTTOM)
 
     def __init_shortcuts(self):
         shortcut = QShortcut(QKeySequence("F5"), self)
