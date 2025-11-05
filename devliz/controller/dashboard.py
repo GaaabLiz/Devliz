@@ -1,9 +1,7 @@
 from pathlib import Path
 
-from PySide6.QtCore import Signal, QObject
 from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
-from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import FluentIcon, NavigationItemPosition
 
 from devliz.application.app import app_settings, AppSettings
@@ -12,7 +10,6 @@ from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.model.dashboard import DashboardModel
 from devliz.view.dashboard import DashboardView
-from devliz.view.widgets.setting import WidgetSettings
 
 
 class DashboardController:

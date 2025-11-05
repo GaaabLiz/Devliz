@@ -1,7 +1,5 @@
 import os
 
-import os
-
 from loguru import logger
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
@@ -11,8 +9,8 @@ from devliz.controller.catalogue_searcher_controller import CatalogueSearcherCon
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
-from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
-from devliz.view.widgets.catalogue_imp_dialog import DialogConfig
+from devliz.view.catalogue import SnapshotCatalogueWidget
+from devliz.view.catalogue_imp_dialog import DialogConfig
 
 
 class CatalogueController:

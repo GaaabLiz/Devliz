@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QApplication
 
 
 from devliz.controller.dashboard import DashboardController
-from devliz.view.widgets.splash import SplashWindow
+from devliz.view.splash import SplashWindow
 
 
 

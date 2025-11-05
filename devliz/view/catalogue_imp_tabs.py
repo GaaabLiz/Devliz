@@ -10,8 +10,8 @@ from qfluentwidgets import SegmentedWidget
 
 from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizData
-from devliz.view.widgets.catalogue_imp_tab_details import TabDetails
-from devliz.view.widgets.catalogue_imp_tab_directories import TabDirectories
+from devliz.view.catalogue_imp_tab_details import TabDetails
+from devliz.view.catalogue_imp_tab_directories import TabDirectories
 
 
 class DialogConfigTabs(QWidget):
