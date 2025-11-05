@@ -10,7 +10,7 @@ from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
 from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, RESOURCE_ID_LOGO, app
-from devliz.model.dash_model import DashboardModel
+from devliz.model.dashboard import DashboardModel
 from devliz.view.widgets.setting import WidgetSettings
 
 

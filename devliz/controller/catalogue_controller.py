@@ -10,7 +10,7 @@ from qfluentwidgets import MessageBox
 
 from devliz.controller.catalogue_searcher_controller import CatalogueSearcherController
 from devliz.domain.data import DevlizData
-from devliz.model.dash_model import DashboardModel
+from devliz.model.dashboard import DashboardModel
 from devliz.view.util.frame import DevlizQFrame
 from devliz.view.widgets.catalogue import SnapshotCatalogueWidget
 from devliz.view.widgets.catalogue_imp_dialog import DialogConfig

@@ -9,8 +9,8 @@ from devliz.application.app import app_settings, AppSettings
 from devliz.controller.catalogue_controller import CatalogueController
 from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
-from devliz.model.dash_model import DashboardModel
-from devliz.view.dash_view import DashboardView
+from devliz.model.dashboard import DashboardModel
+from devliz.view.dashboard import DashboardView
 from devliz.view.widgets.setting import WidgetSettings
 
 
@@ -29,7 +29,7 @@ class DashboardController:
     def __handle_data_updated(self, data: DevlizData):
         logger.debug("Updated dashboard data received in controller. Updating view...")
         logger.debug(data)
-        snap_data = DevlizSnapshotData(snapshot_list=data.snapshots)
+        snap_data = DevlizSnapshotData(snapshot_list=data.snapshots) # TODO: sistemare
         self.cached_data = data
         self.view.widget_catalogue.update_widget(snap_data)
 

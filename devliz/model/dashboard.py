@@ -11,7 +11,7 @@ from PySide6.QtCore import QObject, Signal
 from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, snap_settings
 from devliz.domain.data import DevlizData
 from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots
-from devliz.view.dash_view import DashboardView
+from devliz.view.dashboard import DashboardView
 
 
 
