@@ -35,6 +35,7 @@ class DashboardModel(QObject):
         self.operation_info = OperationInfo(
             name="Aggiornamento Dashboard",
             description="Aggiornamento dati della dashboard",
+            delay_each_task=0.1
         )
         self.runner = OperationRunner(abort_all_on_error=True)
         self.runner.runner_start.connect(self.on_runner_started)
