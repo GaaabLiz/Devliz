@@ -24,11 +24,15 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_edit_requested = Signal(Snapshot)
     signal_install_requested = Signal(Snapshot)
     signal_delete_requested = Signal(Snapshot)
+    signal_delete_installed_folders_requested = Signal(Snapshot)
     signal_open_folder_requested = Signal(Snapshot)
     signal_update_dirs_to_locals_requested = Signal()
     signal_duplicate_requested = Signal(Snapshot)
     signal_search_internal_content_all = Signal()
     signal_search_internal_content_single = Signal(Snapshot)
+    signal_export_request_snapshot = Signal(Snapshot)
+    signal_export_request_assoc_folders = Signal(Snapshot)
+    signal_update_with_local_dirs_requested = Signal()
 
     def __init__(self, model: CatalogueModel, parent=None):
         super().__init__(name="Catalogo", parent=parent)
@@ -147,6 +151,25 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         container.setLayout(lay)
         self.master_layout.addWidget(container)
 
+    def _get_export_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        submenu = RoundMenu("Esporta", self)
+        submenu.setIcon(FluentIcon.DOWNLOAD)
+        submenu.addActions([
+            Action(FluentIcon.DICTIONARY, 'Snapshot (.zip)', triggered=lambda: self.signal_export_request_snapshot.emit(snapshot)),
+            Action(FluentIcon.FOLDER, 'Cartelle associate (.zip)', triggered=lambda: self.signal_export_request_assoc_folders.emit(snapshot)),
+        ])
+        return submenu
+
+    def _get_delete_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        submenu = RoundMenu("Cancella", self)
+        submenu.setIcon(FluentIcon.DELETE)
+        submenu.addActions([
+            Action(FluentIcon.DELETE, 'Cartelle installate', triggered=lambda: self.signal_delete_installed_folders_requested.emit(snapshot)),
+            Action(FluentIcon.DELETE, 'Snapshot intero', triggered=lambda: self.signal_delete_requested.emit(snapshot)),
+        ])
+        return submenu
+
+
     def _show_context_menu(self, pos):
         index = self.table.indexAt(pos)
         if not index.isValid():
@@ -160,8 +183,10 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         menu.addAction(Action(FluentIcon.DOWN, "Installa", triggered=lambda: self.signal_install_requested.emit(config)))
         menu.addAction(Action(FluentIcon.EDIT, "Modifica", triggered=lambda: self.signal_edit_requested.emit(config)))
         menu.addAction(Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_single.emit(config)))
+        menu.addAction(Action(FluentIcon.UP, "Aggiorna con locali", triggered=lambda: self.signal_update_with_local_dirs_requested.emit()))
         menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
-        menu.addAction(Action(FluentIcon.DELETE, "Cancella", triggered=lambda: self.signal_delete_requested.emit(config)))
+        menu.addMenu(self._get_export_context_menu(config))
+        menu.addMenu(self._get_delete_context_menu(config))
         global_pos = self.table.viewport().mapToGlobal(pos)
         menu.exec(global_pos)
 
