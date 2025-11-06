@@ -5,7 +5,7 @@ from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
-from devliz.controller.catalogue_searcher_controller import CatalogueSearcherController
+from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
