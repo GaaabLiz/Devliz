@@ -39,6 +39,7 @@ class CatalogueController:
         self.view.signal_export_request_assoc_folders.connect(self.__export_snapshot_folders)
         self.view.signal_delete_installed_folders_requested.connect(self.__delete_snap_installed_dirs)
         self.view.signal_update_with_local_dirs_requested.connect(self.__update_assoc_dirs_from_installed)
+        self.view.signal_open_assoc_folder_requested.connect(self.__open_directory)
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
         self.model.set_snapshots(snapshot_data.snapshot_list)
@@ -98,10 +99,7 @@ class CatalogueController:
 
     def __open_snap_directory(self, snap: Snapshot):
         path = self.dash_model.snap_catalogue.get_snap_directory_path(snap)
-        if path.exists():
-            os.startfile(path)
-        else:
-            UiUtils.show_message("Attenzione", "La cartella non esiste più in " + path.__str__())
+        self.__open_directory(path)
 
     def __duplicate_snapshot(self, snap: Snapshot):
         try:
@@ -155,3 +153,9 @@ class CatalogueController:
                 self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
         except Exception as e:
             UiUtils.show_message("Errore di aggiornamento", "Si è verificato un errore durante l'aggiornamento: " + str(e))
+
+    def __open_directory(self, path: Path):
+        if path.exists():
+            os.startfile(path)
+        else:
+            UiUtils.show_message("Attenzione", "La cartella non esiste più in " + path.__str__())

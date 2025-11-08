@@ -26,6 +26,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_delete_requested = Signal(Snapshot)
     signal_delete_installed_folders_requested = Signal(Snapshot)
     signal_open_folder_requested = Signal(Snapshot)
+    signal_open_assoc_folder_requested = Signal(Path)
     signal_duplicate_requested = Signal(Snapshot)
     signal_search_internal_content_all = Signal()
     signal_search_internal_content_single = Signal(Snapshot)
@@ -171,6 +172,15 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         ])
         return submenu
 
+    def _get_open_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        submenu = RoundMenu("Apri", self)
+        submenu.setIcon(FluentIcon.VIEW)
+        submenu.addActions([
+            Action(FluentIcon.FOLDER, 'Cartella snapshot', triggered=lambda: self.signal_open_folder_requested.emit(snapshot)),
+        ])
+        for assoc in snapshot.directories:
+            submenu.addAction(Action(FluentIcon.FOLDER, f'Cartella locale associata: {Path(assoc.original_path).name}', triggered=lambda a=assoc: self.signal_open_assoc_folder_requested.emit(Path(assoc.original_path))))
+        return submenu
 
     def _show_context_menu(self, pos):
         index = self.table.indexAt(pos)
@@ -187,6 +197,8 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         menu.addAction(Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_single.emit(config)))
         menu.addAction(Action(FluentIcon.UP, "Aggiorna con locali", triggered=lambda: self.signal_update_with_local_dirs_requested.emit(config)))
         menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
+        menu.addSeparator()
+        menu.addMenu(self._get_open_context_menu(config))
         menu.addMenu(self._get_export_context_menu(config))
         menu.addMenu(self._get_delete_context_menu(config))
         global_pos = self.table.viewport().mapToGlobal(pos)
