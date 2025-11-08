@@ -85,18 +85,21 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         action_sort_author = Action(FluentIcon.PEOPLE, "Autore", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
         action_sort_date_create = Action(FluentIcon.CALENDAR, "Data creazione", checkable=True,triggered=lambda: self.signal_sort_requested.emit( SnapshotSortKey.DATE_CREATED))
         action_sort_date_modify = Action(FluentIcon.EDIT, "Data modifica", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
+        action_sort_date_dim_mb_assoc = Action(FluentIcon.FOLDER, "Dimensione", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.ASSOC_DIR_MB_SIZE))
 
         action_sort_group = QActionGroup(self)
         action_sort_group.addAction(action_sort_name)
         action_sort_group.addAction(action_sort_author)
         action_sort_group.addAction(action_sort_date_create)
         action_sort_group.addAction(action_sort_date_modify)
+        action_sort_group.addAction(action_sort_date_dim_mb_assoc)
 
         menu.addActions([
             action_sort_name,
             action_sort_author,
             action_sort_date_create,
-            action_sort_date_modify
+            action_sort_date_modify,
+            action_sort_date_dim_mb_assoc,
         ])
 
         if pos is not None:
