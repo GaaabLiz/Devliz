@@ -1,10 +1,14 @@
 import os
+from pathlib import Path
 
+from PySide6.QtWidgets import QFileDialog
 from loguru import logger
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
+from scipy.optimize import direct
 
+from devliz.application.app import app
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
@@ -31,6 +35,10 @@ class CatalogueController:
         self.view.signal_sort_requested.connect(self.view.sort)
         self.view.signal_search_internal_content_all.connect(self.__open_snapshot_searcher)
         self.view.signal_search_internal_content_single.connect(self.__open_snapshot_searcher_single)
+        self.view.signal_export_request_snapshot.connect(self.__export_snapshot)
+        self.view.signal_export_request_assoc_folders.connect(self.__export_snapshot_folders)
+        self.view.signal_delete_installed_folders_requested.connect(self.__delete_snap_installed_dirs)
+        self.view.signal_update_with_local_dirs_requested.connect(self.__update_assoc_dirs_from_installed)
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
         self.model.set_snapshots(snapshot_data.snapshot_list)
@@ -103,3 +111,47 @@ class CatalogueController:
                 self.dash_model.update()
         except Exception as e:
             UiUtils.show_message("Errore di duplicazione", "Si è verificato un errore durante la duplicazione: " + str(e))
+
+    def __export_snapshot(self, snap: Snapshot):
+        try:
+            w = MessageBox("Esporta snapshot", "Sei sicuro di voler esportare lo snapshot selezionato ?", parent=self.view)
+            if w.exec_():
+                directory = QFileDialog.getExistingDirectory(
+                    None,
+                    "Seleziona la cartella di salvataggio dello snapshot",
+                    app.path.__str__()
+                )
+                if directory:
+                    self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
+        except Exception as e:
+            UiUtils.show_message("Errore di duplicazione", "Si è verificato un errore durante la duplicazione: " + str(e))
+
+    def __export_snapshot_folders(self, snap: Snapshot):
+        try:
+            w = MessageBox("Esporta cartelle associate", "Sei sicuro di voler esportare le cartelle associate allo snapshot selezionato ?", parent=self.view)
+            if w.exec_():
+                directory = QFileDialog.getExistingDirectory(
+                    None,
+                    "Seleziona la cartella di salvataggio delle cartelle associate",
+                    app.path.__str__()
+                )
+                if directory:
+                    self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
+        except Exception as e:
+            UiUtils.show_message("Errore di esportazione", "Si è verificato un errore durante l'esportazione: " + str(e))
+
+    def __delete_snap_installed_dirs(self, snap: Snapshot):
+        try:
+            w = MessageBox("Elimina cartelle installate", "Sei sicuro di voler eliminare le cartelle installate attualmente nel sistema relative allo snapshot selezionato ?", parent=self.view)
+            if w.exec_():
+                self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
+        except Exception as e:
+            UiUtils.show_message("Errore di eliminazione", "Si è verificato un errore durante l'eliminazione: " + str(e))
+
+    def __update_assoc_dirs_from_installed(self, snap: Snapshot):
+        try:
+            w = MessageBox("Aggiorna cartelle associate", "Sei sicuro di voler aggiornare le cartelle associate allo snapshot selezionato con quelle attualmente installate nel sistema ?", parent=self.view)
+            if w.exec_():
+                self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
+        except Exception as e:
+            UiUtils.show_message("Errore di aggiornamento", "Si è verificato un errore durante l'aggiornamento: " + str(e))
