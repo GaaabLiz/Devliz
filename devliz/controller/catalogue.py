@@ -8,7 +8,7 @@ from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 from scipy.optimize import direct
 
-from devliz.application.app import app
+from devliz.application.app import app, AppSettings, app_settings
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
@@ -77,6 +77,8 @@ class CatalogueController:
         try:
             w = MessageBox("Installa configurazione", "Sei sicuro di voler installare lo snapshot selezionato ? Tutte le directory presenti attualmente verranno rimpiazzate con quelle contenute nello snapshot.", parent=self.view)
             if w.exec_():
+                if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
+                    self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
                 self.dash_model.snap_catalogue.install(snap)
                 self.dash_model.update()
         except Exception as e:

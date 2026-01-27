@@ -115,6 +115,15 @@ class WidgetSettings(DevlizQFrame):
             configItem=setting_backup_before_delete
         )
 
+        # Cancellazione cartelle allegate prima dell'installazione
+        setting_clear_snap_attached_folders_before_install = AppSettings.clear_snap_attached_folders_before_install
+        self.card_clear_snap_attached_folders_before_install = SwitchSettingCard(
+            icon=FluentIcon.BASKETBALL,
+            title="Cancella cartelle allegate prima dell'installazione",
+            content="Prima di installare unna configurazione, cancella le cartelle allegate locali (presenti su questo pc)",
+            configItem=setting_clear_snap_attached_folders_before_install
+        )
+
         grp_manager = SettingGroupManager(self.tr("Snapshots"), self)
         grp_manager.add_widget(setting_catalogue, self.card_general_catalogue, self.signal_ask_catalogue_path)
         grp_manager.add_widget(setting_tags, self.card_fav_tags, None)
@@ -122,6 +131,7 @@ class WidgetSettings(DevlizQFrame):
         grp_manager.add_widget(setting_backup_before_install, self.card_backup_before_install,None)
         grp_manager.add_widget(setting_backup_before_edit, self.card_backup_before_edit, None)
         grp_manager.add_widget(setting_backup_before_delete, self.card_backup_before_delete, None)
+        grp_manager.add_widget(setting_clear_snap_attached_folders_before_install, self.card_clear_snap_attached_folders_before_install, None)
         grp_manager.install_group_on(layout)
 
 

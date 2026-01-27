@@ -37,6 +37,7 @@ DEFAULT_SETTING_PATH_GIT_BASH = PATH_DEFAULT_GIT_BASH.__str__()
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL = True
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT = False
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE = True
+DEFAULT_SETTING_CLEAR_SNAP_ATTACHED_FOLDERS_BEFORE_INSTALL = True
 
 # DEFINIZIONE DEI GRUPPI DI IMPOSTAZIONI
 SETTING_GROUP_CONFIGS = "Configurazioni"
@@ -75,6 +76,7 @@ class AppSettings(QConfig):
     starred_exes = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES, "Eseguibili Preferiti", DEFAULT_SETTING_STARRED_EXES, TextListValidator())
     starred_services = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES, "Servizi Preferiti", DEFAULT_SETTING_STARRED_SERVICES, TextListValidator())
     debug_test_mode = QtFwQConfigItem(False, SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
+    clear_snap_attached_folders_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Clear snap attached folders before install", DEFAULT_SETTING_CLEAR_SNAP_ATTACHED_FOLDERS_BEFORE_INSTALL, BoolValidator())
 
 
 # CARICAMENTO IMPOSTAZIONI
