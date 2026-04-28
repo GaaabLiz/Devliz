@@ -1,3 +1,99 @@
+## [0.1.5] - 2026-04-28
+
+### 🚀 Features
+
+- Add setting to clear attached folders before snapshot installation
+- Add Makefile and project.mk for build automation and project configuration
+- Add CI workflows for quality checks and package publishing to Docker Hub and PyPI
+- Add configuration files for Ruff and Ty to enhance linting and type checking
+- Update dependencies in pyproject.toml for improved compatibility and features
+- Add Makefile run configurations for various build and testing targets
+
+### 💼 Other
+
+- V0.1.5
+
+### 🚜 Refactor
+
+- Update JDK references in project configuration files for consistency
+
+### ⚙️ Miscellaneous Tasks
+
+- Add temporary logo assets in SVG, PNG, and ICO formats
+- Update resource compiler version to Qt 6.11.0
+## [0.1.4] - 2026-01-10
+
+### 🚀 Features
+
+- Add sorting functionality for snapshots
+- Add sorting functionality to snapshot catalogue
+- Add search actions for internal content in the command bar
+- Implement UI builder for DevlizQFrame and refactor label installation
+- Add catalogue search functionality with UI integration
+- Add context menu for results table with delete action
+- Add delete functionality for snapshots in catalogue searcher
+- Enhance search results model with snapshot state and removal functionality
+- Enhance snapshot search functionality with progress and status updates
+- Add JSON file extension support and update task message handling
+- Add task start handling and update status card message during search
+- Add XML file extension support to the search functionality
+- Add reset search state functionality to clear progress and status data
+- Add search results tree model to display snapshot search results
+- Add results count tracking and file opening functionality in searcher
+- Add input validation for search text and update delete action label
+- Update pylizlib version to 0.3.65 and update wheel URL
+- Add functionality for single snapshot search and update loading behavior
+- Add new catalogue.py file for improved catalog management
+- Implement CatalogueModel and SnapshotTableModel for improved snapshot management
+- Completely refactor controller/model/view classes of dashboard and catalogue
+- Add delay between tasks in dashboard operation info for improved performance
+- Add methods to count snapshots and calculate total size in SnapshotTableModel
+- Add export and delete context menus for snapshots and installed folders
+- Add export and delete functionality for snapshots and associated folders
+- Add sorting option by associated directory size in snapshot menu
+- Add functionality to open associated directories from snapshot context menu
+- Enhance search functionality with query type and target selection inside catalogue_searcher.py
+- Add detailed docstrings to CatalogueSearcher classes and methods for better clarity
+
+### 🐛 Bug Fixes
+
+- Remove duplicate import of os in catalogue.py
+- Correct line continuation in makefile for resource generation command
+
+### 💼 Other
+
+- Upgrade pylizlib
+- Bump version to 0.1.1
+- Bump version to 0.1.2
+- Bump version to 0.1.3
+- Bump version to 0.1.4
+
+### 🚜 Refactor
+
+- Update path variable names for consistency
+- Rename DevlizSettings to AppSettings for consistency
+- Update log messages and titles for application consistency
+- Streamline logging setup for improved readability
+- Rename dash_controller.py and dash_model.py to dashboard.py and update imports
+- Remove unnecessary delay parameter from OperationInfo in dashboard.py
+- Rename catalogue_controller.py to catalogue.py and update import in dashboard.py
+- Streamline action definitions in catalogue.py for improved readability
+- Rename widget imports and streamline directory structure
+- Rename catalogue searcher files for consistency and clarity
+
+### 📚 Documentation
+
+- Update changelog for 0.1.0
+
+### ⚙️ Miscellaneous Tasks
+
+- Moved workflow
+- Update package versions for psutil, pylizlib, pyside6-fluent-widgets, and ruff
+- Update pylizlib to version 0.3.63 and refresh package URLs
+- Update pylizlib version to 0.3.67 and adjust package URLs
+- Update Python SDK version in project configuration files
+- Updated uv.lock
+- Update resource compiler version in resources_rc.py to 6.10.1
 ## [0.1.0] - 2025-10-25
 
 ### 🚀 Features
