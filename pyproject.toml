@@ -9,9 +9,9 @@ authors = [
 dependencies = [
     "loguru>=0.7.3",
     "loguru-logging-intercept>=0.1.5",
-    "pylizlib>=0.3.20",
-    "pyside6>=6.10.0",
-    "pyside6-fluent-widgets[full]>=1.9.1",
+    "pylizlib>=0.6.2",
+    "pyside6>=6.11.0",
+    "pyside6-fluent-widgets[full]>=1.11.2",
 ]
 
 [build-system]
@@ -30,6 +30,10 @@ qtfw = [
 
 [dependency-groups]
 dev = [
-    "pyinstaller>=6.16.0",
-    "ruff>=0.14.1",
+    "ty",
+    "pdoc",
+    "pytest",
+    "pytest-cov",
+    "ruff",
 ]
+
