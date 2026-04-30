@@ -6,6 +6,7 @@ from qfluentwidgets import FluentIcon, NavigationItemPosition
 
 from devliz.application.app import app_settings, AppSettings
 from devliz.controller.catalogue import CatalogueController
+from devliz.controller.home import HomeController
 from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.model.dashboard import DashboardModel
@@ -20,9 +21,11 @@ class DashboardController:
         self.view = DashboardView()
         self.model = DashboardModel(self.view)
 
+        self.home = HomeController()
         self.catalogue = CatalogueController(self.model)
         self.settings = SettingController(self.model)
 
+        self.view.addSubInterface(self.home.view, FluentIcon.HOME, self.home.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.catalogue.view, FluentIcon.BOOK_SHELF, self.catalogue.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.settings.view, FluentIcon.SETTING, self.settings.view.window_name,NavigationItemPosition.BOTTOM)
 
@@ -37,6 +40,7 @@ class DashboardController:
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots) # TODO: sistemare
         self.cached_data = data
         self.catalogue.update_data(snap_data)
+        self.home.update_data(snap_data)
 
         self.model.snap_catalogue.path_catalogue = Path(app_settings.get(AppSettings.catalogue_path))
 
