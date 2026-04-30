@@ -7,6 +7,7 @@ from qfluentwidgets import FluentIcon, NavigationItemPosition
 from devliz.application.app import app_settings, AppSettings
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.controller.catalogue import CatalogueController
+from devliz.controller.help import HelpController
 from devliz.controller.home import HomeController
 from devliz.controller.setting_controller import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
@@ -24,12 +25,14 @@ class DashboardController:
 
         self.home = HomeController()
         self.searcher = CatalogueSearcherController(self.model.snap_catalogue, self.view)
+        self.help = HelpController()
         self.catalogue = CatalogueController(self.model, self.__open_search_page)
         self.settings = SettingController(self.model)
 
         self.view.addSubInterface(self.home.view, FluentIcon.HOME, self.home.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.catalogue.view, FluentIcon.BOOK_SHELF, self.catalogue.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.searcher.view, FluentIcon.SEARCH, self.searcher.view.window_name, NavigationItemPosition.TOP)
+        self.view.addSubInterface(self.help.view, FluentIcon.HELP, self.help.view.window_name, NavigationItemPosition.BOTTOM)
         self.view.addSubInterface(self.settings.view, FluentIcon.SETTING, self.settings.view.window_name,NavigationItemPosition.BOTTOM)
 
 
@@ -53,11 +56,13 @@ class DashboardController:
         self.home.view.set_state(UiWidgetMode.UPDATING)
         self.catalogue.view.set_state(UiWidgetMode.UPDATING)
         self.searcher.view.set_state(UiWidgetMode.UPDATING)
+        self.help.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
         self.home.view.set_state(UiWidgetMode.DISPLAYING)
         self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
         self.searcher.view.set_state(UiWidgetMode.DISPLAYING)
+        self.help.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __open_search_page(self, snapshot=None):
         self.searcher.open(snapshot)

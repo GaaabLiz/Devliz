@@ -22,6 +22,7 @@ _translations: dict[str, dict[str, str]] = {
         "Sort": {"it": "Ordina"},
         "Search content": {"it": "Cerca contenuto"},
         "Search": {"it": "Cerca"},
+        "Help": {"it": "Aiuto"},
         "Name": {"it": "Nome"},
         "Author": {"it": "Autore"},
         "Creation date": {"it": "Data creazione"},
@@ -141,6 +142,78 @@ _translations: dict[str, dict[str, str]] = {
         "Search the name of a file": {"it": "Cerca il nome di un file"},
         "Search the name of a file using a regex": {"it": "Cerca il nome di un file usando una regex"},
 
+        # ── Help View ──
+        "Close": {"it": "Chiudi"},
+        "This page gives you a complete guide to every screen and workflow in Devliz. Click a card to open advanced details.": {
+            "it": "Questa pagina offre una guida completa a ogni schermata e flusso di lavoro di Devliz. Clicca una card per aprire i dettagli avanzati."
+        },
+        "This page explains all key features of Devliz and the recommended workflow.": {
+            "it": "Questa pagina spiega tutte le funzionalita principali di Devliz e il flusso di lavoro consigliato."
+        },
+        "Overview": {"it": "Panoramica"},
+        "What Devliz is for": {"it": "A cosa serve Devliz"},
+        "Devliz manages snapshot-based configurations of folders/files. It helps you save, restore, duplicate and compare project states quickly.": {
+            "it": "Devliz gestisce configurazioni basate su snapshot di cartelle/file. Ti aiuta a salvare, ripristinare, duplicare e confrontare rapidamente gli stati dei progetti."
+        },
+        "Home screen": {"it": "Schermata Home"},
+        "System and snapshot indicators": {"it": "Indicatori di sistema e snapshot"},
+        "Home shows a quick summary: number of snapshots, total size, number of files/folders and the heaviest file across saved data.": {
+            "it": "Home mostra un riepilogo rapido: numero di snapshot, dimensione totale, numero di file/cartelle e file piu pesante tra i dati salvati."
+        },
+        "Catalogue screen": {"it": "Schermata Catalogo"},
+        "Manage snapshot configurations": {"it": "Gestione configurazioni snapshot"},
+        "Use Catalogue to import, edit, install, duplicate, sort, export and delete snapshots. Context menus expose advanced actions per snapshot.": {
+            "it": "Usa Catalogo per importare, modificare, installare, duplicare, ordinare, esportare ed eliminare snapshot. I menu contestuali espongono azioni avanzate per ogni snapshot."
+        },
+        "Search screen": {"it": "Schermata Cerca"},
+        "Search inside snapshots": {"it": "Ricerca dentro gli snapshot"},
+        "Use Search to scan snapshot content or file names. You can choose target, query type (text/regex), file extensions and inspect detailed results.": {
+            "it": "Usa Cerca per analizzare il contenuto degli snapshot o i nomi file. Puoi scegliere target, tipo query (testo/regex), estensioni file e ispezionare risultati dettagliati."
+        },
+        "Settings screen": {"it": "Schermata Impostazioni"},
+        "Customize the application": {"it": "Personalizza l'applicazione"},
+        "Settings lets you configure catalogue path, tags, custom fields, favorites, backups, theme and language. Theme/language changes require restart.": {
+            "it": "Impostazioni permette di configurare percorso catalogo, tag, campi personalizzati, preferiti, backup, tema e lingua. Le modifiche di tema/lingua richiedono il riavvio."
+        },
+        "Backup and safety": {"it": "Backup e sicurezza"},
+        "Protect local data": {"it": "Proteggi i dati locali"},
+        "Enable pre-install/edit/delete backups to preserve current local folders before applying changes. You can clean backup storage from Settings.": {
+            "it": "Abilita backup pre-installazione/modifica/eliminazione per preservare le cartelle locali correnti prima di applicare modifiche. Puoi pulire lo storage backup da Impostazioni."
+        },
+        "Refresh and shortcuts": {"it": "Aggiornamento e scorciatoie"},
+        "Keep data updated": {"it": "Mantieni i dati aggiornati"},
+        "Press F5 to refresh the dashboard data from all screens. During refresh, the page shows progress until the new snapshot data is loaded.": {
+            "it": "Premi F5 per aggiornare i dati dashboard da tutte le schermate. Durante l'aggiornamento, la pagina mostra il progresso fino al caricamento dei nuovi dati snapshot."
+        },
+        "Recommended workflow": {"it": "Flusso di lavoro consigliato"},
+        "Suggested daily usage": {"it": "Utilizzo giornaliero suggerito"},
+        "1) Configure catalogue/favorites in Settings. 2) Create or import snapshots in Catalogue. 3) Use Search for inspection. 4) Install/export when needed.": {
+            "it": "1) Configura catalogo/preferiti in Impostazioni. 2) Crea o importa snapshot in Catalogo. 3) Usa Cerca per l'ispezione. 4) Installa/esporta quando necessario."
+        },
+        "Overview details": {
+            "it": "Devliz e uno strumento per salvare e gestire stati di lavoro tramite snapshot. Ogni snapshot rappresenta una configurazione composta da metadati (nome, descrizione, tag, campi personalizzati) e associazioni verso cartelle locali.\n\nFunzioni principali:\n- centralizzare configurazioni in un catalogo\n- ripristinare rapidamente una configurazione sul sistema locale\n- duplicare e versionare configurazioni\n- esportare snapshot o cartelle associate\n- cercare contenuti nei dati salvati\n\nQuando usare Devliz:\n- preparare ambienti di progetto\n- mantenere setup ripetibili\n- ridurre errori manuali durante passaggi tra versioni o clienti"
+        },
+        "Home details": {
+            "it": "La schermata Home mostra una panoramica rapida dello stato del catalogo:\n- numero totale snapshot\n- dimensione complessiva dei dati\n- numero totale file e cartelle\n- file piu pesante\n\nUtilita operativa:\n- verifica immediata della crescita dati\n- controllo della dimensione del catalogo\n- identificazione di file anomali o troppo grandi\n\nAggiornamento:\n- premendo F5 la Home entra in stato di aggiornamento\n- a fine refresh vengono ricalcolate tutte le statistiche"
+        },
+        "Catalogue details": {
+            "it": "Catalogo e la schermata principale di gestione snapshot.\n\nAzioni disponibili:\n- Import: crea una nuova configurazione snapshot\n- Edit: modifica snapshot esistente\n- Sort: ordina per nome, autore, date, dimensione\n- Search content: apre la schermata Cerca\n\nMenu contestuale per snapshot:\n- Install\n- Edit\n- Search content sul singolo snapshot\n- Update with local\n- Duplicate\n- Export (snapshot zip / cartelle associate zip)\n- Delete (intero snapshot o sole cartelle installate)\n- Open (cartella snapshot e cartelle locali associate)\n\nFooter:\n- totale configurazioni\n- dimensione aggregata"
+        },
+        "Search details": {
+            "it": "Cerca permette di eseguire ricerche trasversali nei dati snapshot.\n\nConfigurazione ricerca:\n- Target: nome file o contenuto file\n- Type: testo semplice o regex\n- Extensions: filtro su estensioni supportate\n\nDurante la ricerca:\n- stato operazione e progress bar\n- percentuale e ETA\n- avanzamento per singolo snapshot\n\nRisultati:\n- tabella riepilogativa per snapshot\n- albero dettagliato dei file trovati\n- doppio click su file per aprirlo\n- rimozione snapshot dalla sessione di ricerca"
+        },
+        "Settings details": {
+            "it": "Impostazioni consente la personalizzazione completa dell'app.\n\nArea Snapshots:\n- percorso catalogo\n- gestione tag configurazione\n- campi personalizzati\n- backup pre-install / pre-edit / pre-delete\n- pulizia cartelle allegate prima installazione\n\nArea Preferiti:\n- cartelle preferite\n- file preferiti\n- eseguibili monitorati\n- servizi monitorati\n\nArea Applicazione:\n- cartella di lavoro\n- pulizia backup\n- tema\n- lingua\n\nArea Informazioni:\n- versione applicazione\n\nNota:\n- modifiche a tema e lingua richiedono riavvio"
+        },
+        "Backup details": {
+            "it": "La strategia backup protegge i dati locali prima di operazioni distruttive.\n\nBackup supportati:\n- pre-installazione\n- pre-modifica\n- pre-eliminazione\n\nVantaggi:\n- rollback rapido in caso di errori\n- riduzione rischio perdita dati\n- maggiore confidenza nelle operazioni di massa\n\nGestione spazio:\n- da Impostazioni puoi pulire la cartella backup\n- monitorare periodicamente dimensione totale consigliato"
+        },
+        "Refresh details": {
+            "it": "Il refresh globale sincronizza l'intera dashboard.\n\nComportamento:\n- scorciatoia F5 da qualsiasi schermata\n- tutte le pagine principali entrano in stato di aggiornamento\n- aggiornamento modello dati e ricalcolo viste\n\nCosa viene aggiornato:\n- elenco snapshot e metadati\n- statistiche Home\n- dati sorgente per la schermata Cerca\n\nBuone pratiche:\n- eseguire refresh dopo import/install/export/delete\n- usare refresh prima di analisi o confronti"
+        },
+        "Workflow details": {
+            "it": "Flusso consigliato per uso quotidiano:\n\n1) Setup iniziale\n- definisci percorso catalogo\n- configura backup e preferiti\n- imposta lingua/tema\n\n2) Gestione configurazioni\n- crea/importa snapshot\n- aggiungi tag e metadati utili\n- organizza con ordinamenti\n\n3) Verifica e ricerca\n- usa Cerca per controlli su nomi/contenuti\n- filtra per estensioni e target\n\n4) Applicazione operativa\n- installa snapshot quando necessario\n- aggiorna snapshot con stato locale se richiesto\n- esporta per condivisione o archivio\n\n5) Manutenzione\n- refresh periodico con F5\n- pulizia backup quando opportuno"
+        },
         # ── Catalogue Searcher Controller ──
         "Missing text": {"it": "Testo mancante"},
         "Please enter a text before starting the search.": {"it": "Per favore, inserisci un testo prima di avviare la ricerca."},
