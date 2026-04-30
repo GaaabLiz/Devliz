@@ -4,6 +4,7 @@ from qfluentwidgets import MessageBox
 
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
+from devliz.application.action_history import log_action
 from devliz.model.catalogue_searcher import CatalogueSearcherModel
 from devliz.view.catalogue_searcher import CatalogueSearcherView
 from devliz.application.i18n import tr
@@ -51,6 +52,7 @@ class CatalogueSearcherController:
             row (int): The row index of the snapshot to remove.
         """
         self.model.table_model.remove_snapshot(row)
+        log_action("Search", "search.snapshot.removed", f"row={row}")
 
     def _on_file_double_clicked(self, file_path: str):
         """
@@ -92,6 +94,7 @@ class CatalogueSearcherController:
         self.view.action_stop.setEnabled(True)
 
         self.model.search(search_text, query_type, search_target, extensions)
+        log_action("Search", "search.started", f"query={search_text}")
 
     def _stop_search(self):
         """Stops the search operation in the model and updates the UI state."""
@@ -101,12 +104,14 @@ class CatalogueSearcherController:
         # Toggle button states
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
+        log_action("Search", "search.stopped", "")
 
     def _on_search_finished(self):
         """Handles the completion of the search operation by updating the UI state."""
         self.view.set_operation_status(False)
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
+        log_action("Search", "search.completed", "")
 
     def open(self, snapshot: Snapshot | None = None):
         """
