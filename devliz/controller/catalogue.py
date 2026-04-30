@@ -9,7 +9,6 @@ from qfluentwidgets import MessageBox
 from scipy.optimize import direct
 
 from devliz.application.app import app, AppSettings, app_settings
-from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
@@ -20,10 +19,11 @@ from devliz.application.i18n import tr
 
 class CatalogueController:
 
-    def __init__(self,dash_model: DashboardModel):
+    def __init__(self, dash_model: DashboardModel, search_page_opener=None):
         self.dash_model = dash_model
         self.model = CatalogueModel()
         self.view = SnapshotCatalogueWidget(self.model)
+        self.search_page_opener = search_page_opener
 
 
     def init(self):
@@ -67,12 +67,12 @@ class CatalogueController:
             UiUtils.show_message(tr("Error"), tr("An error occurred: {error}", error=str(e)))
 
     def __open_snapshot_searcher(self):
-        controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
-        controller.open()
+        if self.search_page_opener:
+            self.search_page_opener(None)
 
     def __open_snapshot_searcher_single(self, snapshot: Snapshot):
-        controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
-        controller.open(snapshot=snapshot)
+        if self.search_page_opener:
+            self.search_page_opener(snapshot)
 
     def __install_snapshot(self, snap: Snapshot):
         try:

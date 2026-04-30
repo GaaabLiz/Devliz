@@ -110,13 +110,13 @@ class CatalogueSearcherController:
 
     def open(self, snapshot: Snapshot | None = None):
         """
-        Opens the search dialog window.
+        Loads snapshots into the search page.
 
-        Loads the specified snapshot(s) into the model and shows the dialog.
+        If a snapshot is provided, the page is scoped to that snapshot only.
+        Otherwise it shows all snapshots.
 
         Args:
             snapshot (Snapshot | None, optional): A specific snapshot to load,
                                                   or None to load all. Defaults to None.
         """
         self.model.load_snapshots_from_catalogue(snapshot)
-        self.view.exec_()

@@ -1,6 +1,6 @@
 from PySide6.QtCore import QAbstractItemModel, Qt, Signal, QModelIndex
 from PySide6.QtGui import QActionGroup
-from PySide6.QtWidgets import QDialog, QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView
 from qfluentwidgets import (
     LineEdit,
     TableView,
@@ -21,9 +21,10 @@ from qfluentwidgets import (
 from pylizlib.core.os.snap import QueryType, SearchTarget
 
 from devliz.application.i18n import tr
+from devliz.view.util.frame import DevlizQFrame
 
 
-class CatalogueSearcherView(QDialog):
+class CatalogueSearcherView(DevlizQFrame):
     """
     A dialog window for searching within the snapshot catalogue.
 
@@ -47,14 +48,15 @@ class CatalogueSearcherView(QDialog):
         Args:
             parent (QWidget, optional): The parent widget. Defaults to None.
         """
-        super().__init__(parent)
+        super().__init__(name=tr("Search"), parent=parent)
 
-        # Basic dialog settings
-        self.setWindowTitle(tr("Catalogue Search"))
-        self.resize(1200, 800)
+        self.install_label_title()
+
+        content_widget = QWidget(self)
+        self.master_layout.addWidget(content_widget)
 
         # Main layout
-        self.main_layout = QHBoxLayout(self)
+        self.main_layout = QHBoxLayout(content_widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
         self.main_layout.setSpacing(10)
 
@@ -160,7 +162,7 @@ class CatalogueSearcherView(QDialog):
         self.main_layout.addWidget(self.right_widget, 1)
 
         # Apply Fluent Design stylesheet
-        FluentStyleSheet.DIALOG.apply(self)
+        FluentStyleSheet.DIALOG.apply(content_widget)
 
         # Set initial placeholder
         self._update_search_bar_placeholder()

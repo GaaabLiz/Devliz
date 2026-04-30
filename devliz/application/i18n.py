@@ -21,6 +21,7 @@ _translations: dict[str, dict[str, str]] = {
         "Edit": {"it": "Modifica"},
         "Sort": {"it": "Ordina"},
         "Search content": {"it": "Cerca contenuto"},
+        "Search": {"it": "Cerca"},
         "Name": {"it": "Nome"},
         "Author": {"it": "Autore"},
         "Creation date": {"it": "Data creazione"},
