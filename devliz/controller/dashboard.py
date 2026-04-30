@@ -50,10 +50,14 @@ class DashboardController:
 
 
     def __handle_update_started(self):
+        self.home.view.set_state(UiWidgetMode.UPDATING)
         self.catalogue.view.set_state(UiWidgetMode.UPDATING)
+        self.searcher.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
+        self.home.view.set_state(UiWidgetMode.DISPLAYING)
         self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
+        self.searcher.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __open_search_page(self, snapshot=None):
         self.searcher.open(snapshot)
