@@ -6,6 +6,7 @@ from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
 from devliz.model.catalogue_searcher import CatalogueSearcherModel
 from devliz.view.catalogue_searcher import CatalogueSearcherView
+from devliz.application.i18n import tr
 
 
 class CatalogueSearcherController:
@@ -74,8 +75,8 @@ class CatalogueSearcherController:
         search_text = self.view.search_bar.text()
         if not search_text.strip():
             m = MessageBox(
-                "Testo mancante",
-                "Per favore, inserisci un testo prima di avviare la ricerca.",
+                tr("Missing text"),
+                tr("Please enter a text before starting the search."),
                 self.view
             )
             m.exec()

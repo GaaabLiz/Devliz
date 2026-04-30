@@ -6,6 +6,7 @@ from qfluentwidgets import FluentStyleSheet, PushButton, PrimaryPushButton
 
 from devliz.domain.data import DevlizData
 from devliz.view.catalogue_imp_tabs import DialogConfigTabs
+from devliz.application.i18n import tr
 
 
 class DialogConfig(QDialog):
@@ -57,9 +58,9 @@ class DialogConfig(QDialog):
 
     def __get_dialog_text(self):
         if not self.edit_mode:
-            return "Importa una configurazione"
+            return tr("Import a configuration")
         config_name = self.edit_data.name if self.edit_data else ""
-        return "Modifica una configurazione" + (f": {config_name}" if config_name else "")
+        return tr("Edit a configuration") + (f": {config_name}" if config_name else "")
 
     def _on_form_changed(self, changed: bool):
         """Gestisce le modifiche del form"""
@@ -83,14 +84,14 @@ class DialogConfig(QDialog):
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         btn_layout.setSpacing(5)
         # Creo pulsante accetta
-        btn_create_text = "CREA CONFIGURAZIONE" if not self.edit_mode else "SALVA MODIFICHE"
+        btn_create_text = tr("CREATE CONFIGURATION") if not self.edit_mode else tr("SAVE CHANGES")
         self.btn_create = PrimaryPushButton(btn_create_text, self)
         self.btn_create.setMaximumWidth(600)
         self.btn_create.setEnabled(False) if self.edit_mode else None
         self.btn_create.clicked.connect(self.__handle_accept)
         btn_layout.addWidget(self.btn_create)
         # Creo pulsante chiudi
-        btn_close = PushButton("CHIUDI", self)
+        btn_close = PushButton(tr("CLOSE"), self)
         btn_close.setMaximumWidth(600)
         btn_layout.addWidget(btn_close)
         btn_close.clicked.connect(self.reject)
@@ -100,13 +101,13 @@ class DialogConfig(QDialog):
     def __handle_accept(self):
         data = self.__tabs.get_actual_data()
         if data is None:
-            UiUtils.show_message("Errore", "Si è verificato un errore durante la creazione dei dati.", self)
+            UiUtils.show_message(tr("Error"), tr("An error occurred while creating the data."), self)
             return
         if data.name.strip() == "":
-            UiUtils.show_message("Errore", "Il campo 'Nome' non può essere vuoto.", self)
+            UiUtils.show_message(tr("Error"), tr("The 'Name' field cannot be empty."), self)
             return
         if not data.directories or len(data.directories) == 0:
-            UiUtils.show_message("Errore", "Deve essere associata almeno una cartella alla configurazione.", self)
+            UiUtils.show_message(tr("Error"), tr("At least one folder must be associated with the configuration."), self)
             return
         self.signal_payload.emit(data, self.edit_mode)
         self.output_data = data

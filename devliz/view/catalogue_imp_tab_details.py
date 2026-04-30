@@ -6,6 +6,7 @@ from pylizlib.qtfw.widgets.input import MultiSelectionComboBox
 from qfluentwidgets import BodyLabel, LineEdit, ComboBox
 
 from devliz.application.app import snap_settings
+from devliz.application.i18n import tr
 
 
 class TabDetails(QWidget):
@@ -47,7 +48,7 @@ class TabDetails(QWidget):
 
     def __create_fields(self, tags: list[str]):
         # Campo id
-        self.form_id_label = BodyLabel("ID:", self)
+        self.form_id_label = BodyLabel(tr("ID:"), self)
         self.form_id_value = LineEdit()
         self.form_id_value.setText(gen_random_string(snap_settings.snap_id_length))
         self.form_id_value.setReadOnly(True)
@@ -55,23 +56,23 @@ class TabDetails(QWidget):
         self.form_layout.addRow(self.form_id_label, self.form_id_value)
 
         # Campo nome
-        self.form_name_label = BodyLabel("Nome:", self)
+        self.form_name_label = BodyLabel(tr("Name:"), self)
         self.form_name_input = LineEdit()
         self.form_name_input.setMaximumWidth(250)
         self.form_layout.addRow(self.form_name_label, self.form_name_input)
 
         # Campo descrizione
-        self.form_desc_label = BodyLabel("Descrizione:", self)
+        self.form_desc_label = BodyLabel(tr("Description:"), self)
         self.form_desc_input = LineEdit()
         self.form_desc_input.setMaximumWidth(250)
         self.form_layout.addRow(self.form_desc_label, self.form_desc_input)
 
         # Campo tags
-        self.form_tags_label = BodyLabel("Tags:", self)
+        self.form_tags_label = BodyLabel(tr("Tags:"), self)
         self.form_tags_input = MultiSelectionComboBox(self)
         self.form_tags_input.addItems(tags)
         self.form_tags_input.setMaximumWidth(250)
-        self.form_tags_input.setPlaceholderText("Aggiungi tag...")
+        self.form_tags_input.setPlaceholderText(tr("Add tag..."))
         self.form_layout.addRow(self.form_tags_label, self.form_tags_input)
 
         # Campi custom

@@ -20,6 +20,8 @@ from qfluentwidgets import (
 )
 from pylizlib.core.os.snap import QueryType, SearchTarget
 
+from devliz.application.i18n import tr
+
 
 class CatalogueSearcherView(QDialog):
     """
@@ -48,7 +50,7 @@ class CatalogueSearcherView(QDialog):
         super().__init__(parent)
 
         # Basic dialog settings
-        self.setWindowTitle("Ricerca nel Catalogo")
+        self.setWindowTitle(tr("Catalogue Search"))
         self.resize(1200, 800)
 
         # Main layout
@@ -67,16 +69,16 @@ class CatalogueSearcherView(QDialog):
 
         # CommandBar
         self.command_bar = CommandBar(self)
-        self.action_start = Action(FluentIcon.SEARCH, "Start", self)
-        self.action_stop = Action(FluentIcon.POWER_BUTTON, "Stop", self, enabled=False)
+        self.action_start = Action(FluentIcon.SEARCH, tr("Start"), self)
+        self.action_stop = Action(FluentIcon.POWER_BUTTON, tr("Stop"), self, enabled=False)
 
-        self.target_button = TransparentDropDownPushButton("Target", self, FluentIcon.TILES)
+        self.target_button = TransparentDropDownPushButton(tr("Target"), self, FluentIcon.TILES)
         self.target_button.setMenu(self.__create_target_menu())
 
-        self.query_type_button = TransparentDropDownPushButton("Tipo", self, FluentIcon.FONT)
+        self.query_type_button = TransparentDropDownPushButton(tr("Type"), self, FluentIcon.FONT)
         self.query_type_button.setMenu(self.__create_query_type_menu())
 
-        self.extensions_button = TransparentDropDownPushButton("Estensioni", self, FluentIcon.FILTER)
+        self.extensions_button = TransparentDropDownPushButton(tr("Extensions"), self, FluentIcon.FILTER)
         self.extensions_button.setMenu(self.__create_extensions_menu())
 
         self.command_bar.addAction(self.action_start)
@@ -91,14 +93,14 @@ class CatalogueSearcherView(QDialog):
         self.search_layout = QHBoxLayout(self.search_widget)
         self.search_layout.setContentsMargins(0, 0, 0, 0)
         self.search_bar = LineEdit(self)
-        self.search_bar.setPlaceholderText("Inserisci il testo da cercare...")
+        self.search_bar.setPlaceholderText(tr("Enter the text to search..."))
         self.search_layout.addWidget(self.search_bar)
 
         # Status Card (initially hidden)
         self.status_card = CardWidget(self)
         status_layout = QVBoxLayout(self.status_card)
 
-        self.status_card_label = BodyLabel("In attesa...", self.status_card)
+        self.status_card_label = BodyLabel(tr("Waiting..."), self.status_card)
         status_layout.addWidget(self.status_card_label)
 
         # Progress bar
@@ -188,7 +190,7 @@ class CatalogueSearcherView(QDialog):
             return
 
         menu = RoundMenu(parent=self)
-        delete_action = Action(FluentIcon.DELETE, "Rimuovi dalla ricerca")
+        delete_action = Action(FluentIcon.DELETE, tr("Remove from search"))
         delete_action.triggered.connect(lambda: self.signal_delete_requested.emit(index.row()))
         menu.addAction(delete_action)
         menu.exec(self.results_table.viewport().mapToGlobal(pos))
@@ -242,8 +244,8 @@ class CatalogueSearcherView(QDialog):
 
         self.action_target_map = {}
         target_names = {
-            SearchTarget.FILE_NAME: "Nome del file",
-            SearchTarget.FILE_CONTENT: "Contenuto del file"
+            SearchTarget.FILE_NAME: tr("File name"),
+            SearchTarget.FILE_CONTENT: tr("File content")
         }
         for target in SearchTarget:
             action = Action(target_names.get(target, target.name.replace("_", " ").title()), self, checkable=True)
@@ -287,13 +289,13 @@ class CatalogueSearcherView(QDialog):
         query_type = self.get_selected_query_type()
 
         if target == SearchTarget.FILE_CONTENT and query_type == QueryType.TEXT:
-            self.search_bar.setPlaceholderText("Cerca il contenuto di un file")
+            self.search_bar.setPlaceholderText(tr("Search the content of a file"))
         elif target == SearchTarget.FILE_CONTENT and query_type == QueryType.REGEX:
-            self.search_bar.setPlaceholderText("Cerca il contenuto di un file usando una regex")
+            self.search_bar.setPlaceholderText(tr("Search the content of a file using a regex"))
         elif target == SearchTarget.FILE_NAME and query_type == QueryType.TEXT:
-            self.search_bar.setPlaceholderText("Cerca il nome di un file")
+            self.search_bar.setPlaceholderText(tr("Search the name of a file"))
         elif target == SearchTarget.FILE_NAME and query_type == QueryType.REGEX:
-            self.search_bar.setPlaceholderText("Cerca il nome di un file usando una regex")
+            self.search_bar.setPlaceholderText(tr("Search the name of a file using a regex"))
 
     def get_selected_extensions(self) -> list[str]:
         """

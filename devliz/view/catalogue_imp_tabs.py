@@ -12,6 +12,7 @@ from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizData
 from devliz.view.catalogue_imp_tab_details import TabDetails
 from devliz.view.catalogue_imp_tab_directories import TabDirectories
+from devliz.application.i18n import tr
 
 
 class DialogConfigTabs(QWidget):
@@ -34,8 +35,8 @@ class DialogConfigTabs(QWidget):
         self.tab_directories = TabDirectories(self.payload_data, app_settings.get(AppSettings.starred_dirs))
 
         # Aggiungo i tabs al pivot
-        self.__add_sub_interface(self.tab_details, "details", "Dettagli")
-        self.__add_sub_interface(self.tab_directories, "directories", "Cartelle")
+        self.__add_sub_interface(self.tab_details, "details", tr("Details"))
+        self.__add_sub_interface(self.tab_directories, "directories", tr("Folders"))
 
         # Aggiungo tutto al layout principale
         self.vBoxLayout.addWidget(self.pivot)
@@ -73,4 +74,4 @@ class DialogConfigTabs(QWidget):
             return data
         except Exception as e:
             logger.error(e)
-            UiUtils.show_message("Errore", "Si è verificato un errore durante la raccolta dei dati.", self)
+            UiUtils.show_message(tr("Error"), tr("An error occurred while collecting the data."), self)

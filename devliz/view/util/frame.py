@@ -3,6 +3,8 @@ from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
 from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import SubtitleLabel, setFont, SingleDirectionScrollArea, IndeterminateProgressBar, BodyLabel
 
+from devliz.application.i18n import tr
+
 
 
 class DevlizQFrameUiBuilder:
@@ -16,7 +18,7 @@ class DevlizQFrameUiBuilder:
         return progress_bar
 
     def get_label_updating(self):
-        updating_label = BodyLabel("Aggiornamento in corso attendere", parent=self.parent)
+        updating_label = BodyLabel(tr("Updating, please wait"), parent=self.parent)
         updating_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return updating_label
 

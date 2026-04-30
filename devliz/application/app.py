@@ -9,7 +9,7 @@ from pylizlib.core.os.snap import SnapshotSettings
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
 from pylizlib.qtfw.domain.setting import QtFwQConfigItem
 from pylizlib.qtfw.model.qconfig import TextListValidator, ExecutableValidator
-from qfluentwidgets import QConfig, ConfigItem, BoolValidator, qconfig, FolderValidator
+from qfluentwidgets import QConfig, BoolValidator, qconfig, FolderValidator, OptionsValidator, OptionsConfigItem
 
 from devliz.project import version, name, authors
 
@@ -38,6 +38,8 @@ DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL = True
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT = False
 DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE = True
 DEFAULT_SETTING_CLEAR_SNAP_ATTACHED_FOLDERS_BEFORE_INSTALL = True
+DEFAULT_SETTING_LANGUAGE = "en"
+EXIT_CODE_RESTART = 1000
 
 # DEFINIZIONE DEI GRUPPI DI IMPOSTAZIONI
 SETTING_GROUP_CONFIGS = "Configurazioni"
@@ -77,6 +79,7 @@ class AppSettings(QConfig):
     starred_services = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES, "Servizi Preferiti", DEFAULT_SETTING_STARRED_SERVICES, TextListValidator())
     debug_test_mode = QtFwQConfigItem(False, SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
     clear_snap_attached_folders_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Clear snap attached folders before install", DEFAULT_SETTING_CLEAR_SNAP_ATTACHED_FOLDERS_BEFORE_INSTALL, BoolValidator())
+    language = OptionsConfigItem(SETTING_GROUP_APP, "Language", DEFAULT_SETTING_LANGUAGE, OptionsValidator(["en", "it"]))
 
 
 # CARICAMENTO IMPOSTAZIONI

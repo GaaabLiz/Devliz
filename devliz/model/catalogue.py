@@ -3,6 +3,7 @@ from pylizlib.core.os.snap import Snapshot, SnapshotSortKey, SnapshotUtils
 
 from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizSnapshotData
+from devliz.application.i18n import tr
 
 
 class SnapshotTableModel(QAbstractTableModel):
@@ -18,12 +19,12 @@ class SnapshotTableModel(QAbstractTableModel):
 
     def update_headers(self):
         """Updates the headers based on application settings."""
-        headers = ["Nome", "Descrizione"]
+        headers = [tr("Name"), tr("Description")]
         snap_custom_data = app_settings.get(AppSettings.snap_custom_data)
         for i in snap_custom_data:
             headers.append(i)
-        headers.append("Data/Ora")
-        headers.append("Tags")
+        headers.append(tr("Date/Time"))
+        headers.append(tr("Tags"))
         self._headers = headers
         self.headerDataChanged.emit(Qt.Orientation.Horizontal, 0, len(self._headers) - 1)
 

@@ -15,6 +15,7 @@ from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
 from devliz.view.catalogue import SnapshotCatalogueWidget
 from devliz.view.catalogue_imp_dialog import DialogConfig
+from devliz.application.i18n import tr
 
 
 class CatalogueController:
@@ -57,13 +58,13 @@ class CatalogueController:
                     self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
                 else:
                     self.dash_model.snap_catalogue.add(dialog.output_data)
-                titolo = "Configurazione creata" if not edit_mode else "Configurazione modificata"
-                testo = "La configurazione è stata creata con successo." if not edit_mode else "La configurazione è stata modificata con successo."
+                titolo = tr("Configuration created") if not edit_mode else tr("Configuration modified")
+                testo = tr("The configuration has been created successfully.") if not edit_mode else tr("The configuration has been modified successfully.")
                 UiUtils.show_message(titolo, testo)
                 self.dash_model.update()
         except Exception as e:
             logger.error(str(e))
-            UiUtils.show_message("Attenzione", "Si è verificato un errore: " + str(e))
+            UiUtils.show_message(tr("Error"), tr("An error occurred: {error}", error=str(e)))
 
     def __open_snapshot_searcher(self):
         controller = CatalogueSearcherController(self.dash_model.snap_catalogue, self.view)
@@ -75,29 +76,29 @@ class CatalogueController:
 
     def __install_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox("Installa configurazione", "Sei sicuro di voler installare lo snapshot selezionato ? Tutte le directory presenti attualmente verranno rimpiazzate con quelle contenute nello snapshot.", parent=self.view)
+            w = MessageBox(tr("Install configuration"), tr("Are you sure you want to install the selected snapshot? All current directories will be replaced with those contained in the snapshot."), parent=self.view)
             if w.exec_():
                 if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
                     self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
                 self.dash_model.snap_catalogue.install(snap)
                 self.dash_model.update()
         except Exception as e:
-            UiUtils.show_message("Errore di installazione", "Si è verificato un errore durante l'installazione: " + str(e))
+            UiUtils.show_message(tr("Installation error"), tr("An error occurred during installation: {error}", error=str(e)))
 
     def __edit_snapshot(self, snap: Snapshot):
         try:
             self.__open_config_dialog(True, snap)
         except Exception as e:
-            UiUtils.show_message("Errore di modifica", "Si è verificato un errore durante la modifica: " + str(e))
+            UiUtils.show_message(tr("Edit error"), tr("An error occurred during editing: {error}", error=str(e)))
 
     def __delete_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox("Elimina configurazione", "Sei sicuro di voler eliminare lo snapshot selezionato ?\n\n Verranno eliminati tutti i file associati in ", parent=self.view)
+            w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected snapshot?\n\nAll associated files will be deleted in "), parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.delete(snap)
                 self.dash_model.update()
         except Exception as e:
-            UiUtils.show_message("Errore di eliminazione", "Si è verificato un errore durante l'eliminazione: " + str(e))
+            UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
 
     def __open_snap_directory(self, snap: Snapshot):
         path = self.dash_model.snap_catalogue.get_snap_directory_path(snap)
@@ -105,59 +106,59 @@ class CatalogueController:
 
     def __duplicate_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox("Duplica configurazione", "Sei sicuro di voler duplicare la configurazione selezionata ?", parent=self.view)
+            w = MessageBox(tr("Duplicate configuration"), tr("Are you sure you want to duplicate the selected configuration?"), parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
                 self.dash_model.update()
         except Exception as e:
-            UiUtils.show_message("Errore di duplicazione", "Si è verificato un errore durante la duplicazione: " + str(e))
+            UiUtils.show_message(tr("Duplication error"), tr("An error occurred during duplication: {error}", error=str(e)))
 
     def __export_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox("Esporta snapshot", "Sei sicuro di voler esportare lo snapshot selezionato ?", parent=self.view)
+            w = MessageBox(tr("Export snapshot"), tr("Are you sure you want to export the selected snapshot?"), parent=self.view)
             if w.exec_():
                 directory = QFileDialog.getExistingDirectory(
                     None,
-                    "Seleziona la cartella di salvataggio dello snapshot",
+                    tr("Select the save folder for the snapshot"),
                     app.path.__str__()
                 )
                 if directory:
                     self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
         except Exception as e:
-            UiUtils.show_message("Errore di duplicazione", "Si è verificato un errore durante la duplicazione: " + str(e))
+            UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
     def __export_snapshot_folders(self, snap: Snapshot):
         try:
-            w = MessageBox("Esporta cartelle associate", "Sei sicuro di voler esportare le cartelle associate allo snapshot selezionato ?", parent=self.view)
+            w = MessageBox(tr("Export associated folders"), tr("Are you sure you want to export the folders associated with the selected snapshot?"), parent=self.view)
             if w.exec_():
                 directory = QFileDialog.getExistingDirectory(
                     None,
-                    "Seleziona la cartella di salvataggio delle cartelle associate",
+                    tr("Select the save folder for the associated folders"),
                     app.path.__str__()
                 )
                 if directory:
                     self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
         except Exception as e:
-            UiUtils.show_message("Errore di esportazione", "Si è verificato un errore durante l'esportazione: " + str(e))
+            UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
     def __delete_snap_installed_dirs(self, snap: Snapshot):
         try:
-            w = MessageBox("Elimina cartelle installate", "Sei sicuro di voler eliminare le cartelle installate attualmente nel sistema relative allo snapshot selezionato ?", parent=self.view)
+            w = MessageBox(tr("Delete installed folders"), tr("Are you sure you want to delete the currently installed folders for the selected snapshot?"), parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
         except Exception as e:
-            UiUtils.show_message("Errore di eliminazione", "Si è verificato un errore durante l'eliminazione: " + str(e))
+            UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
 
     def __update_assoc_dirs_from_installed(self, snap: Snapshot):
         try:
-            w = MessageBox("Aggiorna cartelle associate", "Sei sicuro di voler aggiornare le cartelle associate allo snapshot selezionato con quelle attualmente installate nel sistema ?", parent=self.view)
+            w = MessageBox(tr("Update associated folders"), tr("Are you sure you want to update the associated folders of the selected snapshot with the currently installed ones?"), parent=self.view)
             if w.exec_():
                 self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
         except Exception as e:
-            UiUtils.show_message("Errore di aggiornamento", "Si è verificato un errore durante l'aggiornamento: " + str(e))
+            UiUtils.show_message(tr("Update error"), tr("An error occurred during update: {error}", error=str(e)))
 
     def __open_directory(self, path: Path):
         if path.exists():
             os.startfile(path)
         else:
-            UiUtils.show_message("Attenzione", "La cartella non esiste più in " + path.__str__())
+            UiUtils.show_message(tr("Warning"), tr("The folder no longer exists in {path}", path=path.__str__()))

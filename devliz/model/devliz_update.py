@@ -8,12 +8,13 @@ from pylizlib.qtfw.domain.sw import SoftwareData
 from qfluentwidgets import FluentIcon
 
 from devliz.application.app import app_settings, AppSettings
+from devliz.application.i18n import tr
 
 
 class TaskGetMonitoredSoftware(Task):
 
     def __init__(self):
-        super().__init__("Recupero Software Monitorati")
+        super().__init__(tr("Retrieving Monitored Software"))
 
     def execute(self):
         data_list: list[str] = app_settings.get(AppSettings.starred_exes)
@@ -38,7 +39,7 @@ class TaskGetMonitoredSoftware(Task):
 class TaskGetSnapshots(Task):
 
     def __init__(self, catalogue: SnapshotCatalogue):
-        super().__init__("Recupero snapshots salvati")
+        super().__init__(tr("Retrieving saved snapshots"))
         self.catalogue = catalogue
 
     def execute(self):

@@ -7,6 +7,7 @@ from qfluentwidgets import (
 
 from devliz.domain.data import HomeStatistics
 from devliz.view.util.frame import DevlizQFrame
+from devliz.application.i18n import tr
 
 
 class StatCard(SimpleCardWidget):
@@ -53,26 +54,26 @@ class StatCard(SimpleCardWidget):
 class HomeView(DevlizQFrame):
 
     def __init__(self, parent=None):
-        super().__init__(name="Home", parent=parent)
+        super().__init__(name=tr("Home"), parent=parent)
         self.__setup_ui()
 
     def __setup_ui(self):
         self.install_label_title()
 
         self.card_snap_count = StatCard(
-            FluentIcon.PHOTO, "Numero Snapshot", parent=self
+            FluentIcon.PHOTO, tr("Snapshot Count"), parent=self
         )
         self.card_total_size = StatCard(
-            FluentIcon.CLOUD, "Dimensione Totale", parent=self
+            FluentIcon.CLOUD, tr("Total Size"), parent=self
         )
         self.card_total_files = StatCard(
-            FluentIcon.DOCUMENT, "File Totali", parent=self
+            FluentIcon.DOCUMENT, tr("Total Files"), parent=self
         )
         self.card_total_dirs = StatCard(
-            FluentIcon.FOLDER, "Cartelle Totali", parent=self
+            FluentIcon.FOLDER, tr("Total Folders"), parent=self
         )
         self.card_heaviest_file = StatCard(
-            FluentIcon.CALORIES, "File più Pesante", parent=self
+            FluentIcon.CALORIES, tr("Heaviest File"), parent=self
         )
 
         grid = QGridLayout()
@@ -106,4 +107,4 @@ class HomeView(DevlizQFrame):
                 subtitle=name
             )
         else:
-            self.card_heaviest_file.update_value("—", subtitle="Nessun file trovato")
+            self.card_heaviest_file.update_value("—", subtitle=tr("No file found"))

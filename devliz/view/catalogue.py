@@ -10,6 +10,7 @@ from qfluentwidgets import SearchLineEdit, Action, FluentIcon, CommandBar, setFo
 from devliz.application.app import app_settings, AppSettings
 from devliz.model.catalogue import CatalogueModel
 from devliz.view.util.frame import DevlizQFrame
+from devliz.application.i18n import tr
 
 
 class SnapshotCatalogueUiBuilder:
@@ -35,7 +36,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_update_with_local_dirs_requested = Signal(Snapshot)
 
     def __init__(self, model: CatalogueModel, parent=None):
-        super().__init__(name="Catalogo", parent=parent)
+        super().__init__(name=tr("Catalogue"), parent=parent)
 
         # Il modello è l'unica fonte di verità per i dati
         self.model = model
@@ -53,14 +54,14 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.search_line_edit = SearchLineEdit(self)
         self.search_line_edit.textChanged.connect(self.model.filter)
 
-        self.action_import = Action(FluentIcon.ADD, 'Importa', triggered=lambda: self.signal_import_requested.emit())
-        self.action_edit = Action(FluentIcon.EDIT, 'Modifica', enabled=False,triggered=lambda: self.signal_edit_requested.emit())
+        self.action_import = Action(FluentIcon.ADD, tr('Import'), triggered=lambda: self.signal_import_requested.emit())
+        self.action_edit = Action(FluentIcon.EDIT, tr('Edit'), enabled=False,triggered=lambda: self.signal_edit_requested.emit())
 
-        menu_combobox_sort = TransparentDropDownPushButton("Ordina", self, FluentIcon.SCROLL)
+        menu_combobox_sort = TransparentDropDownPushButton(tr("Sort"), self, FluentIcon.SCROLL)
         menu_combobox_sort.setMenu(self.__get_sort_menu())
         menu_combobox_sort.setFixedHeight(34)
 
-        self.action_search_internal_all = Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_all.emit())
+        self.action_search_internal_all = Action(FluentIcon.SEARCH, tr("Search content"),triggered=lambda: self.signal_search_internal_content_all.emit())
 
         left_command_bar = CommandBar()
         left_command_bar.setMinimumWidth(600)
@@ -82,11 +83,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def __get_sort_menu(self, pos=None):
         menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
-        action_sort_name = Action(FluentIcon.QUICK_NOTE, "Nome", checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
-        action_sort_author = Action(FluentIcon.PEOPLE, "Autore", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
-        action_sort_date_create = Action(FluentIcon.CALENDAR, "Data creazione", checkable=True,triggered=lambda: self.signal_sort_requested.emit( SnapshotSortKey.DATE_CREATED))
-        action_sort_date_modify = Action(FluentIcon.EDIT, "Data modifica", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
-        action_sort_date_dim_mb_assoc = Action(FluentIcon.FOLDER, "Dimensione", checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.ASSOC_DIR_MB_SIZE))
+        action_sort_name = Action(FluentIcon.QUICK_NOTE, tr("Name"), checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
+        action_sort_author = Action(FluentIcon.PEOPLE, tr("Author"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
+        action_sort_date_create = Action(FluentIcon.CALENDAR, tr("Creation date"), checkable=True,triggered=lambda: self.signal_sort_requested.emit( SnapshotSortKey.DATE_CREATED))
+        action_sort_date_modify = Action(FluentIcon.EDIT, tr("Modification date"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
+        action_sort_date_dim_mb_assoc = Action(FluentIcon.FOLDER, tr("Size"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.ASSOC_DIR_MB_SIZE))
 
         action_sort_group = QActionGroup(self)
         action_sort_group.addAction(action_sort_name)
@@ -140,7 +141,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         setFont(self.footer_path_label, 12)
         self.footer_path_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
-        self.footer_stats_label = BodyLabel(f"Totale configurazioni: {count} ({size})", self)
+        self.footer_stats_label = BodyLabel(tr("Total configurations: {count} ({size})", count=count, size=size), self)
         setFont(self.footer_stats_label, 12)
         self.footer_stats_label.setAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
 
@@ -155,31 +156,31 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.master_layout.addWidget(container)
 
     def _get_export_context_menu(self, snapshot: Snapshot) -> RoundMenu:
-        submenu = RoundMenu("Esporta", self)
+        submenu = RoundMenu(tr("Export"), self)
         submenu.setIcon(FluentIcon.DOWNLOAD)
         submenu.addActions([
-            Action(FluentIcon.DICTIONARY, 'Snapshot (.zip)', triggered=lambda: self.signal_export_request_snapshot.emit(snapshot)),
-            Action(FluentIcon.FOLDER, 'Cartelle associate (.zip)', triggered=lambda: self.signal_export_request_assoc_folders.emit(snapshot)),
+            Action(FluentIcon.DICTIONARY, tr('Snapshot (.zip)'), triggered=lambda: self.signal_export_request_snapshot.emit(snapshot)),
+            Action(FluentIcon.FOLDER, tr('Associated folders (.zip)'), triggered=lambda: self.signal_export_request_assoc_folders.emit(snapshot)),
         ])
         return submenu
 
     def _get_delete_context_menu(self, snapshot: Snapshot) -> RoundMenu:
-        submenu = RoundMenu("Cancella", self)
+        submenu = RoundMenu(tr("Delete"), self)
         submenu.setIcon(FluentIcon.DELETE)
         submenu.addActions([
-            Action(FluentIcon.DELETE, 'Cartelle installate', triggered=lambda: self.signal_delete_installed_folders_requested.emit(snapshot)),
-            Action(FluentIcon.DELETE, 'Snapshot intero', triggered=lambda: self.signal_delete_requested.emit(snapshot)),
+            Action(FluentIcon.DELETE, tr('Installed folders'), triggered=lambda: self.signal_delete_installed_folders_requested.emit(snapshot)),
+            Action(FluentIcon.DELETE, tr('Entire snapshot'), triggered=lambda: self.signal_delete_requested.emit(snapshot)),
         ])
         return submenu
 
     def _get_open_context_menu(self, snapshot: Snapshot) -> RoundMenu:
-        submenu = RoundMenu("Apri", self)
+        submenu = RoundMenu(tr("Open"), self)
         submenu.setIcon(FluentIcon.VIEW)
         submenu.addActions([
-            Action(FluentIcon.FOLDER, 'Cartella snapshot', triggered=lambda: self.signal_open_folder_requested.emit(snapshot)),
+            Action(FluentIcon.FOLDER, tr('Snapshot folder'), triggered=lambda: self.signal_open_folder_requested.emit(snapshot)),
         ])
         for assoc in snapshot.directories:
-            submenu.addAction(Action(FluentIcon.FOLDER, f'Cartella locale associata: {Path(assoc.original_path).name}', triggered=lambda a=assoc: self.signal_open_assoc_folder_requested.emit(Path(assoc.original_path))))
+            submenu.addAction(Action(FluentIcon.FOLDER, tr('Associated local folder: {name}', name=Path(assoc.original_path).name), triggered=lambda a=assoc: self.signal_open_assoc_folder_requested.emit(Path(assoc.original_path))))
         return submenu
 
     def _show_context_menu(self, pos):
@@ -192,11 +193,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
             return
 
         menu = RoundMenu()
-        menu.addAction(Action(FluentIcon.DOWN, "Installa", triggered=lambda: self.signal_install_requested.emit(config)))
-        menu.addAction(Action(FluentIcon.EDIT, "Modifica", triggered=lambda: self.signal_edit_requested.emit(config)))
-        menu.addAction(Action(FluentIcon.SEARCH, "Cerca contenuto",triggered=lambda: self.signal_search_internal_content_single.emit(config)))
-        menu.addAction(Action(FluentIcon.UP, "Aggiorna con locali", triggered=lambda: self.signal_update_with_local_dirs_requested.emit(config)))
-        menu.addAction(Action(FluentIcon.DICTIONARY_ADD, "Duplica", triggered=lambda: self.signal_duplicate_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.DOWN, tr("Install"), triggered=lambda: self.signal_install_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.EDIT, tr("Edit"), triggered=lambda: self.signal_edit_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.SEARCH, tr("Search content"),triggered=lambda: self.signal_search_internal_content_single.emit(config)))
+        menu.addAction(Action(FluentIcon.UP, tr("Update with local"), triggered=lambda: self.signal_update_with_local_dirs_requested.emit(config)))
+        menu.addAction(Action(FluentIcon.DICTIONARY_ADD, tr("Duplicate"), triggered=lambda: self.signal_duplicate_requested.emit(config)))
         menu.addSeparator()
         menu.addMenu(self._get_open_context_menu(config))
         menu.addMenu(self._get_export_context_menu(config))
@@ -229,7 +230,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.model.sort(method)
 
     def reload_data(self):
-        self.footer_stats_label.setText(f"Totale configurazioni: {self.model.count()} ({self.model.get_mb_size()})")
+        self.footer_stats_label.setText(tr("Total configurations: {count} ({size})", count=self.model.count(), size=self.model.get_mb_size()))
 
         # Aggiorna il path se necessario e le intestazioni della tabella
         new_path = app_settings.get(AppSettings.catalogue_path)

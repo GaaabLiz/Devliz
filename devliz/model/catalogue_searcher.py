@@ -9,6 +9,8 @@ from pylizlib.qt.handler.operation_core import Operation, Task
 from pylizlib.qt.handler.operation_domain import OperationInfo, OperationStatus
 from pylizlib.qt.handler.operation_runner import OperationRunner, RunnerStatistics
 
+from devliz.application.i18n import tr
+
 
 class SearchResultsTableModel(QAbstractTableModel):
     """
@@ -27,7 +29,7 @@ class SearchResultsTableModel(QAbstractTableModel):
             parent (QObject, optional): The parent object. Defaults to None.
         """
         super().__init__(parent)
-        self._headers = ["Nome snapshot", "Stato", "Valori trovati", "Progresso", "ETA"]
+        self._headers = [tr("Snapshot name"), tr("Status"), tr("Values found"), tr("Progress"), "ETA"]
         self._data: list[Snapshot] = []
         self._progress_data = {}
         self._status_data = {}
@@ -61,7 +63,7 @@ class SearchResultsTableModel(QAbstractTableModel):
         if col == 0:
             return snapshot.name
         elif col == 1:
-            return self._status_data.get(snapshot.id, "Pending")
+            return self._status_data.get(snapshot.id, tr("Pending"))
         elif col == 2:
             return self._results_count_data.get(snapshot.id, "")
         elif col == 3:
@@ -196,7 +198,7 @@ class SnapSearchTask(Task):
             list[SnapshotSearchResult]: A list of results found in the snapshot.
         """
         def on_progress(file_name: str, total_files: int, current_file: int):
-            self.task_update_message.emit(self.name, f"Scansione: {file_name}")
+            self.task_update_message.emit(self.name, tr("Scan: {file_name}", file_name=file_name))
             if total_files > 0:
                 self.gen_update_task_progress(current_file, total_files)
 
@@ -210,12 +212,12 @@ class SearchResultsTreeModel:
     def __init__(self):
         """Initializes the SearchResultsTreeModel."""
         self.model = QStandardItemModel()
-        self.model.setHorizontalHeaderLabels(['Risultati'])
+        self.model.setHorizontalHeaderLabels([tr('Results')])
 
     def clear(self):
         """Clears the tree model and resets the header."""
         self.model.clear()
-        self.model.setHorizontalHeaderLabels(['Risultati'])
+        self.model.setHorizontalHeaderLabels([tr('Results')])
 
     def populate_from_results(self, results: list[SnapshotSearchResult]):
         """
@@ -225,7 +227,7 @@ class SearchResultsTreeModel:
             results (list[SnapshotSearchResult]): The list of search results to display.
         """
         self.clear()
-        self.model.setHorizontalHeaderLabels([f"Risultati ({len(results)})"])
+        self.model.setHorizontalHeaderLabels([tr("Results ({count})", count=len(results))])
 
         results_by_snapshot = {}
         for res in results:
@@ -285,7 +287,7 @@ class CatalogueSearcherModel(QObject):
         self.tree_model_manager = SearchResultsTreeModel()
         self.runner = OperationRunner()
 
-        self._current_message = "In attesa..."
+        self._current_message = tr("Waiting...")
         self._current_progress = 0
         self._current_eta = "--:--"
 
@@ -351,7 +353,7 @@ class CatalogueSearcherModel(QObject):
         """
         self.table_model.reset_search_state()
         self.tree_model_manager.clear()
-        self._current_message = "Avvio..."
+        self._current_message = tr("Starting...")
         self._current_progress = 0
         self._current_eta = "--:--"
         self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
@@ -402,7 +404,7 @@ class CatalogueSearcherModel(QObject):
         Args:
             task_name (str): The name of the task that started.
         """
-        self._current_message = "Ricerca in corso..."
+        self._current_message = tr("Searching...")
         self._current_eta = "--:--"
         self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
 

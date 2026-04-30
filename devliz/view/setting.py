@@ -7,6 +7,7 @@ from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettin
 from devliz.application.app import app, app_settings, AppSettings
 from devliz.view.util.frame import DevlizQFrame
 from devliz.view.util.setting import SettingGroupManager
+from devliz.application.i18n import tr
 
 
 class WidgetSettings(DevlizQFrame):
@@ -18,9 +19,11 @@ class WidgetSettings(DevlizQFrame):
     signal_ask_catalogue_path = Signal()
     signal_open_tags_dialog = Signal()
     signal_clear_backups_request = Signal()
+    signal_language_changed = Signal()
+    signal_theme_changed = Signal()
 
     def __init__(self, parent=None):
-        super().__init__(name="Settings", parent=parent)
+        super().__init__(name=tr("Settings"), parent=parent)
 
         # Label titolo
         self.install_label_title()
@@ -44,9 +47,9 @@ class WidgetSettings(DevlizQFrame):
         # Percorso catalogo generale
         setting_catalogue = AppSettings.catalogue_path
         self.card_general_catalogue = PushSettingCard(
-            text="Scegli directory",
+            text=tr("Choose directory"),
             icon=FluentIcon.BOOK_SHELF,
-            title="Percorso del catalogo",
+            title=tr("Catalogue path"),
             content=app_settings.get(setting_catalogue)
         )
 
@@ -55,18 +58,18 @@ class WidgetSettings(DevlizQFrame):
         self.card_fav_tags = MasterListSettingCard(
             config_item=setting_tags,
             item_type=MasterListSettingCard.Type.TEXT,
-            card_title="Tag configurazioni",
+            card_title=tr("Configuration tags"),
             card_icon=FluentIcon.TAG,
-            main_btn=PushButton("Aggiungi tag", self),
-            card_content="Aggiungi uno o più tag da assegnare alle configurazioni",
+            main_btn=PushButton(tr("Add tag"), self),
+            card_content=tr("Add one or more tags to assign to configurations"),
             parent=self if setting_tags.enabled else None,
-            dialog_title="Aggiungi tag",
-            dialog_content="Inserisci il nome del tag",
-            dialog_button_yes="Aggiungi",
-            dialog_button_no="Annulla",
-            dialog_error="Il tag non può essere vuoto o già esistente",
-            deletion_title="Conferma eliminazione",
-            deletion_content="Sei sicuro di voler eliminare questo tag?"
+            dialog_title=tr("Add tag"),
+            dialog_content=tr("Enter the tag name"),
+            dialog_button_yes=tr("Add"),
+            dialog_button_no=tr("Cancel"),
+            dialog_error=tr("The tag cannot be empty or already existing"),
+            deletion_title=tr("Confirm deletion"),
+            deletion_content=tr("Are you sure you want to delete this tag?")
         )
 
         # custom data snapshots
@@ -74,26 +77,26 @@ class WidgetSettings(DevlizQFrame):
         self.card_snap_custom_data = MasterListSettingCard(
             config_item=setting_custom_data,
             item_type=MasterListSettingCard.Type.TEXT,
-            card_title="Snapshots - Dati personalizzati",
+            card_title=tr("Snapshots - Custom data"),
             card_icon=FluentIcon.QUICK_NOTE,
-            main_btn=PushButton("Aggiungi variabile", self),
-            card_content="Aggiungi una o un più variabili personalizzate da assegnare agli snapshots",
+            main_btn=PushButton(tr("Add variable"), self),
+            card_content=tr("Add one or more custom variables to assign to snapshots"),
             parent=self if setting_custom_data.enabled else None,
-            dialog_title="Aggiungi variabile",
-            dialog_content="Inserisci il nome della variabile",
-            dialog_button_yes="Aggiungi",
-            dialog_button_no="Annulla",
-            dialog_error="La variabile non può essere vuota o già esistente",
-            deletion_title="Conferma eliminazione",
-            deletion_content="Sei sicuro di voler eliminare questa variabile?"
+            dialog_title=tr("Add variable"),
+            dialog_content=tr("Enter the variable name"),
+            dialog_button_yes=tr("Add"),
+            dialog_button_no=tr("Cancel"),
+            dialog_error=tr("The variable cannot be empty or already existing"),
+            deletion_title=tr("Confirm deletion"),
+            deletion_content=tr("Are you sure you want to delete this variable?")
         )
 
         # Backup pre-installazione
         setting_backup_before_install = AppSettings.backup_before_install
         self.card_backup_before_install = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
-            title="Abilita backup pre-installazione",
-            content="Esegui il backup delle cartelle locali (presenti su questo pc) contenute nella configurazione prima di installarla",
+            title=tr("Enable pre-installation backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before installing it"),
             configItem=setting_backup_before_install
         )
 
@@ -101,8 +104,8 @@ class WidgetSettings(DevlizQFrame):
         setting_backup_before_edit = AppSettings.backup_before_edit
         self.card_backup_before_edit = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
-            title="Abilita backup pre-modifica",
-            content="Esegui il backup delle cartelle locali (presenti su questo pc) contenute nella configurazione prima di modificarle",
+            title=tr("Enable pre-edit backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before editing them"),
             configItem=setting_backup_before_edit
         )
 
@@ -110,8 +113,8 @@ class WidgetSettings(DevlizQFrame):
         setting_backup_before_delete = AppSettings.backup_before_delete
         self.card_backup_before_delete= SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
-            title="Abilita backup pre-eliminazione",
-            content="Esegui il backup delle cartelle locali (presenti su questo pc) contenute nella configurazione prima di eliminarle",
+            title=tr("Enable pre-deletion backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before deleting them"),
             configItem=setting_backup_before_delete
         )
 
@@ -119,12 +122,12 @@ class WidgetSettings(DevlizQFrame):
         setting_clear_snap_attached_folders_before_install = AppSettings.clear_snap_attached_folders_before_install
         self.card_clear_snap_attached_folders_before_install = SwitchSettingCard(
             icon=FluentIcon.BASKETBALL,
-            title="Cancella cartelle allegate prima dell'installazione",
-            content="Prima di installare unna configurazione, cancella le cartelle allegate locali (presenti su questo pc)",
+            title=tr("Clear attached folders before installation"),
+            content=tr("Before installing a configuration, clear the local attached folders (on this PC)"),
             configItem=setting_clear_snap_attached_folders_before_install
         )
 
-        grp_manager = SettingGroupManager(self.tr("Snapshots"), self)
+        grp_manager = SettingGroupManager(tr("Snapshots"), self)
         grp_manager.add_widget(setting_catalogue, self.card_general_catalogue, self.signal_ask_catalogue_path)
         grp_manager.add_widget(setting_tags, self.card_fav_tags, None)
         grp_manager.add_widget(setting_custom_data, self.card_snap_custom_data, None)
@@ -142,12 +145,12 @@ class WidgetSettings(DevlizQFrame):
         self.card_fav_dirs = MasterListSettingCard(
             config_item=setting_fav_dirs,
             item_type=MasterListSettingCard.Type.FOLDER,
-            card_title="Cartelle preferite",
+            card_title=tr("Starred folders"),
             card_icon=FluentIcon.FOLDER,
-            main_btn=PushButton("Aggiungi cartella", self),
-            card_content="Aggiungi una o più cartelle preferite",
+            main_btn=PushButton(tr("Add folder"), self),
+            card_content=tr("Add one or more starred folders"),
             parent=self if setting_fav_dirs.enabled else None,
-            dialog_title="Seleziona cartella",
+            dialog_title=tr("Select folder"),
         )
 
         # File preferite
@@ -155,13 +158,13 @@ class WidgetSettings(DevlizQFrame):
         self.card_fav_files = MasterListSettingCard(
             config_item=setting_fav_files,
             item_type=MasterListSettingCard.Type.FILE,
-            card_title="File preferiti",
+            card_title=tr("Starred files"),
             card_icon=FluentIcon.DOCUMENT,
-            main_btn=PushButton("Aggiungi file", self),
-            card_content="Aggiungi uno o più file preferiti",
+            main_btn=PushButton(tr("Add file"), self),
+            card_content=tr("Add one or more starred files"),
             parent=self if setting_fav_files.enabled else None,
-            dialog_title="Seleziona file",
-            dialog_file_filter="All Files (*.*)"
+            dialog_title=tr("Select file"),
+            dialog_file_filter=tr("All Files (*.*)")
         )
 
         # Eseguibili preferiti
@@ -169,13 +172,13 @@ class WidgetSettings(DevlizQFrame):
         self.card_fav_exes = MasterListSettingCard(
             config_item=setting_fav_exe,
             item_type=MasterListSettingCard.Type.FILE,
-            card_title="Eseguibili preferiti",
+            card_title=tr("Starred executables"),
             card_icon=FluentIcon.APPLICATION,
-            main_btn=PushButton("Scegli un eseguibile", self),
-            card_content="Aggiungi uno o più file preferiti da monitorare nella home",
+            main_btn=PushButton(tr("Choose an executable"), self),
+            card_content=tr("Add one or more starred executables to monitor on the home screen"),
             parent=self if setting_fav_exe.enabled else None,
-            dialog_title="Seleziona eseguibile",
-            dialog_file_filter="Executable Files (*.exe);;All Files (*.*)"
+            dialog_title=tr("Select executable"),
+            dialog_file_filter=tr("Executable Files (*.exe);;All Files (*.*)")
         )
 
         # Servizi preferiti
@@ -183,21 +186,21 @@ class WidgetSettings(DevlizQFrame):
         self.card_fav_services = MasterListSettingCard(
             config_item=setting_fav_services,
             item_type=MasterListSettingCard.Type.TEXT,
-            card_title="Servizi preferiti",
+            card_title=tr("Starred services"),
             card_icon=FluentIcon.SETTING,
-            main_btn=PushButton("Aggiungi servizio", self),
-            card_content="Aggiungi uno o più servizi di Windows da monitorare nella home",
+            main_btn=PushButton(tr("Add service"), self),
+            card_content=tr("Add one or more Windows services to monitor on the home screen"),
             parent=self if setting_fav_services.enabled else None,
-            dialog_title="Aggiungi servizio",
-            dialog_content="Inserisci il nome del servizio di Windows (es. Spooler)",
-            dialog_button_yes="Aggiungi",
-            dialog_button_no="Annulla",
-            dialog_error="Il nome del servizio non può essere vuoto o già esistente",
-            deletion_title="Conferma eliminazione",
-            deletion_content="Sei sicuro di voler eliminare questo servizio?"
+            dialog_title=tr("Add service"),
+            dialog_content=tr("Enter the Windows service name (e.g. Spooler)"),
+            dialog_button_yes=tr("Add"),
+            dialog_button_no=tr("Cancel"),
+            dialog_error=tr("The service name cannot be empty or already existing"),
+            deletion_title=tr("Confirm deletion"),
+            deletion_content=tr("Are you sure you want to delete this service?")
         )
 
-        grp_manager = SettingGroupManager(self.tr("Preferiti"), self)
+        grp_manager = SettingGroupManager(tr("Favorites"), self)
         grp_manager.add_widget(setting_fav_dirs, self.card_fav_dirs, None)
         grp_manager.add_widget(setting_fav_files, self.card_fav_files, None)
         grp_manager.add_widget(setting_fav_exe, self.card_fav_exes, None)
@@ -210,47 +213,59 @@ class WidgetSettings(DevlizQFrame):
 
         # Directory di lavoro
         self.card_working_folder = PushSettingCard(
-            text="Apri Cartella",
+            text=tr("Open Folder"),
             icon=FluentIcon.FOLDER,
-            title="Cartella di lavoro di " + app.name,
+            title=tr("Working folder of {name}", name=app.name),
             content=app.path.__str__()
         )
 
         # Cancella backups
         size_str = get_normalized_gb_mb_str(0)
         self.card_clear_backups = PushSettingCard(
-            text="Cancella backups",
+            text=tr("Clear backups"),
             icon=FluentIcon.DELETE,
-            title="Cancella Backups di " +  app.name,
+            title=tr("Clear Backups of {name}", name=app.name),
             #content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione. (Attualmente: " + size_str + ")"
-            content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione."
+            content=tr("This operation will delete all backup files created by the application.")
         )
 
         # Tema applicazione
         self.card_theme = OptionsSettingCard(
             AppSettings.themeMode,
             icon=FluentIcon.BRUSH,
-            title="Tema dell'applicazione",
-            content="Seleziona il tema dell'applicazione",
-            texts=["Chiaro", "Scuro"],
+            title=tr("Application theme"),
+            content=tr("Select the application theme"),
+            texts=[tr("Light"), tr("Dark")],
         )
+        self.card_theme.optionChanged.connect(lambda: self.signal_theme_changed.emit())
 
-        grp_manager = SettingGroupManager(self.tr("Applicazione"), self)
+        # Lingua applicazione
+        self.card_language = OptionsSettingCard(
+            AppSettings.language,
+            icon=FluentIcon.LANGUAGE,
+            title=tr("Language"),
+            content=tr("Select the application language"),
+            texts=[tr("English"), tr("Italian")],
+        )
+        self.card_language.optionChanged.connect(lambda: self.signal_language_changed.emit())
+
+        grp_manager = SettingGroupManager(tr("Application"), self)
         grp_manager.add_widget(None, self.card_working_folder, self.signal_open_dir_request)
         grp_manager.add_widget(None, self.card_clear_backups, self.signal_clear_backups_request)
         grp_manager.add_widget(None, self.card_theme, None)
+        grp_manager.add_widget(None, self.card_language, None)
         grp_manager.install_group_on(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
 
         # Informazioni applicazione
         self.card_info_app = PushSettingCard(
-            text="Informazioni",
+            text=tr("Information"),
             icon=FluentIcon.APPLICATION,
-            title=f"Informazioni su {app.name}",
+            title=tr("About {name}", name=app.name),
             content=app.version
         )
 
-        grp_manager = SettingGroupManager(self.tr("Informazioni"), self)
+        grp_manager = SettingGroupManager(tr("Information"), self)
         grp_manager.add_widget(None, self.card_info_app, self.signal_open_about_dialog_request)
         grp_manager.install_group_on(layout)

@@ -6,6 +6,8 @@ from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import FluentIcon, PushButton, Action, RoundMenu, ListWidget
 
+from devliz.application.i18n import tr
+
 
 class TabDirectories(QWidget):
 
@@ -67,7 +69,7 @@ class TabDirectories(QWidget):
         item = self.listWidget.itemAt(pos)
         if item is not None:
             menu = RoundMenu()
-            action_delete = Action(FluentIcon.DELETE, "Cancella",
+            action_delete = Action(FluentIcon.DELETE, tr("Delete"),
                                    triggered=lambda: self.__delete_selected_item(item))
             menu.addAction(action_delete)
             global_pos = self.listWidget.mapToGlobal(pos)
@@ -78,7 +80,7 @@ class TabDirectories(QWidget):
         btn_layout = QHBoxLayout(btn_container)
         btn_layout.addStretch()  # spazio a sinistra
 
-        self.btn_choose_dir = PushButton("Aggiungi cartella locale", self, FluentIcon.FOLDER_ADD)
+        self.btn_choose_dir = PushButton(tr("Add local folder"), self, FluentIcon.FOLDER_ADD)
         self.btn_choose_dir.setMaximumWidth(300)
         self.btn_choose_dir.clicked.connect(lambda: self.Signal_btn_choose_dir.emit())
         btn_layout.addWidget(self.btn_choose_dir)
@@ -86,7 +88,7 @@ class TabDirectories(QWidget):
         self.btn_choose_dir_starred = UiUtils.create_widget_act_bar_btn(
             self,
             self.starred_dirs_paths,
-            "Aggiungi cartella preferita",
+            tr("Add starred folder"),
             FluentIcon.FOLDER_ADD,
             False,
             self.Signal_btn_add_dir,
@@ -99,7 +101,7 @@ class TabDirectories(QWidget):
 
     def __on_add_directory_request(self, path: str | None = None):
         if path is None:
-            dir_path = QFileDialog.getExistingDirectory(self, "Seleziona una cartella ad aggiungere alla lista", )
+            dir_path = QFileDialog.getExistingDirectory(self, tr("Select a folder to add to the list"), )
             if dir_path:
                 self.add_directory(Path(dir_path))
             else:
@@ -110,13 +112,13 @@ class TabDirectories(QWidget):
     def add_directory(self, directory: Path, execute_checks: bool = True):
         if execute_checks:
             if directory in self.directories:
-                UiUtils.show_message("Attenzione", "La cartella selezionata è già presente nella lista.", self)
+                UiUtils.show_message(tr("Warning"), tr("The selected folder is already in the list."), self)
                 return
             if not directory.exists():
-                UiUtils.show_message("Attenzione", "La cartella selezionata non esiste nel sistema.", self)
+                UiUtils.show_message(tr("Warning"), tr("The selected folder does not exist on the system."), self)
                 return
             if not directory.is_dir():
-                UiUtils.show_message("Attenzione", "La cartella selezionata non è una cartella valida.", self)
+                UiUtils.show_message(tr("Warning"), tr("The selected folder is not a valid folder."), self)
                 return
         self.directories.append(directory)
         item = QListWidgetItem(directory.__str__())

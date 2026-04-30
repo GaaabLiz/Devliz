@@ -12,6 +12,7 @@ from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, snap
 from devliz.domain.data import DevlizData
 from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshots
 from devliz.view.dashboard import DashboardView
+from devliz.application.i18n import tr
 
 
 
@@ -33,8 +34,8 @@ class DashboardModel(QObject):
         self.task_monitored_soft = TaskGetMonitoredSoftware()
         self.task_snap = TaskGetSnapshots(self.snap_catalogue)
         self.operation_info = OperationInfo(
-            name="Aggiornamento Dashboard",
-            description="Aggiornamento dati della dashboard",
+            name=tr("Dashboard Update"),
+            description=tr("Dashboard data update"),
             delay_each_task=0.1
         )
         self.runner = OperationRunner(abort_all_on_error=True)
