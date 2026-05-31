@@ -369,6 +369,31 @@ _translations: dict[str, dict[str, str]] = {
         "The application needs to restart to apply the changes. Restart now?": {
             "it": "L'applicazione deve essere riavviata per applicare le modifiche. Riavviare ora?"
         },
+
+        # ── Backups View / Controller ──
+        "Backups": {"it": "Backups"},
+        "File Name": {"it": "Nome file"},
+        "Snapshot ID": {"it": "ID Snapshot"},
+        "Backup Type": {"it": "Tipo Backup"},
+        "Created At": {"it": "Data creazione"},
+        "Total backups: {count}": {"it": "Totale backups: {count}"},
+        "Open in Finder": {"it": "Apri nel Finder"},
+        "Restore": {"it": "Ripristina"},
+        "Confirm Restore": {"it": "Conferma ripristino"},
+        "Are you sure you want to restore this backup? This will overwrite current data.": {
+            "it": "Sei sicuro di voler ripristinare questo backup? I dati attuali verranno sovrascritti."
+        },
+        "An error occurred during restore: {error}": {"it": "Si è verificato un errore durante il ripristino: {error}"},
+        "Confirm Delete": {"it": "Conferma eliminazione"},
+        "Are you sure you want to delete this backup? This action cannot be undone.": {
+            "it": "Sei sicuro di voler eliminare questo backup? L'azione non può essere annullata."
+        },
+        "Backup path": {"it": "Percorso backup"},
+        "Select the backup folder": {"it": "Seleziona la cartella di backup"},
+
+        # ── Home View (extra cards) ──
+        "Backup Count": {"it": "Numero Backup"},
+        "Catalogue Path": {"it": "Percorso Catalogo"},
 }
 
 

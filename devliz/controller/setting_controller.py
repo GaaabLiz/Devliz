@@ -26,6 +26,7 @@ class SettingController:
 
         self.view.signal_request_update.connect(self.dash_model.update)
         self.view.signal_ask_catalogue_path.connect(self.__ask_catalogue_path)
+        self.view.signal_ask_backup_path.connect(self.__ask_backup_path)
         self.view.signal_open_dir_request.connect(self.__open_directory)
         self.view.signal_clear_backups_request.connect(self.__clear_backup_directory)
         self.view.signal_open_about_dialog_request.connect(self.__open_info_dialog)
@@ -48,6 +49,16 @@ class SettingController:
             self.dash_model.snap_catalogue.set_catalogue_path(Path(directory))
             log_action("Settings", "settings.catalogue.path.changed", directory)
             self.dash_model.update()
+        else:
+            logger.trace("Nessun percorso selezionato.")
+
+    def __ask_backup_path(self):
+        directory = QFileDialog.getExistingDirectory(None, tr("Select the backup folder"))
+        if directory:
+            logger.trace(f"Backup path selezionato: {directory}")
+            app_settings.set(AppSettings.backup_path, Path(directory))
+            self.view.card_backup_path.setContent(directory)
+            log_action("Settings", "settings.backup.path.changed", directory)
         else:
             logger.trace("Nessun percorso selezionato.")
 

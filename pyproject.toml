@@ -9,7 +9,7 @@ authors = [
 dependencies = [
     "loguru>=0.7.3",
     "loguru-logging-intercept>=0.1.5",
-    "pylizlib>=0.6.2",
+    "pylizlib>=0.6.3",
     "pyside6>=6.11.0",
     "pyside6-fluent-widgets[full]>=1.11.2",
 ]

@@ -4,9 +4,10 @@ from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import FluentIcon, NavigationItemPosition
 
-from devliz.application.app import app_settings, AppSettings
+from devliz.application.app import app_settings, AppSettings, snap_settings
 from devliz.application.action_history import log_action
 from devliz.controller.action_history import ActionHistoryController
+from devliz.controller.backup import BackupController
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.controller.catalogue import CatalogueController
 from devliz.controller.help import HelpController
@@ -28,6 +29,7 @@ class DashboardController:
         self.home = HomeController()
         self.searcher = CatalogueSearcherController(self.model.snap_catalogue, self.view)
         self.history = ActionHistoryController()
+        self.backup = BackupController(self.model.snap_catalogue)
         self.help = HelpController()
         self.catalogue = CatalogueController(self.model, self.__open_search_page)
         self.settings = SettingController(self.model)
@@ -36,6 +38,7 @@ class DashboardController:
         self.view.addSubInterface(self.catalogue.view, FluentIcon.BOOK_SHELF, self.catalogue.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.searcher.view, FluentIcon.SEARCH, self.searcher.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.history.view, FluentIcon.HISTORY, self.history.view.window_name, NavigationItemPosition.TOP)
+        self.view.addSubInterface(self.backup.view, FluentIcon.SAVE, self.backup.view.window_name, NavigationItemPosition.TOP)
         self.view.addSubInterface(self.help.view, FluentIcon.HELP, self.help.view.window_name, NavigationItemPosition.BOTTOM)
         self.view.addSubInterface(self.settings.view, FluentIcon.SETTING, self.settings.view.window_name,NavigationItemPosition.BOTTOM)
 
@@ -52,10 +55,17 @@ class DashboardController:
         self.catalogue.update_data(snap_data)
         self.home.update_data(snap_data)
         self.searcher.open()
+        self.backup.update_data()
         self.history.reload()
         log_action("Dashboard", "dashboard.data.loaded", f"snapshots={len(data.snapshots)}")
 
         self.model.snap_catalogue.path_catalogue = Path(app_settings.get(AppSettings.catalogue_path))
+
+        # Sync snap_settings with current app_settings values
+        snap_settings.backup_path = Path(app_settings.get(AppSettings.backup_path))
+        snap_settings.backup_pre_install = app_settings.get(AppSettings.backup_before_install)
+        snap_settings.backup_pre_modify = app_settings.get(AppSettings.backup_before_edit)
+        snap_settings.backup_pre_delete = app_settings.get(AppSettings.backup_before_delete)
 
 
     def __handle_update_started(self):
@@ -64,6 +74,7 @@ class DashboardController:
         self.catalogue.view.set_state(UiWidgetMode.UPDATING)
         self.searcher.view.set_state(UiWidgetMode.UPDATING)
         self.history.view.set_state(UiWidgetMode.UPDATING)
+        self.backup.view.set_state(UiWidgetMode.UPDATING)
         self.help.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
@@ -72,6 +83,7 @@ class DashboardController:
         self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
         self.searcher.view.set_state(UiWidgetMode.DISPLAYING)
         self.history.view.set_state(UiWidgetMode.DISPLAYING)
+        self.backup.view.set_state(UiWidgetMode.DISPLAYING)
         self.help.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __open_search_page(self, snapshot=None):
@@ -98,6 +110,7 @@ class DashboardController:
         self.model.signal_on_update_started.connect(self.__handle_update_started)
         self.model.signal_on_update_complete.connect(self.__handle_update_complete)
         self.model.signal_on_updated_data_available.connect(self.__handle_data_updated)
+        self.backup.signal_request_refresh.connect(self.model.update)
 
     def start(self):
         logger.info("Application is starting...")

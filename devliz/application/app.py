@@ -45,6 +45,7 @@ EXIT_CODE_RESTART = 1000
 SETTING_GROUP_CONFIGS = "Configurazioni"
 SETTING_GROUP_SCRIPTS = "Scripts"
 SETTING_GROUP_FAVORITES = "Preferiti"
+SETTING_GROUP_BACKUPS = "Backups"
 SETTING_GROUP_APP = "App"
 
 # GESTIONE RISORSE
@@ -68,9 +69,10 @@ logger.info("{} Application Started. Version: {}", app.name, app.version)
 class AppSettings(QConfig):
     config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
     catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
-    backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
-    backup_before_edit = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Edit", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT, BoolValidator())
-    backup_before_delete = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Backup Before Delete", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE, BoolValidator())
+    backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
+    backup_before_edit = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Edit", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT, BoolValidator())
+    backup_before_delete = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Delete", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE, BoolValidator())
+    backup_path = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Path", PATH_BACKUPS.__str__(), FolderValidator())
     snap_custom_data = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Snapshots custom data", DEFAULT_SETTING_SNAPSHOTS_CUSTOM_DATA, TextListValidator())
     git_bash_path = QtFwQConfigItem(True, SETTING_GROUP_SCRIPTS, "Git Bash path", DEFAULT_SETTING_PATH_GIT_BASH, ExecutableValidator())
     starred_dirs = QtFwQConfigItem(True, SETTING_GROUP_FAVORITES,"Cartelle preferite", DEFAULT_SETTING_STARRED_DIRS, TextListValidator())
@@ -88,7 +90,7 @@ qconfig.load(PATH_JSON_SETTING_FILE, app_settings)
 
 # IMPSOTAZIONE DEGLI SNAPSHOTS
 snap_settings = SnapshotSettings(
-    backup_path=PATH_BACKUPS,
+    backup_path=Path(app_settings.get(AppSettings.backup_path)),
     backup_pre_install=app_settings.get(AppSettings.backup_before_install),
     backup_pre_delete=app_settings.get(AppSettings.backup_before_delete),
     backup_pre_modify=app_settings.get(AppSettings.backup_before_edit),

@@ -19,6 +19,7 @@ class WidgetSettings(DevlizQFrame):
     signal_ask_catalogue_path = Signal()
     signal_open_tags_dialog = Signal()
     signal_clear_backups_request = Signal()
+    signal_ask_backup_path = Signal()
     signal_language_changed = Signal()
     signal_theme_changed = Signal()
 
@@ -38,6 +39,7 @@ class WidgetSettings(DevlizQFrame):
 
     def __add_groups(self, layout: QVBoxLayout):
         self.__add_group_snapshot(layout)
+        self.__add_group_backups(layout)
         self.__add_group_favorites(layout)
         self.__add_group_app(layout)
         self.__add_group_info(layout)
@@ -91,33 +93,6 @@ class WidgetSettings(DevlizQFrame):
             deletion_content=tr("Are you sure you want to delete this variable?")
         )
 
-        # Backup pre-installazione
-        setting_backup_before_install = AppSettings.backup_before_install
-        self.card_backup_before_install = SwitchSettingCard(
-            icon=FluentIcon.BASKETBALL,
-            title=tr("Enable pre-installation backup"),
-            content=tr("Backup local folders (on this PC) contained in the configuration before installing it"),
-            configItem=setting_backup_before_install
-        )
-
-        # Backup pre-modifica
-        setting_backup_before_edit = AppSettings.backup_before_edit
-        self.card_backup_before_edit = SwitchSettingCard(
-            icon=FluentIcon.BASKETBALL,
-            title=tr("Enable pre-edit backup"),
-            content=tr("Backup local folders (on this PC) contained in the configuration before editing them"),
-            configItem=setting_backup_before_edit
-        )
-
-        # Backup pre-eliminazione
-        setting_backup_before_delete = AppSettings.backup_before_delete
-        self.card_backup_before_delete= SwitchSettingCard(
-            icon=FluentIcon.BASKETBALL,
-            title=tr("Enable pre-deletion backup"),
-            content=tr("Backup local folders (on this PC) contained in the configuration before deleting them"),
-            configItem=setting_backup_before_delete
-        )
-
         # Cancellazione cartelle allegate prima dell'installazione
         setting_clear_snap_attached_folders_before_install = AppSettings.clear_snap_attached_folders_before_install
         self.card_clear_snap_attached_folders_before_install = SwitchSettingCard(
@@ -131,12 +106,54 @@ class WidgetSettings(DevlizQFrame):
         grp_manager.add_widget(setting_catalogue, self.card_general_catalogue, self.signal_ask_catalogue_path)
         grp_manager.add_widget(setting_tags, self.card_fav_tags, None)
         grp_manager.add_widget(setting_custom_data, self.card_snap_custom_data, None)
-        grp_manager.add_widget(setting_backup_before_install, self.card_backup_before_install,None)
-        grp_manager.add_widget(setting_backup_before_edit, self.card_backup_before_edit, None)
-        grp_manager.add_widget(setting_backup_before_delete, self.card_backup_before_delete, None)
         grp_manager.add_widget(setting_clear_snap_attached_folders_before_install, self.card_clear_snap_attached_folders_before_install, None)
         grp_manager.install_group_on(layout)
 
+
+    def __add_group_backups(self, layout: QVBoxLayout):
+
+        # Percorso backup
+        setting_backup_path = AppSettings.backup_path
+        self.card_backup_path = PushSettingCard(
+            text=tr("Choose directory"),
+            icon=FluentIcon.SAVE,
+            title=tr("Backup path"),
+            content=app_settings.get(setting_backup_path)
+        )
+
+        # Backup pre-installazione
+        setting_backup_before_install = AppSettings.backup_before_install
+        self.card_backup_before_install = SwitchSettingCard(
+            icon=FluentIcon.SAVE,
+            title=tr("Enable pre-installation backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before installing it"),
+            configItem=setting_backup_before_install
+        )
+
+        # Backup pre-modifica
+        setting_backup_before_edit = AppSettings.backup_before_edit
+        self.card_backup_before_edit = SwitchSettingCard(
+            icon=FluentIcon.SAVE,
+            title=tr("Enable pre-edit backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before editing them"),
+            configItem=setting_backup_before_edit
+        )
+
+        # Backup pre-eliminazione
+        setting_backup_before_delete = AppSettings.backup_before_delete
+        self.card_backup_before_delete = SwitchSettingCard(
+            icon=FluentIcon.SAVE,
+            title=tr("Enable pre-deletion backup"),
+            content=tr("Backup local folders (on this PC) contained in the configuration before deleting them"),
+            configItem=setting_backup_before_delete
+        )
+
+        grp_manager = SettingGroupManager(tr("Backups"), self)
+        grp_manager.add_widget(setting_backup_path, self.card_backup_path, self.signal_ask_backup_path)
+        grp_manager.add_widget(setting_backup_before_install, self.card_backup_before_install, None)
+        grp_manager.add_widget(setting_backup_before_edit, self.card_backup_before_edit, None)
+        grp_manager.add_widget(setting_backup_before_delete, self.card_backup_before_delete, None)
+        grp_manager.install_group_on(layout)
 
     def __add_group_favorites(self, layout: QVBoxLayout):
 

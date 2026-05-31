@@ -1,0 +1,90 @@
+from PySide6.QtCore import Signal, Qt, QMargins
+from PySide6.QtWidgets import QHBoxLayout, QWidget, QHeaderView
+from pylizlib.core.os.snap.domain import SnapshotBackupInfo
+from qfluentwidgets import Action, FluentIcon, BodyLabel, RoundMenu, TableView, setFont
+
+from devliz.model.backup import BackupModel
+from devliz.view.util.frame import DevlizQFrame
+from devliz.application.i18n import tr
+
+
+class BackupView(DevlizQFrame):
+    signal_open_requested = Signal(object)
+    signal_restore_requested = Signal(object)
+    signal_delete_requested = Signal(object)
+
+    def __init__(self, model: BackupModel, parent=None):
+        super().__init__(name=tr("Backups"), parent=parent)
+        self.model = model
+        self.__setup_ui()
+
+    def __setup_ui(self):
+        self.install_label_title()
+        self.__setup_table()
+        self.__setup_footer()
+
+    def __setup_table(self):
+        self.table = TableView(self)
+        self.table.setModel(self.model.table_model)
+
+        self.table.setBorderVisible(True)
+        self.table.setBorderRadius(8)
+        self.table.setWordWrap(False)
+        self.table.verticalHeader().hide()
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
+        self.table.setSelectionBehavior(TableView.SelectionBehavior.SelectRows)
+        self.table.setSelectionMode(TableView.SelectionMode.SingleSelection)
+
+        self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._show_context_menu)
+
+        self.column_percents = [0.40, 0.20, 0.20, 0.20]
+        self._distribuisci_colonne_perc()
+        self.table.resizeEvent = self._table_resize_event
+
+        self.master_layout.addWidget(self.table)
+
+    def __setup_footer(self):
+        lay = QHBoxLayout()
+        self.footer_label = BodyLabel(tr("Total backups: {count}", count=self.model.count()), self)
+        setFont(self.footer_label, 12)
+        self.footer_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        lay.addWidget(self.footer_label)
+        lay.addStretch(1)
+        lay.setContentsMargins(QMargins(5, 0, 5, 0))
+
+        container = QWidget(self)
+        container.setLayout(lay)
+        self.master_layout.addWidget(container)
+
+    def _show_context_menu(self, pos):
+        index = self.table.indexAt(pos)
+        if not index.isValid():
+            return
+
+        backup = self.model.get_backup_at(index.row())
+        if not backup:
+            return
+
+        menu = RoundMenu()
+        menu.addAction(Action(FluentIcon.FOLDER, tr("Open in Finder"), triggered=lambda: self.signal_open_requested.emit(backup)))
+        menu.addAction(Action(FluentIcon.SYNC, tr("Restore"), triggered=lambda: self.signal_restore_requested.emit(backup)))
+        menu.addSeparator()
+        menu.addAction(Action(FluentIcon.DELETE, tr("Delete"), triggered=lambda: self.signal_delete_requested.emit(backup)))
+        global_pos = self.table.viewport().mapToGlobal(pos)
+        menu.exec(global_pos)
+
+    def _distribuisci_colonne_perc(self):
+        total_width = self.table.viewport().width()
+        if total_width > 0:
+            for idx, perc in enumerate(self.column_percents):
+                width = int(total_width * perc)
+                self.table.setColumnWidth(idx, width)
+
+    def _table_resize_event(self, event):
+        self._distribuisci_colonne_perc()
+        super(type(self.table), self.table).resizeEvent(event)
+
+    def reload_data(self):
+        self.footer_label.setText(tr("Total backups: {count}", count=self.model.count()))
+        self._distribuisci_colonne_perc()
