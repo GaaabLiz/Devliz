@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget
 from qfluentwidgets import (
     SimpleCardWidget, SubtitleLabel, CaptionLabel, TitleLabel,
-    setFont, FluentIcon, IconWidget, BodyLabel
+    setFont, FluentIcon, IconWidget, BodyLabel, SingleDirectionScrollArea
 )
 
 from devliz.domain.data import HomeStatistics
@@ -75,6 +75,12 @@ class HomeView(DevlizQFrame):
         self.card_heaviest_file = StatCard(
             FluentIcon.CALORIES, tr("Heaviest File"), parent=self
         )
+        self.card_backup_count = StatCard(
+            FluentIcon.SAVE, tr("Backup Count"), parent=self
+        )
+        self.card_catalogue_path = StatCard(
+            FluentIcon.BOOK_SHELF, tr("Catalogue Path"), parent=self
+        )
 
         grid = QGridLayout()
         grid.setSpacing(12)
@@ -84,20 +90,35 @@ class HomeView(DevlizQFrame):
         grid.addWidget(self.card_total_size, 0, 1)
         grid.addWidget(self.card_total_files, 0, 2)
         grid.addWidget(self.card_total_dirs, 1, 0)
-        grid.addWidget(self.card_heaviest_file, 1, 1, 1, 2)
+        grid.addWidget(self.card_heaviest_file, 1, 1)
+        grid.addWidget(self.card_backup_count, 1, 2)
+        grid.addWidget(self.card_catalogue_path, 2, 0, 1, 3)
 
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
         grid.setColumnStretch(2, 1)
 
-        self.master_layout.addLayout(grid)
-        self.master_layout.addStretch(1)
+        scroll_content = QWidget()
+        scroll_layout = QVBoxLayout(scroll_content)
+        scroll_layout.setContentsMargins(0, 0, 0, 0)
+        scroll_layout.addLayout(grid)
+        scroll_layout.addStretch(1)
 
-    def update_statistics(self, stats: HomeStatistics):
+        scroll_area = SingleDirectionScrollArea(orient=Qt.Orientation.Vertical)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(scroll_content)
+        scroll_area.enableTransparentBackground()
+
+        self.master_layout.addWidget(scroll_area, 1)
+
+    def update_statistics(self, stats: HomeStatistics, backup_count: int = 0, catalogue_path: str = ""):
         self.card_snap_count.update_value(str(stats.snapshot_count))
         self.card_total_size.update_value(stats.total_size_str)
         self.card_total_files.update_value(f"{stats.total_files:,}".replace(",", "."))
         self.card_total_dirs.update_value(f"{stats.total_dirs:,}".replace(",", "."))
+        self.card_backup_count.update_value(str(backup_count))
+        self.card_catalogue_path.update_value(catalogue_path)
 
         if stats.heaviest_file_path:
             from pathlib import Path

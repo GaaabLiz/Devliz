@@ -72,10 +72,9 @@ class ActionHistoryView(DevlizQFrame):
         container_layout.setContentsMargins(8, 8, 8, 8)
         container_layout.setSpacing(10)
         container_layout.addWidget(self.empty_label)
-        container_layout.addWidget(self.table)
+        container_layout.addWidget(self.table, 1)
 
-        self.master_layout.addLayout(container_layout)
-        self.master_layout.addStretch(1)
+        self.master_layout.addLayout(container_layout, 1)
 
     def update_rows(self, rows: list[dict[str, str]]):
         self.model.set_rows(rows)
