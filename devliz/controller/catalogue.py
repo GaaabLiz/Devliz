@@ -170,6 +170,8 @@ class CatalogueController:
 
     def __open_directory(self, path: Path):
         if path.exists():
-            os.startfile(path)
+            from PySide6.QtGui import QDesktopServices
+            from PySide6.QtCore import QUrl
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
         else:
             UiUtils.show_message(tr("Warning"), tr("The folder no longer exists in {path}", path=path.__str__()))
