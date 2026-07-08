@@ -19,16 +19,9 @@ class SplashWindow(FramelessWindow):
         self.splashScreen = SplashScreen(self.windowIcon(), self)
         self.splashScreen.setIconSize(QSize(102, 102))
 
-        # 2. Show the main interface before creating other sub-interfaces
+    def show_splash(self):
         self.show()
 
-        # 3. Create sub-interfaces
-        self.createSubInterface()
-
-        # 4. Hide the splash screen
+    def close_splash(self):
         self.splashScreen.finish()
-
-    def createSubInterface(self):
-        loop = QEventLoop(self)
-        QTimer.singleShot(1000, loop.quit)
-        loop.exec()
+        self.close()
