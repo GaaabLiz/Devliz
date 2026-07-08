@@ -394,6 +394,9 @@ _translations: dict[str, dict[str, str]] = {
         # ── Home View (extra cards) ──
         "Backup Count": {"it": "Numero Backup"},
         "Catalogue Path": {"it": "Percorso Catalogo"},
+        "Latest Snapshot": {"it": "Snapshot più Recente"},
+        "Oldest Snapshot": {"it": "Snapshot più Vecchio"},
+        "Average Snap Size": {"it": "Dimensione Media Snapshot"},
 }
 
 

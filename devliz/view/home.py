@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget
 from qfluentwidgets import (
-    SimpleCardWidget, SubtitleLabel, CaptionLabel, TitleLabel,
+    ElevatedCardWidget, SubtitleLabel, CaptionLabel, TitleLabel,
     setFont, FluentIcon, IconWidget, BodyLabel, SingleDirectionScrollArea
 )
 
@@ -10,7 +10,7 @@ from devliz.view.util.frame import DevlizQFrame
 from devliz.application.i18n import tr
 
 
-class StatCard(SimpleCardWidget):
+class StatCard(ElevatedCardWidget):
     """Card che mostra una singola statistica con icona, titolo e valore."""
 
     def __init__(self, icon: FluentIcon, title: str, value: str = "—", subtitle: str = "", parent=None):
@@ -26,7 +26,7 @@ class StatCard(SimpleCardWidget):
         self.titleLabel.setTextColor("#606060", "#d2d2d2")
 
         self.valueLabel = TitleLabel(value, self)
-        setFont(self.valueLabel, 28)
+        setFont(self.valueLabel, 22)
 
         self.subtitleLabel = CaptionLabel(subtitle, self)
         self.subtitleLabel.setTextColor("#909090", "#a0a0a0")
@@ -78,21 +78,36 @@ class HomeView(DevlizQFrame):
         self.card_backup_count = StatCard(
             FluentIcon.SAVE, tr("Backup Count"), parent=self
         )
+        self.card_last_snap_date = StatCard(
+            FluentIcon.CALENDAR, tr("Latest Snapshot"), parent=self
+        )
+        self.card_oldest_snap_date = StatCard(
+            FluentIcon.HISTORY, tr("Oldest Snapshot"), parent=self
+        )
+        self.card_avg_size = StatCard(
+            FluentIcon.PIE_SINGLE, tr("Average Snap Size"), parent=self
+        )
         self.card_catalogue_path = StatCard(
             FluentIcon.BOOK_SHELF, tr("Catalogue Path"), parent=self
         )
 
         grid = QGridLayout()
-        grid.setSpacing(12)
-        grid.setContentsMargins(16, 8, 16, 16)
+        grid.setSpacing(16)
+        grid.setContentsMargins(16, 16, 16, 16)
 
         grid.addWidget(self.card_snap_count, 0, 0)
         grid.addWidget(self.card_total_size, 0, 1)
         grid.addWidget(self.card_total_files, 0, 2)
+        
         grid.addWidget(self.card_total_dirs, 1, 0)
         grid.addWidget(self.card_heaviest_file, 1, 1)
-        grid.addWidget(self.card_backup_count, 1, 2)
-        grid.addWidget(self.card_catalogue_path, 2, 0, 1, 3)
+        grid.addWidget(self.card_avg_size, 1, 2)
+        
+        grid.addWidget(self.card_last_snap_date, 2, 0)
+        grid.addWidget(self.card_oldest_snap_date, 2, 1)
+        grid.addWidget(self.card_backup_count, 2, 2)
+        
+        grid.addWidget(self.card_catalogue_path, 3, 0, 1, 3)
 
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)
@@ -119,6 +134,9 @@ class HomeView(DevlizQFrame):
         self.card_total_dirs.update_value(f"{stats.total_dirs:,}".replace(",", "."))
         self.card_backup_count.update_value(str(backup_count))
         self.card_catalogue_path.update_value(catalogue_path)
+        self.card_last_snap_date.update_value(stats.last_snapshot_date)
+        self.card_oldest_snap_date.update_value(stats.oldest_snapshot_date)
+        self.card_avg_size.update_value(stats.average_snapshot_size_str)
 
         if stats.heaviest_file_path:
             from pathlib import Path
@@ -129,3 +147,4 @@ class HomeView(DevlizQFrame):
             )
         else:
             self.card_heaviest_file.update_value("—", subtitle=tr("No file found"))
+

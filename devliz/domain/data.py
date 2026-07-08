@@ -15,6 +15,9 @@ class HomeStatistics:
     total_dirs: int = 0
     heaviest_file_path: str = ""
     heaviest_file_size: int = 0
+    last_snapshot_date: str = ""
+    oldest_snapshot_date: str = ""
+    average_snapshot_size_bytes: int = 0
 
     @property
     def total_size_str(self) -> str:
@@ -23,6 +26,10 @@ class HomeStatistics:
     @property
     def heaviest_file_size_str(self) -> str:
         return get_normalized_gb_mb_str(self.heaviest_file_size)
+    
+    @property
+    def average_snapshot_size_str(self) -> str:
+        return get_normalized_gb_mb_str(self.average_snapshot_size_bytes)
 
 
 @dataclass
@@ -49,8 +56,13 @@ class DevlizSnapshotData:
         stats = HomeStatistics(snapshot_count=self.count)
         heaviest_size = 0
         heaviest_path = ""
+        
+        dates = []
 
         for snap in self.snapshot_list:
+            if snap.date_created:
+                dates.append(snap.date_created)
+
             for dir_assoc in snap.directories:
                 path = Path(dir_assoc.original_path)
                 if not path.exists() or not path.is_dir():
@@ -74,6 +86,18 @@ class DevlizSnapshotData:
 
         stats.heaviest_file_path = heaviest_path
         stats.heaviest_file_size = heaviest_size
+        
+        if dates:
+            dates.sort()
+            stats.oldest_snapshot_date = dates[0].strftime("%Y-%m-%d")
+            stats.last_snapshot_date = dates[-1].strftime("%Y-%m-%d")
+        else:
+            stats.oldest_snapshot_date = "—"
+            stats.last_snapshot_date = "—"
+            
+        if self.count > 0:
+            stats.average_snapshot_size_bytes = stats.total_size_bytes // self.count
+            
         return stats
 
 
