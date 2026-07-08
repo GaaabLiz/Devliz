@@ -8,7 +8,7 @@ from qfluentwidgets import FluentTranslator
 from devliz.application.app import app_settings, AppSettings
 from devliz.application.i18n import set_language
 from devliz.controller.dashboard import DashboardController
-from devliz.view.splash import SplashWindow
+from devliz.controller.splash import SplashController
 
 
 def main():
@@ -23,9 +23,9 @@ def main():
     translator = FluentTranslator(locale)
     qt_app.installTranslator(translator)
 
-    splash = SplashWindow()
-    splash.show()
-    splash.close()
+    splash_controller = SplashController()
+    splash_controller.start()
+
     dashboard = DashboardController()
     dashboard.start()
     return qt_app.exec()
