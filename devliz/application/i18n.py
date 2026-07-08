@@ -397,6 +397,13 @@ _translations: dict[str, dict[str, str]] = {
         "Latest Snapshot": {"it": "Snapshot più Recente"},
         "Oldest Snapshot": {"it": "Snapshot più Vecchio"},
         "Average Snap Size": {"it": "Dimensione Media Snapshot"},
+
+        # ── Startup Check ──
+        "Catalogue Error": {"it": "Errore Catalogo"},
+        "The catalogue path is not reachable or does not exist:\n{path}\n\nDo you want to use the default catalogue or close the program?": {
+            "it": "Il percorso del catalogo non è raggiungibile o non esiste:\n{path}\n\nVuoi usare il catalogo di default o chiudere il programma?"
+        },
+        "Use default catalogue": {"it": "Usa catalogo di default"},
 }
 
 
