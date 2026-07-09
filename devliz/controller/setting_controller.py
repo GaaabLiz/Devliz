@@ -37,7 +37,10 @@ class SettingController:
         w = MessageBox(tr("Restart required"), tr("The application needs to restart to apply the changes. Restart now?"), parent=self.view)
         if w.exec_():
             log_action("Settings", "settings.restart.confirmed", "theme/language change")
-            QProcess.startDetached(sys.executable, sys.argv)
+            import os
+            args = sys.argv[:]
+            args[0] = os.path.abspath(args[0])
+            QProcess.startDetached(sys.executable, args)
             QApplication.instance().quit()
 
     def __ask_catalogue_path(self):
@@ -63,17 +66,11 @@ class SettingController:
             logger.trace("Nessun percorso selezionato.")
 
     def __open_directory(self):
-        import subprocess
-        import platform
-
+        from PySide6.QtGui import QDesktopServices
+        from PySide6.QtCore import QUrl
         path = app.path
-
-        if platform.system() == "Windows":
-            os.startfile(path)
-        elif platform.system() == "Darwin":
-            subprocess.Popen(["open", path])
-        else:
-            subprocess.Popen(["xdg-open", path])
+        if Path(path).exists():
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     def __clear_backup_directory(self):
         try:
