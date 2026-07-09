@@ -74,9 +74,13 @@ _translations: dict[str, dict[str, str]] = {
         "Description:": {"it": "Descrizione:"},
         "Tags:": {"it": "Tags:"},
         "Add tag...": {"it": "Aggiungi tag..."},
+        "No tags": {"it": "Nessun tag"},
+        "No tags found. Please create them in the Settings.": {"it": "Nessun tag configurato. Creane uno nelle Impostazioni."},
+        "The name contains invalid characters for a folder.": {"it": "Il nome contiene caratteri non validi per una cartella."},
 
         # ── Import Tab Directories ──
-        "Add local folder": {"it": "Aggiungi cartella locale"},
+        "Add folder": {"it": "Aggiungi cartella"},
+        "Remove selected folder": {"it": "Rimuovi cartella selezionata"},
         "Add starred folder": {"it": "Aggiungi cartella preferita"},
         "Select a folder to add to the list": {"it": "Seleziona una cartella ad aggiungere alla lista"},
         "Warning": {"it": "Attenzione"},
