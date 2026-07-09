@@ -22,6 +22,8 @@ class SplashWindow(FramelessWindow):
     def show_splash(self):
         self.show()
 
-    def close_splash(self):
+    def hide_overlay(self):
         self.splashScreen.finish()
+
+    def close_splash(self):
         self.close()

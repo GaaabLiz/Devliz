@@ -27,6 +27,8 @@ class SplashController:
         QTimer.singleShot(1000, loop.quit)
         loop.exec()
 
+        self.view.hide_overlay()
+
         self.__check_catalogue()
 
         self.view.close_splash()
