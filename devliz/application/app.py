@@ -9,7 +9,7 @@ from pylizlib.core.os.snap import SnapshotSettings
 from pylizlib.core.os.utils import PATH_DEFAULT_GIT_BASH
 from pylizlib.qtfw.domain.setting import QtFwQConfigItem
 from pylizlib.qtfw.model.qconfig import TextListValidator, ExecutableValidator
-from qfluentwidgets import QConfig, BoolValidator, qconfig, FolderValidator, OptionsValidator, OptionsConfigItem
+from qfluentwidgets import QConfig, BoolValidator, qconfig, FolderValidator, OptionsValidator, OptionsConfigItem, ConfigValidator
 
 from devliz.project import version, name, authors
 
@@ -64,11 +64,19 @@ setup_loguru_logging_intercept(level=logging.DEBUG, modules="pylizlib")
 logger.info("{} Application Started. Version: {}", app.name, app.version)
 
 
+# TODO: MOve to lib
+class NetworkFolderValidator(ConfigValidator):
+    """ Validator that does not check if the folder exists, preventing automatic fallback for network drives. """
+    def validate(self, value):
+        return isinstance(value, str)
+
+    def correct(self, value):
+        return str(value) if value else ""
 
 # DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
 class AppSettings(QConfig):
     config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
-    catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, FolderValidator())
+    catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, NetworkFolderValidator())
     backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
     backup_before_edit = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Edit", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_EDIT, BoolValidator())
     backup_before_delete = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Delete", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_DELETE, BoolValidator())
