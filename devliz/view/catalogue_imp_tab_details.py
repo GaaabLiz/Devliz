@@ -52,36 +52,50 @@ class TabDetails(QWidget):
         self.form_id_value = LineEdit()
         self.form_id_value.setText(gen_random_string(snap_settings.snap_id_length))
         self.form_id_value.setReadOnly(True)
-        self.form_id_value.setMaximumWidth(250)
+        self.form_id_value.setMaximumWidth(500)
         self.form_layout.addRow(self.form_id_label, self.form_id_value)
 
         # Campo nome
         self.form_name_label = BodyLabel(tr("Name:"), self)
         self.form_name_input = LineEdit()
-        self.form_name_input.setMaximumWidth(250)
+        self.form_name_input.setMaximumWidth(500)
         self.form_layout.addRow(self.form_name_label, self.form_name_input)
 
         # Campo descrizione
         self.form_desc_label = BodyLabel(tr("Description:"), self)
         self.form_desc_input = LineEdit()
-        self.form_desc_input.setMaximumWidth(250)
+        self.form_desc_input.setMaximumWidth(500)
         self.form_layout.addRow(self.form_desc_label, self.form_desc_input)
 
         # Campo tags
         self.form_tags_label = BodyLabel(tr("Tags:"), self)
         self.form_tags_input = MultiSelectionComboBox(self)
         self.form_tags_input.addItems(tags)
-        self.form_tags_input.setMaximumWidth(250)
+        self.form_tags_input.setMaximumWidth(500)
         self.form_tags_input.setPlaceholderText(tr("Add tag..."))
         self.form_layout.addRow(self.form_tags_label, self.form_tags_input)
+        
+        self.form_tags_input.installEventFilter(self)
 
         # Campi custom
         for key in self.custom_data_keys:
             label = BodyLabel(f"{key.capitalize()}:", self)
             line_edit = LineEdit()
-            line_edit.setMaximumWidth(250)
+            line_edit.setMaximumWidth(500)
             self.form_layout.addRow(label, line_edit)
             self.custom_data_inputs[key] = line_edit
+            
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent
+        if obj == self.form_tags_input and event.type() == QEvent.Type.MouseButtonPress:
+            if not self.tags:
+                from qfluentwidgets import MessageBox
+                w = MessageBox(tr("No tags"), tr("No tags found. Please create them in the Settings."), self)
+                w.yesButton.hide()
+                w.cancelButton.setText(tr("Close"))
+                w.exec()
+                return True
+        return super().eventFilter(obj, event)
 
     def __populate_fields(self):
         if not self.payload_data:
