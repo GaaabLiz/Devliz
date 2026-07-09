@@ -80,7 +80,7 @@ class TabDirectories(QWidget):
         btn_layout = QHBoxLayout(btn_container)
         btn_layout.addStretch()  # spazio a sinistra
 
-        self.btn_choose_dir = PushButton(tr("Add local folder"), self, FluentIcon.FOLDER_ADD)
+        self.btn_choose_dir = PushButton(tr("Add folder"), self, FluentIcon.FOLDER_ADD)
         self.btn_choose_dir.setMaximumWidth(300)
         self.btn_choose_dir.clicked.connect(lambda: self.Signal_btn_choose_dir.emit())
         btn_layout.addWidget(self.btn_choose_dir)
