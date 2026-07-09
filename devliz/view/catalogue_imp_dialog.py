@@ -58,7 +58,7 @@ class DialogConfig(QDialog):
 
     def __get_dialog_text(self):
         if not self.edit_mode:
-            return tr("Import a configuration")
+            return tr("Import")
         config_name = self.edit_data.name if self.edit_data else ""
         return tr("Edit a configuration") + (f": {config_name}" if config_name else "")
 
@@ -106,6 +106,13 @@ class DialogConfig(QDialog):
         if data.name.strip() == "":
             UiUtils.show_message(tr("Error"), tr("The 'Name' field cannot be empty."), self)
             return
+            
+        import re
+        invalid_chars = r'[<>:"/\\|?*]'
+        if re.search(invalid_chars, data.name):
+            UiUtils.show_message(tr("Error"), tr("The name contains invalid characters for a folder."), self)
+            return
+            
         if not data.directories or len(data.directories) == 0:
             UiUtils.show_message(tr("Error"), tr("At least one folder must be associated with the configuration."), self)
             return
