@@ -37,7 +37,7 @@ def _import_domain_data_module(monkeypatch):
 
 def _make_snapshot(path: Path):
     dir_assoc = types.SimpleNamespace(original_path=str(path))
-    return types.SimpleNamespace(directories=[dir_assoc])
+    return types.SimpleNamespace(directories=[dir_assoc], date_created=None)
 
 
 def test_snapshot_count(monkeypatch, tmp_path):

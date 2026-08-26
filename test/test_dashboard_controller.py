@@ -116,6 +116,7 @@ def _import_dashboard_module(monkeypatch):
         HISTORY = "HISTORY"
         HELP = "HELP"
         SETTING = "SETTING"
+        SAVE = "SAVE"
 
     class FakeNavigationItemPosition:
         TOP = "TOP"
@@ -128,6 +129,10 @@ def _import_dashboard_module(monkeypatch):
 
     class FakeAppSettingsKeys:
         catalogue_path = "catalogue_path"
+        backup_path = "backup_path"
+        backup_before_install = "backup_before_install"
+        backup_before_edit = "backup_before_edit"
+        backup_before_delete = "backup_before_delete"
 
     class FakeDevlizSnapshotData:
         def __init__(self, snapshot_list):
@@ -137,6 +142,14 @@ def _import_dashboard_module(monkeypatch):
         def __init__(self, snapshots=None):
             self.snapshots = snapshots or []
 
+    class FakeBackupController:
+        def __init__(self, _model):
+            self.view = FakePageView("Backup")
+            self.signal_request_refresh = FakeSignal()
+
+        def update_data(self):
+            pass
+
     fake_action_history_module = types.ModuleType("devliz.application.action_history")
 
     def fake_log_action(screen_key, action_key, details=""):
@@ -144,9 +157,13 @@ def _import_dashboard_module(monkeypatch):
 
     fake_action_history_module.log_action = fake_log_action
 
+    class FakeSnapSettings:
+        pass
+
     fake_app_module = types.ModuleType("devliz.application.app")
     fake_app_module.app_settings = FakeAppSettings()
     fake_app_module.AppSettings = FakeAppSettingsKeys
+    fake_app_module.snap_settings = FakeSnapSettings()
 
     fake_data_module = types.ModuleType("devliz.domain.data")
     fake_data_module.DevlizData = FakeDevlizData
@@ -176,6 +193,7 @@ def _import_dashboard_module(monkeypatch):
         ("devliz.controller.help", "HelpController", FakeHelpController),
         ("devliz.controller.home", "HomeController", FakeHomeController),
         ("devliz.controller.setting_controller", "SettingController", FakeSettingController),
+        ("devliz.controller.backup", "BackupController", FakeBackupController),
         ("devliz.model.dashboard", "DashboardModel", FakeDashboardModel),
         ("devliz.view.dashboard", "DashboardView", FakeDashboardView),
     ]:
@@ -193,7 +211,7 @@ def test_start_connects_signals_and_runs_initial_refresh(monkeypatch):
     dashboard_module, actions = _import_dashboard_module(monkeypatch)
     controller = dashboard_module.DashboardController()
 
-    assert len(controller.view.added_sub_interfaces) == 6
+    assert len(controller.view.added_sub_interfaces) == 7
 
     controller.start()
 
@@ -236,6 +254,7 @@ def test_update_started_and_complete_toggle_all_states(monkeypatch):
     assert controller.catalogue.view.states[-1] == "UPDATING"
     assert controller.searcher.view.states[-1] == "UPDATING"
     assert controller.history.view.states[-1] == "UPDATING"
+    assert controller.backup.view.states[-1] == "UPDATING"
     assert controller.help.view.states[-1] == "UPDATING"
     assert ("Dashboard", "dashboard.refresh.started", "F5/dashboard refresh") in actions
 
@@ -244,6 +263,7 @@ def test_update_started_and_complete_toggle_all_states(monkeypatch):
     assert controller.catalogue.view.states[-1] == "DISPLAYING"
     assert controller.searcher.view.states[-1] == "DISPLAYING"
     assert controller.history.view.states[-1] == "DISPLAYING"
+    assert controller.backup.view.states[-1] == "DISPLAYING"
     assert controller.help.view.states[-1] == "DISPLAYING"
     assert ("Dashboard", "dashboard.refresh.completed", "") in actions
 
