@@ -43,7 +43,7 @@ class DashboardController:
         self.view.addSubInterface(self.settings.view, FluentIcon.SETTING, self.settings.view.window_name,NavigationItemPosition.BOTTOM)
 
 
-        self.cached_data : DevlizData | None = None
+        self.cached_data: DevlizData | None = None
 
 
 
