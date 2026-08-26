@@ -156,6 +156,13 @@ class HelpView(DevlizQFrame):
                 tr("Settings lets you configure catalogue path, tags, custom fields, favorites, backups, theme and language. Theme/language changes require restart."),
             ),
             (
+                "history",
+                FluentIcon.HISTORY,
+                tr("Action History"),
+                tr("Track application events"),
+                tr("The History screen displays a chronological log of all the actions you perform within Devliz, including details about snapshot changes, installations, and settings updates."),
+            ),
+            (
                 "backup",
                 FluentIcon.SAVE,
                 tr("Backup and safety"),
@@ -182,42 +189,47 @@ class HelpView(DevlizQFrame):
             "overview": (
                 tr("Overview"),
                 tr("What Devliz is for"),
-                tr("Overview details"),
+                tr("Devliz is a robust snapshot-based configuration manager designed for developers and power users. It allows you to create snapshots of specific folders and files, saving their exact state. You can restore these states at any point in the future. This is particularly useful when testing new configurations, experimenting with different setups, or creating a standardized environment that you want to replicate easily. Devliz handles the heavy lifting by securely copying, tracking, and restoring your files while providing a clean and intuitive user interface to manage everything."),
             ),
             "home": (
                 tr("Home screen"),
                 tr("System and snapshot indicators"),
-                tr("Home details"),
+                tr("The Home screen provides a high-level dashboard of your entire Devliz environment. It calculates real-time metrics based on the snapshots you have stored. You will see the total number of snapshots available, the total storage space they occupy on your disk, the total count of files and folders contained within them, and the single largest file stored across all snapshots. This screen is designed to give you an immediate understanding of your usage and help you identify if you need to perform maintenance or clean up old snapshots to free up space."),
             ),
             "catalogue": (
                 tr("Catalogue screen"),
                 tr("Manage snapshot configurations"),
-                tr("Catalogue details"),
+                tr("The Catalogue is the core of Devliz, where you manage all your saved snapshots. From here, you can:\n\n• Import new snapshots from your local filesystem.\n• Edit existing snapshots to update their contents or metadata.\n• Install a snapshot, which restores its saved files to their original or specified target locations.\n• Duplicate an existing snapshot to create a variation without starting from scratch.\n• Export snapshots for sharing or backing up to external drives.\n• Delete snapshots you no longer need.\n\nRight-click on any snapshot card to access the context menu for these advanced actions. You can also sort and filter the catalogue to quickly find specific configurations."),
             ),
             "search": (
                 tr("Search screen"),
                 tr("Search inside snapshots"),
-                tr("Search details"),
+                tr("The Search screen provides powerful tools to find specific content or files within your saved snapshots. You can perform plain text searches or use Regular Expressions for advanced pattern matching.\n\n• Target: Choose whether to search within the file contents or just the file names.\n• Filters: Restrict your search to specific file extensions to speed up the process and reduce noise.\n\nThe results are displayed with detailed context, showing you exactly where the match was found, allowing you to inspect the file or snapshot directly from the search results without having to install it first."),
             ),
             "settings": (
                 tr("Settings screen"),
                 tr("Customize the application"),
-                tr("Settings details"),
+                tr("The Settings screen allows you to tailor Devliz to your preferences and workflow.\n\n• Paths: Define the root catalogue path where all snapshots are stored.\n• Organization: Manage your tags and custom fields to categorize snapshots effectively. Set up your favorite directories for quick access.\n• Safety: Configure backup behaviors before installing, editing, or deleting snapshots to prevent accidental data loss.\n• Appearance: Change the application theme (Light/Dark) and language. Note that changing the theme or language will require restarting the application to take effect fully."),
+            ),
+            "history": (
+                tr("Action History"),
+                tr("Track application events"),
+                tr("The Action History screen provides a comprehensive audit trail of your activities within Devliz. Every significant action, such as creating, installing, or deleting snapshots, searching for files, and altering settings, is recorded here.\n\n• Timestamp: See exactly when each action occurred.\n• Screen & Action: Identify which part of the application was used and what was done.\n• Details: Review context-specific information, like the name of the snapshot involved or the scope of a search.\n\nThis log is incredibly useful for tracking down what changes were made during a session and verifying that operations like backups or installations were completed as expected."),
             ),
             "backup": (
                 tr("Backup and safety"),
                 tr("Protect local data"),
-                tr("Backup details"),
+                tr("Data safety is a priority in Devliz. The Backup system ensures you never lose important local data when applying snapshot changes.\n\n• Pre-install Backups: Before a snapshot overwrites local files during installation, a backup of the current local state is created.\n• Edit/Delete Backups: When modifying or removing snapshots, temporary backups are made to allow recovery in case of mistakes.\n\nYou can manage these backup policies in the Settings screen and periodically clear the backup storage to free up disk space when you are confident the changes are stable."),
             ),
             "refresh": (
                 tr("Refresh and shortcuts"),
                 tr("Keep data updated"),
-                tr("Refresh details"),
+                tr("Devliz is designed to stay in sync with your filesystem. If you make changes to the snapshot directories outside of the application, or if you simply want to ensure you are viewing the most up-to-date information, you can refresh the data.\n\n• Press the F5 key on your keyboard from any screen to trigger a global refresh.\n• During the refresh, a progress indicator will appear, ensuring you know the application is scanning and reloading your snapshot data. Once complete, all dashboards, catalogue entries, and metrics will reflect the current state."),
             ),
             "workflow": (
                 tr("Recommended workflow"),
                 tr("Suggested daily usage"),
-                tr("Workflow details"),
+                tr("To get the most out of Devliz, we recommend the following workflow:\n\n1. Initial Setup: Visit the Settings screen to define your primary catalogue path and configure your preferred tags and backup safety nets.\n2. Capture: Go to the Catalogue and create or import your first snapshots representing known good states of your projects.\n3. Iterate: As you work, use Devliz to install different configurations or save new snapshots when you reach milestones.\n4. Search & Inspect: Use the Search screen to find specific snippets or files across all your history without needing to install the snapshot first.\n5. Maintenance: Periodically review your Home screen metrics and clean up outdated snapshots or backups to maintain a healthy disk space."),
             ),
         }
 
