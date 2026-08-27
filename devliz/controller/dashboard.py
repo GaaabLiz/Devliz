@@ -110,7 +110,25 @@ class DashboardController:
         self.model.signal_on_update_started.connect(self.__handle_update_started)
         self.model.signal_on_update_complete.connect(self.__handle_update_complete)
         self.model.signal_on_updated_data_available.connect(self.__handle_data_updated)
+        self.model.signal_on_update_progress.connect(self.__handle_update_progress)
+        self.model.signal_on_update_text.connect(self.__handle_update_text)
         self.backup.signal_request_refresh.connect(self.model.update)
+        
+    def __handle_update_progress(self, progress: int):
+        self.home.view.set_updating_progress(progress)
+        self.catalogue.view.set_updating_progress(progress)
+        self.searcher.view.set_updating_progress(progress)
+        self.history.view.set_updating_progress(progress)
+        self.backup.view.set_updating_progress(progress)
+        self.help.view.set_updating_progress(progress)
+
+    def __handle_update_text(self, text: str):
+        self.home.view.set_updating_text(text)
+        self.catalogue.view.set_updating_text(text)
+        self.searcher.view.set_updating_text(text)
+        self.history.view.set_updating_text(text)
+        self.backup.view.set_updating_text(text)
+        self.help.view.set_updating_text(text)
 
     def start(self):
         logger.info("Application is starting...")
