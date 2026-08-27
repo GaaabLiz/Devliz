@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
 from pylizlib.qt.domain.view import UiWidgetMode
-from qfluentwidgets import SubtitleLabel, setFont, SingleDirectionScrollArea, IndeterminateProgressBar, BodyLabel
+from qfluentwidgets import SubtitleLabel, setFont, SingleDirectionScrollArea, ProgressBar, BodyLabel
 
 from devliz.application.i18n import tr
 
@@ -13,8 +13,9 @@ class DevlizQFrameUiBuilder:
         self.parent = parent
 
     def get_updating_progress_bar(self):
-        progress_bar = IndeterminateProgressBar(self.parent, start=True)
-        progress_bar.setRange(0, 0)  # Indeterminate
+        progress_bar = ProgressBar(self.parent)
+        progress_bar.setRange(0, 100)
+        progress_bar.setValue(0)
         return progress_bar
 
     def get_label_updating(self):
@@ -46,9 +47,13 @@ class DevlizQFrame(QFrame):
         self.__updating_widget = QWidget(self)
         updating_layout = QVBoxLayout(self.__updating_widget)
         updating_layout.setContentsMargins(0, 0, 0, 0)
-        updating_layout.addWidget(self.__builder.get_updating_progress_bar())
+        
+        self.__det_prog_bar = self.__builder.get_updating_progress_bar()
+        self.__upd_label = self.__builder.get_label_updating()
+        
+        updating_layout.addWidget(self.__det_prog_bar)
         updating_layout.addStretch()
-        updating_layout.addWidget(self.__builder.get_label_updating())
+        updating_layout.addWidget(self.__upd_label)
         updating_layout.addStretch()
         self._top_level_layout.addWidget(self.__updating_widget)
 
@@ -88,3 +93,9 @@ class DevlizQFrame(QFrame):
     def install_label_title(self):
         title_label = self.__builder.get_label_title(self.window_name)
         self.master_layout.addWidget(title_label)
+        
+    def set_updating_progress(self, progress: int):
+        self.__det_prog_bar.setValue(progress)
+        
+    def set_updating_text(self, text: str):
+        self.__upd_label.setText(text)
