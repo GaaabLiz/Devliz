@@ -6,7 +6,6 @@ from loguru import logger
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
-from scipy.optimize import direct
 
 from devliz.application.app import app, AppSettings, app_settings
 from devliz.application.action_history import log_action
@@ -55,20 +54,34 @@ class CatalogueController:
             if dialog.exec():
                 print(dialog.output_data)
                 if edit_mode:
-                    old = snap
-                    new = dialog.output_data
-                    self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
-                    log_action("Catalogue", "catalogue.snapshot.updated", new.name)
+                    op_name = tr("Modify configuration")
+                    op_desc = tr("Modifying configuration")
+                    
+                    def action(task):
+                        old = snap
+                        new = dialog.output_data
+                        self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
+                        log_action("Catalogue", "catalogue.snapshot.updated", new.name)
+                        
+                    titolo = tr("Configuration modified")
+                    testo = tr("The configuration has been modified successfully.")
                 else:
-                    self.dash_model.snap_catalogue.add(dialog.output_data)
-                    log_action("Catalogue", "catalogue.snapshot.created", dialog.output_data.name)
-                titolo = tr("Configuration created") if not edit_mode else tr("Configuration modified")
-                testo = tr("The configuration has been created successfully.") if not edit_mode else tr("The configuration has been modified successfully.")
-                UiUtils.show_message(titolo, testo)
-                self.dash_model.update()
+                    op_name = tr("Create configuration")
+                    op_desc = tr("Creating configuration")
+                    
+                    def action(task):
+                        self.dash_model.snap_catalogue.add(dialog.output_data, progress_callback=task.update_task_progress)
+                        log_action("Catalogue", "catalogue.snapshot.created", dialog.output_data.name)
+                        
+                    titolo = tr("Configuration created")
+                    testo = tr("The configuration has been created successfully.")
+                
+                self.dash_model.run_heavy_operation(
+                    op_name, op_desc, action, 
+                    success_msg_title=titolo, success_msg=testo, update_dashboard=True
+                )
         except Exception as e:
-            logger.error(str(e))
-            UiUtils.show_message(tr("Error"), tr("An error occurred: {error}", error=str(e)))
+            logger.error(f"Error executing dialog: {e}")
 
     def __open_snapshot_searcher(self):
         if self.search_page_opener:
@@ -82,13 +95,22 @@ class CatalogueController:
         try:
             w = MessageBox(tr("Install configuration"), tr("Are you sure you want to install the selected snapshot? All current directories will be replaced with those contained in the snapshot."), parent=self.view)
             if w.exec_():
-                if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
-                    self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
-                self.dash_model.snap_catalogue.install(snap)
-                log_action("Catalogue", "catalogue.snapshot.installed", snap.name)
-                self.dash_model.update()
+                def action(task):
+                    if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
+                        self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
+                    self.dash_model.snap_catalogue.install(snap, progress_callback=task.update_task_progress)
+                    log_action("Catalogue", "catalogue.snapshot.installed", snap.name)
+                
+                self.dash_model.run_heavy_operation(
+                    tr("Install configuration"),
+                    tr("Installing configuration"),
+                    action,
+                    success_msg_title=tr("Configuration installed"),
+                    success_msg=tr("The configuration has been installed successfully."),
+                    update_dashboard=True
+                )
         except Exception as e:
-            UiUtils.show_message(tr("Installation error"), tr("An error occurred during installation: {error}", error=str(e)))
+            logger.error(f"Error during install process: {e}")
 
     def __edit_snapshot(self, snap: Snapshot):
         try:
@@ -98,13 +120,22 @@ class CatalogueController:
 
     def __delete_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected snapshot?\n\nAll associated files will be deleted in "), parent=self.view)
+            w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected configuration? This operation cannot be undone."), parent=self.view)
             if w.exec_():
-                self.dash_model.snap_catalogue.delete(snap)
-                log_action("Catalogue", "catalogue.snapshot.deleted", snap.name)
-                self.dash_model.update()
+                def action(task):
+                    self.dash_model.snap_catalogue.delete(snap)
+                    log_action("Catalogue", "catalogue.snapshot.deleted", snap.name)
+                
+                self.dash_model.run_heavy_operation(
+                    tr("Delete configuration"),
+                    tr("Deleting configuration"),
+                    action,
+                    success_msg_title=tr("Configuration deleted"),
+                    success_msg=tr("The configuration has been deleted successfully."),
+                    update_dashboard=True
+                )
         except Exception as e:
-            UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
+            logger.error(f"Error during delete process: {e}")
 
     def __open_snap_directory(self, snap: Snapshot):
         path = self.dash_model.snap_catalogue.get_snap_directory_path(snap)
@@ -112,13 +143,20 @@ class CatalogueController:
 
     def __duplicate_snapshot(self, snap: Snapshot):
         try:
-            w = MessageBox(tr("Duplicate configuration"), tr("Are you sure you want to duplicate the selected configuration?"), parent=self.view)
-            if w.exec_():
+            def action(task):
                 self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
                 log_action("Catalogue", "catalogue.snapshot.duplicated", snap.name)
-                self.dash_model.update()
+            
+            self.dash_model.run_heavy_operation(
+                tr("Duplicate configuration"),
+                tr("Duplicating configuration"),
+                action,
+                success_msg_title=tr("Configuration duplicated"),
+                success_msg=tr("The configuration has been duplicated successfully."),
+                update_dashboard=True
+            )
         except Exception as e:
-            UiUtils.show_message(tr("Duplication error"), tr("An error occurred during duplication: {error}", error=str(e)))
+            logger.error(f"Error during duplicate process: {e}")
 
     def __export_snapshot(self, snap: Snapshot):
         try:
@@ -130,8 +168,16 @@ class CatalogueController:
                     app.path.__str__()
                 )
                 if directory:
-                    self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
-                    log_action("Catalogue", "catalogue.snapshot.exported", f"{snap.name} -> {directory}")
+                    def action(task):
+                        self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
+                        log_action("Catalogue", "catalogue.snapshot.exported", f"{snap.name} -> {directory}")
+                    
+                    self.dash_model.run_heavy_operation(
+                        tr("Export snapshot"),
+                        tr("Exporting snapshot"),
+                        action,
+                        success_msg_title="", success_msg="", update_dashboard=False
+                    )
         except Exception as e:
             UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
@@ -145,8 +191,16 @@ class CatalogueController:
                     app.path.__str__()
                 )
                 if directory:
-                    self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
-                    log_action("Catalogue", "catalogue.associated.folders.exported", f"{snap.name} -> {directory}")
+                    def action(task):
+                        self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
+                        log_action("Catalogue", "catalogue.associated.folders.exported", f"{snap.name} -> {directory}")
+                    
+                    self.dash_model.run_heavy_operation(
+                        tr("Export associated folders"),
+                        tr("Exporting folders"),
+                        action,
+                        success_msg_title="", success_msg="", update_dashboard=False
+                    )
         except Exception as e:
             UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
@@ -154,8 +208,16 @@ class CatalogueController:
         try:
             w = MessageBox(tr("Delete installed folders"), tr("Are you sure you want to delete the currently installed folders for the selected snapshot?"), parent=self.view)
             if w.exec_():
-                self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
-                log_action("Catalogue", "catalogue.installed.folders.deleted", snap.name)
+                def action(task):
+                    self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
+                    log_action("Catalogue", "catalogue.installed.folders.deleted", snap.name)
+                
+                self.dash_model.run_heavy_operation(
+                    tr("Delete installed folders"),
+                    tr("Deleting folders"),
+                    action,
+                    success_msg_title="", success_msg="", update_dashboard=False
+                )
         except Exception as e:
             UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
 
@@ -163,8 +225,16 @@ class CatalogueController:
         try:
             w = MessageBox(tr("Update associated folders"), tr("Are you sure you want to update the associated folders of the selected snapshot with the currently installed ones?"), parent=self.view)
             if w.exec_():
-                self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
-                log_action("Catalogue", "catalogue.associated.folders.updated", snap.name)
+                def action(task):
+                    self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
+                    log_action("Catalogue", "catalogue.associated.folders.updated", snap.name)
+                
+                self.dash_model.run_heavy_operation(
+                    tr("Update associated folders"),
+                    tr("Updating folders"),
+                    action,
+                    success_msg_title="", success_msg="", update_dashboard=False
+                )
         except Exception as e:
             UiUtils.show_message(tr("Update error"), tr("An error occurred during update: {error}", error=str(e)))
 
