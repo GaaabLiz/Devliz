@@ -2,7 +2,8 @@ import platform
 import subprocess
 from pathlib import Path
 
-from PySide6.QtCore import Signal, QObject
+from PySide6.QtCore import Signal, QObject, QUrl
+from PySide6.QtGui import QDesktopServices
 from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue
 from pylizlib.core.os.snap.domain import SnapshotBackupInfo
@@ -38,8 +39,7 @@ class BackupController(QObject):
     def __handle_open(self, backup: SnapshotBackupInfo):
         folder = backup.path.parent
         try:
-            from pylizlib.core.os.utils import open_system_folder
-            open_system_folder(str(folder))
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
             log_action(ActionCategory.BACKUPS, ActionType.BACKUP_OPENED_IN_FINDER, backup.file_name)
         except Exception as e:
             logger.error(f"Error opening backup folder: {e}")
