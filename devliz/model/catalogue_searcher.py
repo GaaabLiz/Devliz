@@ -3,6 +3,7 @@ from time import sleep
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, Signal, QObject
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
+from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot, SnapshotSearchParams, QueryType, SearchTarget, SnapshotSearcher, \
     SnapshotSearchResult
 from pylizlib.qt.handler.operation_core import Operation, Task
@@ -367,10 +368,12 @@ class CatalogueSearcherModel(QObject):
         operations = self.__get_runner_operations(params)
         self.runner.clear()
         self.runner.adds(operations)
+        logger.debug("Starting search operations in model")
         self.runner.start()
 
     def stop_search(self):
         """Stops the ongoing search operation."""
+        logger.debug("Stopping search operations in model")
         self.runner.stop()
 
     def on_operation_status_changed(self, op_id: str, status: OperationStatus):
@@ -449,6 +452,7 @@ class CatalogueSearcherModel(QObject):
         Args:
             statistics (RunnerStatistics): Statistics about the completed run.
         """
+        logger.info("Model search finished. Processing statistics...")
         self.signal_search_finished.emit()
         all_results = []
         for op in self.runner._all_operations:

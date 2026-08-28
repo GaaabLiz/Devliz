@@ -6,6 +6,7 @@ from qfluentwidgets import MessageBox
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtCore import QUrl
 
+from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
 from devliz.application.action_history import log_action, ActionCategory, ActionType
@@ -55,6 +56,7 @@ class CatalogueSearcherController:
         Args:
             row (int): The row index of the snapshot to remove.
         """
+        logger.debug(f"Removing row {row} from search results")
         self.model.table_model.remove_snapshot(row)
         log_action(ActionCategory.SEARCH, ActionType.SEARCH_SNAPSHOT_REMOVED, f"row={row}")
 
@@ -66,10 +68,11 @@ class CatalogueSearcherController:
         Args:
             file_path (str): The path to the file to open.
         """
+        logger.info(f"Opening file in search results: {file_path}")
         if os.path.isfile(file_path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
         elif os.path.isdir(file_path):
-            print(f"Cannot open directory: {file_path}")
+            logger.warning(f"Cannot open directory in _on_file_double_clicked: {file_path}")
 
     def _on_tree_open_parent_folder(self, file_path: str):
         """
@@ -78,6 +81,7 @@ class CatalogueSearcherController:
         Args:
             file_path (str): The path to the file whose parent folder should be opened.
         """
+        logger.info(f"Opening parent folder for file {file_path}")
         parent_dir = os.path.dirname(file_path)
         if os.path.exists(parent_dir):
             QDesktopServices.openUrl(QUrl.fromLocalFile(parent_dir))
@@ -105,17 +109,20 @@ class CatalogueSearcherController:
         self.view.action_start.setEnabled(False)
         self.view.action_stop.setEnabled(True)
 
+        logger.info(f"Starting search: text='{search_text}', type={query_type}, target={search_target}")
         self.model.search(search_text, query_type, search_target, extensions)
         log_action(ActionCategory.SEARCH, ActionType.SEARCH_STARTED, f"query={search_text}")
 
     def _stop_search(self):
         """Stops the search operation in the model and updates the UI state."""
         self.view.set_operation_status(False)
+        logger.info("Search interrupted by user")
         self.model.stop_search()
 
         # Toggle button states
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
+        logger.info("Search completed")
         log_action(ActionCategory.SEARCH, ActionType.SEARCH_STOPPED, "")
 
     def _on_search_finished(self):
@@ -123,6 +130,7 @@ class CatalogueSearcherController:
         self.view.set_operation_status(False)
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
+        logger.info("Search completed")
         log_action(ActionCategory.SEARCH, ActionType.SEARCH_COMPLETED, "")
 
     def open(self, snapshot: Snapshot | None = None):
@@ -136,4 +144,5 @@ class CatalogueSearcherController:
             snapshot (Snapshot | None, optional): A specific snapshot to load,
                                                   or None to load all. Defaults to None.
         """
+        logger.debug(f"Opening search page with snapshot_scope={snapshot.name if snapshot else 'ALL'}")
         self.model.load_snapshots_from_catalogue(snapshot)

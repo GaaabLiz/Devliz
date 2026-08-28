@@ -1,6 +1,6 @@
 from PySide6.QtCore import QAbstractItemModel, Qt, Signal, QModelIndex
 from PySide6.QtGui import QActionGroup
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView, QStackedWidget
 from qfluentwidgets import (
     LineEdit,
     TableView,
@@ -40,6 +40,7 @@ class CatalogueSearcherView(DevlizQFrame):
     """
     signal_delete_requested = Signal(int)
     signal_file_double_clicked = Signal(str)
+    signal_tree_open_parent_folder = Signal(str)
 
     def __init__(self, parent=None):
         """
@@ -60,18 +61,9 @@ class CatalogueSearcherView(DevlizQFrame):
         self.master_layout.addWidget(content_widget)
 
         # Main layout
-        self.main_layout = QHBoxLayout(content_widget)
+        self.main_layout = QVBoxLayout(content_widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
         self.main_layout.setSpacing(10)
-
-        # Left and Right sections
-        self.left_widget = QWidget(self)
-        self.right_widget = QWidget(self)
-
-        # --- Left Section ---
-        self.left_layout = QVBoxLayout(self.left_widget)
-        self.left_layout.setContentsMargins(0, 0, 0, 0)
-        self.left_layout.setSpacing(10)
 
         # CommandBar
         self.command_bar = CommandBar(self)
@@ -87,12 +79,17 @@ class CatalogueSearcherView(DevlizQFrame):
         self.extensions_button = TransparentDropDownPushButton(tr("Extensions"), self, FluentIcon.FILTER)
         self.extensions_button.setMenu(self.__create_extensions_menu())
 
+        self.view_button = TransparentDropDownPushButton(tr("View"), self, FluentIcon.VIEW)
+        self.view_button.setMenu(self.__create_view_menu())
+
         self.command_bar.addAction(self.action_start)
         self.command_bar.addAction(self.action_stop)
         self.command_bar.addSeparator()
         self.command_bar.addWidget(self.target_button)
         self.command_bar.addWidget(self.query_type_button)
         self.command_bar.addWidget(self.extensions_button)
+        self.command_bar.addSeparator()
+        self.command_bar.addWidget(self.view_button)
 
         # Search bar
         self.search_widget = QWidget(self)
@@ -128,7 +125,7 @@ class CatalogueSearcherView(DevlizQFrame):
 
         self.status_card.hide()
 
-        # Results table
+        # Results table (Snapshot Table)
         self.results_table = TableView(self)
         self.results_table.verticalHeader().hide()
         self.results_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -138,32 +135,28 @@ class CatalogueSearcherView(DevlizQFrame):
         self._distribuisci_colonne_perc()
         self.results_table.resizeEvent = self._table_resize_event
 
-        # Add widgets to left layout
-        self.left_layout.addWidget(self.command_bar)
-        self.left_layout.addWidget(self.search_widget)
-        self.left_layout.addWidget(self.status_card)
-        self.left_layout.addSpacing(30)
-        self.left_layout.addWidget(self.results_table)
-
-        # --- Right Section ---
-        self.right_layout = QVBoxLayout(self.right_widget)
-        self.right_layout.setContentsMargins(0, 0, 0, 0)
-        self.right_layout.setSpacing(5)
+        # Tree view (Results List)
         self.tree_view = TreeView(self)
         self.tree_view.doubleClicked.connect(self._on_tree_view_double_clicked)
         self.tree_view.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
         self.tree_view.header().setStretchLastSection(False)
         self.tree_view.setIndentation(20)
+        self.tree_view.header().hide()
+        self.tree_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree_view.customContextMenuRequested.connect(self._show_tree_context_menu)
         FluentStyleSheet.TREE_VIEW.apply(self.tree_view)
-        self.right_layout.addWidget(self.tree_view)
+
+        # Section X (Stacked Widget for swapping views)
+        self.view_stack = QStackedWidget(self)
+        self.view_stack.addWidget(self.results_table)
+        self.view_stack.addWidget(self.tree_view)
 
         # Add widgets to main layout
-        self.main_layout.addWidget(self.left_widget, 2)
-        line = QFrame()
-        line.setFrameShape(QFrame.Shape.VLine)
-        line.setFrameShadow(QFrame.Shadow.Sunken)
-        self.main_layout.addWidget(line)
-        self.main_layout.addWidget(self.right_widget, 1)
+        self.main_layout.addWidget(self.command_bar)
+        self.main_layout.addWidget(self.search_widget)
+        self.main_layout.addWidget(self.status_card)
+        self.main_layout.addSpacing(10)
+        self.main_layout.addWidget(self.view_stack)
 
         # Apply Fluent Design stylesheet
         FluentStyleSheet.DIALOG.apply(content_widget)
@@ -184,6 +177,33 @@ class CatalogueSearcherView(DevlizQFrame):
             file_path = item.text()
             self.signal_file_double_clicked.emit(file_path)
 
+    def _show_tree_context_menu(self, pos):
+        """
+        Shows a context menu for items in the results tree.
+
+        Args:
+            pos (QPoint): The position where the context menu was requested.
+        """
+        index = self.tree_view.indexAt(pos)
+        if not index.isValid():
+            return
+
+        item = self.tree_view.model().itemFromIndex(index)
+        if item and item.parent():  # Only for valid file paths
+            file_path = item.text()
+            
+            menu = RoundMenu(parent=self)
+            
+            action_open_folder = Action(FluentIcon.FOLDER, tr("Open parent folder"))
+            action_open_folder.triggered.connect(lambda: self.signal_tree_open_parent_folder.emit(file_path))
+            menu.addAction(action_open_folder)
+            
+            action_open_file = Action(FluentIcon.DOCUMENT, tr("Open file"))
+            action_open_file.triggered.connect(lambda: self.signal_file_double_clicked.emit(file_path))
+            menu.addAction(action_open_file)
+            
+            menu.exec(self.tree_view.viewport().mapToGlobal(pos))
+
     def _show_context_menu(self, pos):
         """
         Shows a context menu for items in the results table.
@@ -200,6 +220,39 @@ class CatalogueSearcherView(DevlizQFrame):
         delete_action.triggered.connect(lambda: self.signal_delete_requested.emit(index.row()))
         menu.addAction(delete_action)
         menu.exec(self.results_table.viewport().mapToGlobal(pos))
+
+    def __create_view_menu(self):
+        """
+        Creates the checkable menu for selecting the view (Snapshot Table vs Results List).
+
+        Returns:
+            CheckableMenu: The configured menu for the view button.
+        """
+        menu = CheckableMenu(parent=self)
+        action_group = QActionGroup(self)
+        action_group.setExclusive(True)
+
+        self.action_view_snapshot = Action(tr("Snapshot Table"), self, checkable=True)
+        self.action_view_results = Action(tr("Results List"), self, checkable=True)
+
+        self.action_view_snapshot.setChecked(True)
+
+        self.action_view_snapshot.triggered.connect(self._on_view_changed)
+        self.action_view_results.triggered.connect(self._on_view_changed)
+
+        action_group.addAction(self.action_view_snapshot)
+        action_group.addAction(self.action_view_results)
+
+        menu.addAction(self.action_view_snapshot)
+        menu.addAction(self.action_view_results)
+        return menu
+
+    def _on_view_changed(self):
+        """Handles switching between the Snapshot Table and Results List views."""
+        if self.action_view_snapshot.isChecked():
+            self.view_stack.setCurrentWidget(self.results_table)
+        else:
+            self.view_stack.setCurrentWidget(self.tree_view)
 
     def __create_extensions_menu(self):
         """
