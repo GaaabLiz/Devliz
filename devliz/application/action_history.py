@@ -2,6 +2,51 @@ import sqlite3
 from pathlib import Path
 
 from devliz.application.app import app
+from enum import Enum
+
+class ActionCategory(str, Enum):
+    BACKUPS = "Backups"
+    CATALOGUE = "Catalogue"
+    SEARCH = "Search"
+    DASHBOARD = "Dashboard"
+    SETTINGS = "Settings"
+    HELP = "Help"
+    HOME = "Home"
+
+class ActionType(str, Enum):
+    BACKUP_OPENED_IN_FINDER = "backup.opened.in.finder"
+    BACKUP_RESTORED = "backup.restored"
+    BACKUP_DELETED = "backup.deleted"
+    CATALOGUE_CONFIG_DIALOG_OPENED = "catalogue.config.dialog.opened"
+    CATALOGUE_SNAPSHOT_UPDATED = "catalogue.snapshot.updated"
+    CATALOGUE_SNAPSHOT_CREATED = "catalogue.snapshot.created"
+    CATALOGUE_SNAPSHOT_INSTALLED = "catalogue.snapshot.installed"
+    CATALOGUE_SNAPSHOT_DELETED = "catalogue.snapshot.deleted"
+    CATALOGUE_SNAPSHOT_DUPLICATED = "catalogue.snapshot.duplicated"
+    CATALOGUE_SNAPSHOT_EXPORTED = "catalogue.snapshot.exported"
+    CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED = "catalogue.associated.folders.exported"
+    CATALOGUE_INSTALLED_FOLDERS_DELETED = "catalogue.installed.folders.deleted"
+    CATALOGUE_ASSOCIATED_FOLDERS_UPDATED = "catalogue.associated.folders.updated"
+    SEARCH_SNAPSHOT_REMOVED = "search.snapshot.removed"
+    SEARCH_STARTED = "search.started"
+    SEARCH_STOPPED = "search.stopped"
+    SEARCH_COMPLETED = "search.completed"
+    SEARCH_PAGE_OPENED = "search.page.opened"
+    DASHBOARD_DATA_LOADED = "dashboard.data.loaded"
+    DASHBOARD_REFRESH_STARTED = "dashboard.refresh.started"
+    DASHBOARD_REFRESH_COMPLETED = "dashboard.refresh.completed"
+    DASHBOARD_F5_PRESSED = "dashboard.f5.pressed"
+    DASHBOARD_PAGE_CHANGED = "dashboard.page.changed"
+    DASHBOARD_APPLICATION_STARTED = "dashboard.application.started"
+    SETTINGS_RESTART_CONFIRMED = "settings.restart.confirmed"
+    SETTINGS_CATALOGUE_PATH_CHANGED = "settings.catalogue.path.changed"
+    SETTINGS_BACKUP_PATH_CHANGED = "settings.backup.path.changed"
+    SETTINGS_BACKUP_CLEANED = "settings.backup.cleaned"
+    HELP_CARD_OPENED = "help.card.opened"
+    OPEN = "open"
+    REFRESH = "refresh"
+
+
 
 PATH_ACTION_HISTORY_DB = Path(app.get_path()).joinpath("ActionHistory.db")
 
@@ -29,11 +74,11 @@ def init_action_history_db():
         conn.commit()
 
 
-def log_action(screen_key: str, action_key: str, details: str = ""):
+def log_action(screen_key: ActionCategory | str, action_key: ActionType | str, details: str = ""):
     with _get_connection() as conn:
         conn.execute(
             "INSERT INTO action_history (screen_key, action_key, details) VALUES (?, ?, ?)",
-            (screen_key, action_key, details),
+            ((screen_key.value if isinstance(screen_key, ActionCategory) else screen_key), (action_key.value if isinstance(action_key, ActionType) else action_key), details),
         )
         conn.commit()
 
