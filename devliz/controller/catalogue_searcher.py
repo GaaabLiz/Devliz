@@ -1,14 +1,17 @@
 import os
+import sys
+import subprocess
 
 from qfluentwidgets import MessageBox
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QUrl
 
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
-from devliz.application.action_history import log_action
+from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.model.catalogue_searcher import CatalogueSearcherModel
 from devliz.view.catalogue_searcher import CatalogueSearcherView
 from devliz.application.i18n import tr
-
 
 class CatalogueSearcherController:
     """
@@ -40,6 +43,7 @@ class CatalogueSearcherController:
         self.view.action_stop.triggered.connect(self._stop_search)
         self.view.signal_delete_requested.connect(self._on_delete_requested)
         self.view.signal_file_double_clicked.connect(self._on_file_double_clicked)
+        self.view.signal_tree_open_parent_folder.connect(self._on_tree_open_parent_folder)
 
         # Connect the status card update signal directly to the view's slot
         self.model.signal_status_card_update.connect(self.view.update_status_card)
@@ -52,7 +56,7 @@ class CatalogueSearcherController:
             row (int): The row index of the snapshot to remove.
         """
         self.model.table_model.remove_snapshot(row)
-        log_action("Search", "search.snapshot.removed", f"row={row}")
+        log_action(ActionCategory.SEARCH, ActionType.SEARCH_SNAPSHOT_REMOVED, f"row={row}")
 
     def _on_file_double_clicked(self, file_path: str):
         """
@@ -63,12 +67,20 @@ class CatalogueSearcherController:
             file_path (str): The path to the file to open.
         """
         if os.path.isfile(file_path):
-            try:
-                os.startfile(file_path)
-            except Exception as e:
-                print(f"Error opening file {file_path}: {e}")
+            QDesktopServices.openUrl(QUrl.fromLocalFile(file_path))
         elif os.path.isdir(file_path):
             print(f"Cannot open directory: {file_path}")
+
+    def _on_tree_open_parent_folder(self, file_path: str):
+        """
+        Handles the context menu action to open the parent folder of a file.
+
+        Args:
+            file_path (str): The path to the file whose parent folder should be opened.
+        """
+        parent_dir = os.path.dirname(file_path)
+        if os.path.exists(parent_dir):
+            QDesktopServices.openUrl(QUrl.fromLocalFile(parent_dir))
 
     def _perform_search(self):
         """
@@ -94,7 +106,7 @@ class CatalogueSearcherController:
         self.view.action_stop.setEnabled(True)
 
         self.model.search(search_text, query_type, search_target, extensions)
-        log_action("Search", "search.started", f"query={search_text}")
+        log_action(ActionCategory.SEARCH, ActionType.SEARCH_STARTED, f"query={search_text}")
 
     def _stop_search(self):
         """Stops the search operation in the model and updates the UI state."""
@@ -104,14 +116,14 @@ class CatalogueSearcherController:
         # Toggle button states
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
-        log_action("Search", "search.stopped", "")
+        log_action(ActionCategory.SEARCH, ActionType.SEARCH_STOPPED, "")
 
     def _on_search_finished(self):
         """Handles the completion of the search operation by updating the UI state."""
         self.view.set_operation_status(False)
         self.view.action_start.setEnabled(True)
         self.view.action_stop.setEnabled(False)
-        log_action("Search", "search.completed", "")
+        log_action(ActionCategory.SEARCH, ActionType.SEARCH_COMPLETED, "")
 
     def open(self, snapshot: Snapshot | None = None):
         """
