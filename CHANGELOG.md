@@ -1,3 +1,64 @@
+## [0.2.0] - 2026-08-28
+
+### 🚀 Features
+
+- Implement HomeController and HomeView for displaying home statistics
+- Translate UI strings to English using the i18n module for better localization support across the application. Updated various labels, messages, and dialog texts in the catalogue, dashboard, settings, and searcher views to enhance user experience for English-speaking users.
+- Refactor CatalogueController to accept a search page opener and update CatalogueSearcherView to inherit from DevlizQFrame for improved UI integration
+- Update DashboardController to manage UI states during data updates for home, catalogue, and searcher views
+- Add HelpController and HelpView for user assistance and guidance in the application
+- Implement ActionHistoryController and ActionHistoryView for managing and displaying user action history
+- Add Italian translations for various UI strings to enhance localization support
+- Integrate action logging across Catalogue, Search, Dashboard, Help, and Settings modules for enhanced user activity tracking
+- Add unit tests for ActionHistory and Dashboard modules to improve code coverage and reliability
+- *(backups)* Add backups section with management actions and settings
+- *(ui)* Improve home dashboard cards and layout behavior
+- *(ui)* Enhance home dashboard with additional snapshot statistics and improved card layout
+- *(ui)* Update directory opening method to use QDesktopServices for better compatibility
+- *(splash)* Implement splash screen controller with catalogue path validation
+- *(i18n)* Add Italian translations for catalogue error messages and default options
+- *(splash)* Refactor splash screen handling to use SplashController
+- *(validation)* Implement NetworkFolderValidator to allow non-existent network paths for catalogue
+- *(splash)* Add hide_overlay method and update splash screen handling
+- *(settings)* Improve application restart handling and streamline directory opening
+- *(i18n)* Add Italian translations for new tags and folder management messages
+- *(catalogue)* Rename button text from "Add local folder" to "Add folder"
+- *(catalogue)* Increase maximum width of input fields and add event filter for tag input
+- *(catalogue)* Simplify import dialog text and validate folder name for invalid characters
+- *(help)* Add Action History section with detailed descriptions for tracking application events
+- *(backup)* Add FakeBackupController and related settings for backup functionality
+- *(frame)* Replace IndeterminateProgressBar with ProgressBar and enhance updating functionality
+- *(dashboard)* Enhance update process with progress and message signals
+- *(dashboard)* Add progress and text signals for update feedback
+- *(catalogue)* Implement heavy operation handling for snapshot modifications and installations
+- Add subtitles to various views for enhanced context and usability
+- *(action_history)* Introduce ActionCategory and ActionType enums for structured action logging
+- *(backup)* Enhance action logging with ActionCategory and ActionType enums
+- *(backup)* Update folder opening method to use QDesktopServices for better compatibility
+- *(catalogue)* Refactor action logging to use ActionCategory and ActionType enums for improved structure
+- *(catalogue_searcher)* Refactor action logging to use ActionCategory and ActionType enums; enhance folder opening method for better compatibility
+- *(catalogue_searcher)* Enhance logging and introduce view switching functionality in search results
+- Enhance logging. improve folder handling. Created enum class for action history handling
+
+### 🐛 Bug Fixes
+
+- *(dashboard)* Correct spacing in type hint for cached_data variable
+
+### 💼 Other
+
+- V0.2.0
+
+### 🧪 Testing
+
+- Add unit tests for various controllers and models
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci]
+- Remove accidental temp request note file
+- Add .vscode/ to .gitignore to exclude Visual Studio Code settings
+- Updated some packages
+- Update .gitignore to include temp directory
 ## [0.1.5] - 2026-04-28
 
 ### 🚀 Features
