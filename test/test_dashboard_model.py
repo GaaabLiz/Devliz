@@ -52,6 +52,8 @@ def _import_dashboard_model_module(monkeypatch):
             self.runner_start = FakeSignal()
             self.runner_stop = FakeSignal()
             self.runner_finish = FakeSignal()
+            self.runner_update_progress = FakeSignal()
+            self.task_update_message = FakeSignal()
             self.clear_count = 0
             self.added_ops = []
             self.start_count = 0
@@ -102,6 +104,7 @@ def _import_dashboard_model_module(monkeypatch):
 
     fake_operation_core_module = types.ModuleType("pylizlib.qt.handler.operation_core")
     fake_operation_core_module.Operation = FakeOperation
+    fake_operation_core_module.Task = object  # or some fake task class if needed
 
     fake_operation_domain_module = types.ModuleType("pylizlib.qt.handler.operation_domain")
     fake_operation_domain_module.OperationInfo = FakeOperationInfo
@@ -139,7 +142,7 @@ def _import_dashboard_model_module(monkeypatch):
     fake_app_module.snap_settings = "snap-settings"
 
     fake_i18n_module = types.ModuleType("devliz.application.i18n")
-    fake_i18n_module.tr = lambda key: key
+    fake_i18n_module.tr = lambda key, **kwargs: key.format(**kwargs) if kwargs else key
 
     fake_ui_mode_module = types.ModuleType("pylizlib.qt.domain.view")
     fake_ui_mode_module.UiWidgetMode = types.SimpleNamespace()
@@ -245,4 +248,147 @@ def test_update_logs_error_if_runner_add_raises(monkeypatch):
 
     assert model.runner.start_count == 0
     assert any("cannot add" in msg for msg in logs["error"])
+
+def test_dashboard_model_on_runner_stopped(monkeypatch):
+    """
+    Test on_runner_stopped logs info.
+    """
+    dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)
+    model = dashboard_model_module.DashboardModel(view=object())
+    model.on_runner_stopped()
+    assert any("Aggiornamento Dashboard fermato." in msg for msg in logs["info"])
+
+def test_dashboard_model_run_heavy_operation_success_update(monkeypatch):
+    dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)
+    model = dashboard_model_module.DashboardModel(view=object())
+    
+    import sys
+    import types
+    qtfw_mod = types.ModuleType("pylizlib.qtfw.util.ui")
+    class FakeUiUtils:
+        msgs = []
+        @classmethod
+        def show_message(cls, title, text):
+            cls.msgs.append((title, text))
+    qtfw_mod.UiUtils = FakeUiUtils
+    monkeypatch.setitem(sys.modules, "pylizlib.qtfw.util.ui", qtfw_mod)
+    
+    core_mod = types.ModuleType("pylizlib.qt.handler.operation_core")
+    class FakeGenericTask:
+        def __init__(self, name, func): pass
+    class FakeOperation:
+        def __init__(self, t, i): pass
+    class FakeTask: pass
+    core_mod.GenericTask = FakeGenericTask
+    core_mod.Operation = FakeOperation
+    core_mod.Task = FakeTask
+    monkeypatch.setitem(sys.modules, "pylizlib.qt.handler.operation_core", core_mod)
+    
+    class FakeOperationInfo2:
+        def __init__(self, *args, **kwargs): pass
+    dashboard_model_module.OperationInfo = FakeOperationInfo2
+
+    model.update = lambda: setattr(model, "updated", True)
+    
+    model.run_heavy_operation(
+        "op", "desc", lambda: None, "Success", "Did it", update_dashboard=True
+    )
+    
+    runner = model._heavy_runners[-1] if model._heavy_runners else model.runner
+    
+    class FakeStats:
+        def has_ops_failed(self): return False
+    
+    runner.runner_finish.emit(FakeStats())
+    
+    assert FakeUiUtils.msgs[-1] == ("Success", "Did it")
+    assert getattr(model, "updated", False)
+
+def test_dashboard_model_run_heavy_operation_fail(monkeypatch):
+    dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)
+    model = dashboard_model_module.DashboardModel(view=object())
+    
+    import sys
+    import types
+    qtfw_mod = types.ModuleType("pylizlib.qtfw.util.ui")
+    class FakeUiUtils:
+        msgs = []
+        @classmethod
+        def show_message(cls, title, text):
+            cls.msgs.append((title, text))
+    qtfw_mod.UiUtils = FakeUiUtils
+    monkeypatch.setitem(sys.modules, "pylizlib.qtfw.util.ui", qtfw_mod)
+    
+    core_mod = types.ModuleType("pylizlib.qt.handler.operation_core")
+    class FakeGenericTask:
+        def __init__(self, name, func): pass
+    class FakeOperation:
+        def __init__(self, t, i): pass
+    class FakeTask: pass
+    core_mod.GenericTask = FakeGenericTask
+    core_mod.Operation = FakeOperation
+    core_mod.Task = FakeTask
+    monkeypatch.setitem(sys.modules, "pylizlib.qt.handler.operation_core", core_mod)
+
+    class FakeOperationInfo2:
+        def __init__(self, *args, **kwargs): pass
+    dashboard_model_module.OperationInfo = FakeOperationInfo2
+
+    model.run_heavy_operation(
+        "op", "desc", lambda: None, update_dashboard=False
+    )
+    
+    runner = model._heavy_runners[-1] if model._heavy_runners else model.runner
+    class FakeStats:
+        def has_ops_failed(self): return True
+        def get_first_error(self): return "Big Error"
+    
+    runner.runner_finish.emit(FakeStats())
+    
+    assert FakeUiUtils.msgs[-1] == ("Error", "An error occurred: Big Error")
+
+def test_dashboard_model_run_heavy_operation_success_no_update(monkeypatch):
+    dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)
+    model = dashboard_model_module.DashboardModel(view=object())
+    
+    import sys
+    import types
+    qtfw_mod = types.ModuleType("pylizlib.qtfw.util.ui")
+    class FakeUiUtils:
+        msgs = []
+        @classmethod
+        def show_message(cls, title, text):
+            cls.msgs.append((title, text))
+    qtfw_mod.UiUtils = FakeUiUtils
+    monkeypatch.setitem(sys.modules, "pylizlib.qtfw.util.ui", qtfw_mod)
+    
+    core_mod = types.ModuleType("pylizlib.qt.handler.operation_core")
+    class FakeGenericTask:
+        def __init__(self, name, func): pass
+    class FakeOperation:
+        def __init__(self, t, i): pass
+    class FakeTask: pass
+    core_mod.GenericTask = FakeGenericTask
+    core_mod.Operation = FakeOperation
+    core_mod.Task = FakeTask
+    monkeypatch.setitem(sys.modules, "pylizlib.qt.handler.operation_core", core_mod)
+
+    class FakeOperationInfo2:
+        def __init__(self, *args, **kwargs): pass
+    dashboard_model_module.OperationInfo = FakeOperationInfo2
+
+    c = []
+    model.signal_on_update_complete.connect(lambda: c.append(1))
+    
+    model.run_heavy_operation(
+        "op", "desc", lambda: None, update_dashboard=False
+    )
+    
+    runner = model._heavy_runners[-1] if model._heavy_runners else model.runner
+    class FakeStats:
+        def has_ops_failed(self): return False
+    
+    runner.runner_finish.emit(FakeStats())
+    
+    assert len(c) == 1
 

@@ -106,3 +106,54 @@ def test_compute_home_statistics_logs_permission_error(monkeypatch, tmp_path):
     assert len(warnings) == 1
     assert "Permesso negato" in warnings[0]
 
+def test_home_statistics_str_properties(monkeypatch):
+    data_module = _import_domain_data_module(monkeypatch)
+    stats = data_module.HomeStatistics(heaviest_file_size=1024, average_snapshot_size_bytes=2048)
+    assert stats.heaviest_file_size_str == "1024B"
+    assert stats.average_snapshot_size_str == "2048B"
+
+def test_compute_home_statistics_dates_and_missing_dir(monkeypatch, tmp_path):
+    data_module = _import_domain_data_module(monkeypatch)
+    from datetime import datetime
+    
+    missing_dir = tmp_path / "missing"
+    snap1 = _make_snapshot(missing_dir)
+    snap1.date_created = datetime(2023, 1, 5)
+    
+    existing_dir = tmp_path / "existing"
+    existing_dir.mkdir()
+    (existing_dir / "file.txt").write_bytes(b"123")
+    snap2 = _make_snapshot(existing_dir)
+    snap2.date_created = datetime(2023, 1, 1)
+    
+    snap_data = data_module.DevlizSnapshotData(snapshot_list=[snap1, snap2])
+    stats = snap_data.compute_home_statistics()
+    
+    assert stats.oldest_snapshot_date == "2023-01-01"
+    assert stats.last_snapshot_date == "2023-01-05"
+    assert stats.average_snapshot_size_bytes == 3 // 2  # 3 bytes / 2 snapshots = 1
+
+def test_compute_home_statistics_os_error_on_stat(monkeypatch, tmp_path):
+    data_module = _import_domain_data_module(monkeypatch)
+    
+    root = tmp_path / "root"
+    root.mkdir()
+    f = root / "file.txt"
+    f.touch()
+    
+    snap = _make_snapshot(root)
+    snap_data = data_module.DevlizSnapshotData(snapshot_list=[snap])
+    
+    original_stat = Path.stat
+    def fake_stat(self, *args, **kwargs):
+        if self == f and not args and not kwargs:
+            raise OSError("stat failed")
+        return original_stat(self, *args, **kwargs)
+        
+    monkeypatch.setattr(Path, "stat", fake_stat)
+    
+    stats = snap_data.compute_home_statistics()
+    assert stats.total_files == 1
+    assert stats.total_size_bytes == 0
+
+

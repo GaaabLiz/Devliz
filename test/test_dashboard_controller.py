@@ -21,9 +21,17 @@ def _import_dashboard_module(monkeypatch):
         def __init__(self, window_name):
             self.window_name = window_name
             self.states = []
+            self.progress = []
+            self.text = []
 
         def set_state(self, state):
             self.states.append(state)
+            
+        def set_updating_progress(self, p):
+            self.progress.append(p)
+            
+        def set_updating_text(self, t):
+            self.text.append(t)
 
     class FakeStackedWidget:
         def __init__(self):
@@ -99,6 +107,8 @@ def _import_dashboard_module(monkeypatch):
             self.signal_on_update_started = FakeSignal()
             self.signal_on_update_complete = FakeSignal()
             self.signal_on_updated_data_available = FakeSignal()
+            self.signal_on_update_progress = FakeSignal()
+            self.signal_on_update_text = FakeSignal()
             self.snap_catalogue = types.SimpleNamespace(path_catalogue=None)
             self.update_count = 0
 
@@ -153,9 +163,13 @@ def _import_dashboard_module(monkeypatch):
     fake_action_history_module = types.ModuleType("devliz.application.action_history")
 
     def fake_log_action(screen_key, action_key, details=""):
-        actions.append((screen_key, action_key, details))
+        actions.append((getattr(screen_key, "value", screen_key), getattr(action_key, "value", action_key), details))
 
     fake_action_history_module.log_action = fake_log_action
+    from devliz.application.action_history import ActionCategory, ActionType
+    fake_action_history_module.ActionCategory = ActionCategory
+    fake_action_history_module.ActionType = ActionType
+
 
     class FakeSnapSettings:
         pass
@@ -266,6 +280,15 @@ def test_update_started_and_complete_toggle_all_states(monkeypatch):
     assert controller.backup.view.states[-1] == "DISPLAYING"
     assert controller.help.view.states[-1] == "DISPLAYING"
     assert ("Dashboard", "dashboard.refresh.completed", "") in actions
+    
+    # test progress and text
+    controller._DashboardController__handle_update_progress(50)
+    assert controller.home.view.progress[-1] == 50
+    assert controller.catalogue.view.progress[-1] == 50
+    
+    controller._DashboardController__handle_update_text("loading...")
+    assert controller.home.view.text[-1] == "loading..."
+    assert controller.catalogue.view.text[-1] == "loading..."
 
 
 def test_handle_data_updated_updates_children_and_catalogue_path(monkeypatch):
