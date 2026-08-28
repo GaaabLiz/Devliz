@@ -24,9 +24,12 @@ class WidgetSettings(DevlizQFrame):
     signal_theme_changed = Signal()
 
     def __init__(self, parent=None):
-        super().__init__(name=tr("Settings"), parent=parent)
-
-        # Label titolo
+        super().__init__(
+            name=tr("Settings"), 
+            parent=parent, 
+            subtitle=tr("Configure the application preferences and default behaviors.")
+        )
+        self.layout = self.get_scroll_layout()
         self.install_label_title()
 
         # Aggiungo i widgets

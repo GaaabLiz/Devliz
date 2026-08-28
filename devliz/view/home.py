@@ -54,7 +54,11 @@ class StatCard(ElevatedCardWidget):
 class HomeView(DevlizQFrame):
 
     def __init__(self, parent=None):
-        super().__init__(name=tr("Home"), parent=parent)
+        super().__init__(
+            name=tr("Home"), 
+            parent=parent, 
+            subtitle=tr("Overview of your application statistics and quick data.")
+        )
         self.__setup_ui()
 
     def __setup_ui(self):

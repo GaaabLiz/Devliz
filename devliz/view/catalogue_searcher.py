@@ -48,7 +48,11 @@ class CatalogueSearcherView(DevlizQFrame):
         Args:
             parent (QWidget, optional): The parent widget. Defaults to None.
         """
-        super().__init__(name=tr("Search"), parent=parent)
+        super().__init__(
+            name=tr("Search"), 
+            parent=parent, 
+            subtitle=tr("Search through the content and files of your snapshots.")
+        )
 
         self.install_label_title()
 
