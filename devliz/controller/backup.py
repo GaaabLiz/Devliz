@@ -10,7 +10,7 @@ from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
 from devliz.application.app import app_settings, AppSettings
-from devliz.application.action_history import log_action
+from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.model.backup import BackupModel
 from devliz.view.backup import BackupView
@@ -38,14 +38,9 @@ class BackupController(QObject):
     def __handle_open(self, backup: SnapshotBackupInfo):
         folder = backup.path.parent
         try:
-            if platform.system() == "Darwin":
-                subprocess.Popen(["open", str(folder)])
-            elif platform.system() == "Windows":
-                import os
-                os.startfile(str(folder))
-            else:
-                subprocess.Popen(["xdg-open", str(folder)])
-            log_action("Backups", "backup.opened.in.finder", backup.file_name)
+            from pylizlib.core.os.utils import open_system_folder
+            open_system_folder(str(folder))
+            log_action(ActionCategory.BACKUPS, ActionType.BACKUP_OPENED_IN_FINDER, backup.file_name)
         except Exception as e:
             logger.error(f"Error opening backup folder: {e}")
 
@@ -59,7 +54,7 @@ class BackupController(QObject):
             return
         try:
             self.snap_catalogue.restore_backup(backup.path)
-            log_action("Backups", "backup.restored", backup.file_name)
+            log_action(ActionCategory.BACKUPS, ActionType.BACKUP_RESTORED, backup.file_name)
             self.update_data()
             self.signal_request_refresh.emit()
         except Exception as e:
@@ -76,7 +71,7 @@ class BackupController(QObject):
             return
         try:
             self.snap_catalogue.delete_backup(backup.path)
-            log_action("Backups", "backup.deleted", backup.file_name)
+            log_action(ActionCategory.BACKUPS, ActionType.BACKUP_DELETED, backup.file_name)
             self.update_data()
         except Exception as e:
             logger.error(f"Error deleting backup: {e}")
