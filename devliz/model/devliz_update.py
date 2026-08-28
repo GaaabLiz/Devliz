@@ -17,6 +17,8 @@ class TaskGetMonitoredSoftware(Task):
         super().__init__(tr("Retrieving Monitored Software"))
 
     def execute(self):
+        from loguru import logger
+        logger.debug("Fetching monitored software list...")
         data_list: list[str] = app_settings.get(AppSettings.starred_exes)
         data_objs: list[SoftwareData] = []
         # for i in range(1, 50000000):
@@ -43,4 +45,6 @@ class TaskGetSnapshots(Task):
         self.catalogue = catalogue
 
     def execute(self):
+        from loguru import logger
+        logger.debug("Fetching saved snapshots...")
         return self.catalogue.get_all()

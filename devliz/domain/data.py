@@ -53,6 +53,7 @@ class DevlizSnapshotData:
         return get_normalized_gb_mb_str(total_size)
 
     def compute_home_statistics(self) -> HomeStatistics:
+        logger.debug("Starting statistics calculation for Home...")
         stats = HomeStatistics(snapshot_count=self.count)
         heaviest_size = 0
         heaviest_path = ""
@@ -82,7 +83,7 @@ class DevlizSnapshotData:
                         elif entry.is_dir():
                             stats.total_dirs += 1
                 except PermissionError:
-                    logger.warning(f"Permesso negato per la directory: {path}")
+                    logger.warning(f"Permission denied for directory: {path}")
 
         stats.heaviest_file_path = heaviest_path
         stats.heaviest_file_size = heaviest_size
@@ -98,6 +99,7 @@ class DevlizSnapshotData:
         if self.count > 0:
             stats.average_snapshot_size_bytes = stats.total_size_bytes // self.count
             
+        logger.debug(f"Statistics calculation completed: {stats.snapshot_count} snapshots processed.")
         return stats
 
 

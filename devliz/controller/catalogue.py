@@ -94,6 +94,7 @@ class CatalogueController:
             self.search_page_opener(snapshot)
 
     def __install_snapshot(self, snap: Snapshot):
+        logger.debug(f"Installation requested for {snap.name}")
         try:
             w = MessageBox(tr("Install configuration"), tr("Are you sure you want to install the selected snapshot? All current directories will be replaced with those contained in the snapshot."), parent=self.view)
             if w.exec_():
@@ -101,6 +102,7 @@ class CatalogueController:
                     if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
                         self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
                     self.dash_model.snap_catalogue.install(snap, progress_callback=task.update_task_progress)
+                    logger.info(f"Configuration installation {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_INSTALLED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
@@ -121,11 +123,13 @@ class CatalogueController:
             UiUtils.show_message(tr("Edit error"), tr("An error occurred during editing: {error}", error=str(e)))
 
     def __delete_snapshot(self, snap: Snapshot):
+        logger.debug(f"Deletion requested for {snap.name}")
         try:
             w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected configuration? This operation cannot be undone."), parent=self.view)
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.delete(snap)
+                    logger.info(f"Configuration deletion {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DELETED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
@@ -144,9 +148,11 @@ class CatalogueController:
         self.__open_directory(path)
 
     def __duplicate_snapshot(self, snap: Snapshot):
+        logger.debug(f"Duplication requested for {snap.name}")
         try:
             def action(task):
                 self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
+                logger.info(f"Configuration duplication {snap.name} completed.")
                 log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DUPLICATED, snap.name)
             
             self.dash_model.run_heavy_operation(
@@ -161,6 +167,7 @@ class CatalogueController:
             logger.error(f"Error during duplicate process: {e}")
 
     def __export_snapshot(self, snap: Snapshot):
+        logger.debug(f"Export requested for {snap.name}")
         try:
             w = MessageBox(tr("Export snapshot"), tr("Are you sure you want to export the selected snapshot?"), parent=self.view)
             if w.exec_():
@@ -172,6 +179,7 @@ class CatalogueController:
                 if directory:
                     def action(task):
                         self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
+                        logger.info(f"Export of {snap.name} to {directory} completed.")
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_EXPORTED, f"{snap.name} -> {directory}")
                     
                     self.dash_model.run_heavy_operation(
@@ -184,6 +192,7 @@ class CatalogueController:
             UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
     def __export_snapshot_folders(self, snap: Snapshot):
+        logger.debug(f"Folder export requested for {snap.name}")
         try:
             w = MessageBox(tr("Export associated folders"), tr("Are you sure you want to export the folders associated with the selected snapshot?"), parent=self.view)
             if w.exec_():
@@ -195,6 +204,7 @@ class CatalogueController:
                 if directory:
                     def action(task):
                         self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
+                        logger.info(f"Folder export of {snap.name} to {directory} completed.")
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED, f"{snap.name} -> {directory}")
                     
                     self.dash_model.run_heavy_operation(
@@ -207,11 +217,13 @@ class CatalogueController:
             UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
     def __delete_snap_installed_dirs(self, snap: Snapshot):
+        logger.debug(f"Installed folders deletion requested for {snap.name}")
         try:
             w = MessageBox(tr("Delete installed folders"), tr("Are you sure you want to delete the currently installed folders for the selected snapshot?"), parent=self.view)
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
+                    logger.info(f"Installed folders deletion for {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_INSTALLED_FOLDERS_DELETED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
@@ -224,11 +236,13 @@ class CatalogueController:
             UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
 
     def __update_assoc_dirs_from_installed(self, snap: Snapshot):
+        logger.debug(f"Associated folders update requested for {snap.name}")
         try:
             w = MessageBox(tr("Update associated folders"), tr("Are you sure you want to update the associated folders of the selected snapshot with the currently installed ones?"), parent=self.view)
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
+                    logger.info(f"Associated folders update for {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_UPDATED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
@@ -241,6 +255,7 @@ class CatalogueController:
             UiUtils.show_message(tr("Update error"), tr("An error occurred during update: {error}", error=str(e)))
 
     def __open_directory(self, path: Path):
+        logger.debug(f"Opening directory {path}")
         if path.exists():
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
         else:

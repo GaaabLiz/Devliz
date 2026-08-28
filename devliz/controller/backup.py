@@ -32,11 +32,13 @@ class BackupController(QObject):
         self.view.signal_delete_requested.connect(self.__handle_delete)
 
     def update_data(self):
+        logger.debug("Updating backup data...")
         backup_path = Path(app_settings.get(AppSettings.backup_path))
         self.model.load_backups(self.snap_catalogue, backup_path)
         self.view.reload_data()
 
     def __handle_open(self, backup: SnapshotBackupInfo):
+        logger.info(f"Opening backup folder in file system: {backup.file_name}")
         folder = backup.path.parent
         try:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
@@ -51,12 +53,15 @@ class BackupController(QObject):
             parent=self.view
         )
         if not w.exec_():
+            logger.debug("Backup restore cancelled by user.")
             return
         try:
+            logger.info(f"Restoring backup {backup.file_name}...")
             self.snap_catalogue.restore_backup(backup.path)
             log_action(ActionCategory.BACKUPS, ActionType.BACKUP_RESTORED, backup.file_name)
             self.update_data()
             self.signal_request_refresh.emit()
+            logger.info("Backup restored successfully.")
         except Exception as e:
             logger.error(f"Error restoring backup: {e}")
             UiUtils.show_message(tr("Error"), tr("An error occurred during restore: {error}", error=str(e)))
@@ -68,11 +73,14 @@ class BackupController(QObject):
             parent=self.view
         )
         if not w.exec_():
+            logger.debug("Backup deletion cancelled by user.")
             return
         try:
+            logger.info(f"Deleting backup {backup.file_name}...")
             self.snap_catalogue.delete_backup(backup.path)
             log_action(ActionCategory.BACKUPS, ActionType.BACKUP_DELETED, backup.file_name)
             self.update_data()
+            logger.info("Backup deletion completed.")
         except Exception as e:
             logger.error(f"Error deleting backup: {e}")
             UiUtils.show_message(tr("Error"), tr("An error occurred during deletion: {error}", error=str(e)))

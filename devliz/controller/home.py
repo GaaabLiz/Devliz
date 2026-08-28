@@ -13,9 +13,9 @@ class HomeController:
         self.view = HomeView()
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
-        logger.debug("Calcolo statistiche Home...")
+        logger.debug("Calculating Home statistics...")
         stats = snapshot_data.compute_home_statistics()
-        logger.debug(f"Statistiche calcolate: {stats}")
+        logger.debug(f"Statistics calculated: {stats}")
 
         backup_path = Path(app_settings.get(AppSettings.backup_path))
         backup_count = 0

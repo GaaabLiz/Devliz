@@ -141,6 +141,11 @@ _translations: dict[str, dict[str, str]] = {
 
         # ── Catalogue Searcher View ──
         "Catalogue Search": {"it": "Ricerca nel Catalogo"},
+        "View": {"it": "Visualizzazione"},
+        "Snapshot Table": {"it": "Tabella degli snapshot"},
+        "Results List": {"it": "Lista di risultati"},
+        "Open parent folder": {"it": "Apri cartella genitore"},
+        "Open file": {"it": "Apri file"},
         "Start": {"it": "Avvia"},
         "Stop": {"it": "Ferma"},
         "Target": {"it": "Target"},

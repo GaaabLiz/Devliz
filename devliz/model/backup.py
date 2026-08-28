@@ -2,6 +2,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
 from pylizlib.core.os.snap import SnapshotCatalogue
+from loguru import logger
 from pylizlib.core.os.snap.domain import SnapshotBackupInfo, BackupType
 
 from devliz.application.i18n import tr
@@ -75,10 +76,12 @@ class BackupModel:
         self.table_model = BackupTableModel()
 
     def load_backups(self, catalogue: SnapshotCatalogue, backup_path: Path):
+        logger.debug(f"Loading backups from: {backup_path}")
         if not backup_path.exists():
             backup_path.mkdir(parents=True, exist_ok=True)
         self._backups = catalogue.list_backups(backup_path)
         self.table_model.set_backups(self._backups)
+        logger.debug(f"Loaded {len(self._backups)} backups.")
 
     def get_backup_at(self, row: int) -> SnapshotBackupInfo | None:
         return self.table_model.get_backup(row)

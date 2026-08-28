@@ -13,7 +13,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
-from devliz.application.action_history import log_action
+from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.view.util.frame import DevlizQFrame
 
@@ -312,6 +312,6 @@ class HelpView(DevlizQFrame):
 
     def __open_details(self, card_id: str):
         title, subtitle, details = self._detail_payload[card_id]
-        log_action("Help", "help.card.opened", title)
+        log_action(ActionCategory.HELP, ActionType.HELP_CARD_OPENED, title)
         dialog = HelpDetailDialog(title, subtitle, details, self)
         dialog.exec()

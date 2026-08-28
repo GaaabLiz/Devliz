@@ -113,27 +113,27 @@ class DashboardModel(QObject):
             self.runner.start()
 
         except Exception as e:
-            logger.error(f"Errore durante il lancio dell'aggiornamento: {e}")
+            logger.error(f"Error launching update: {e}")
             return
 
     def on_runner_started(self):
-        logger.info("Aggiornamento Dashboard iniziato.")
+        logger.info("Dashboard update started.")
         self.signal_on_update_started.emit()
         self.signal_on_update_text.emit(tr("Updating dashboard data..."))
         self.signal_on_update_progress.emit(0)
 
     def on_runner_stopped(self):
-        logger.info("Aggiornamento Dashboard fermato.")
+        logger.info("Dashboard update stopped.")
 
     def on_runner_finished(self, stats: RunnerStatistics):
-        logger.info("Aggiornamento Dashboard completato.")
+        logger.info("Dashboard update completed.")
         self.signal_on_update_complete.emit()
         if stats.has_ops_failed():
             error = stats.get_first_error()
-            logger.error(f"Errore durante l'aggiornamento della dashboard: {error}")
+            logger.error(f"Error during dashboard update: {error}")
             return
 
-        logger.debug("Aggiornamento dashboard completato con successo, recupero dati...")
+        logger.debug("Dashboard update successfully completed, fetching data...")
         op = stats.operations[0]
         snapshots = op.get_task_result_by_id(self.task_snap.id)
         data = DevlizData(

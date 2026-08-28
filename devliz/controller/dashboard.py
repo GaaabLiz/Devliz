@@ -5,7 +5,7 @@ from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import FluentIcon, NavigationItemPosition
 
 from devliz.application.app import app_settings, AppSettings, snap_settings
-from devliz.application.action_history import log_action
+from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.controller.action_history import ActionHistoryController
 from devliz.controller.backup import BackupController
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
@@ -57,7 +57,7 @@ class DashboardController:
         self.searcher.open()
         self.backup.update_data()
         self.history.reload()
-        log_action("Dashboard", "dashboard.data.loaded", f"snapshots={len(data.snapshots)}")
+        log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_DATA_LOADED, f"snapshots={len(data.snapshots)}")
 
         self.model.snap_catalogue.path_catalogue = Path(app_settings.get(AppSettings.catalogue_path))
 
@@ -69,7 +69,7 @@ class DashboardController:
 
 
     def __handle_update_started(self):
-        log_action("Dashboard", "dashboard.refresh.started", "F5/dashboard refresh")
+        log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_REFRESH_STARTED, "F5/dashboard refresh")
         self.home.view.set_state(UiWidgetMode.UPDATING)
         self.catalogue.view.set_state(UiWidgetMode.UPDATING)
         self.searcher.view.set_state(UiWidgetMode.UPDATING)
@@ -78,7 +78,7 @@ class DashboardController:
         self.help.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
-        log_action("Dashboard", "dashboard.refresh.completed", "")
+        log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_REFRESH_COMPLETED, "")
         self.home.view.set_state(UiWidgetMode.DISPLAYING)
         self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
         self.searcher.view.set_state(UiWidgetMode.DISPLAYING)
@@ -90,19 +90,19 @@ class DashboardController:
         self.searcher.open(snapshot)
         self.view.switchTo(self.searcher.view)
         if snapshot is None:
-            log_action("Search", "search.page.opened", "scope=all")
+            log_action(ActionCategory.SEARCH, ActionType.SEARCH_PAGE_OPENED, "scope=all")
         else:
-            log_action("Search", "search.page.opened", f"scope=snapshot:{snapshot.name}")
+            log_action(ActionCategory.SEARCH, ActionType.SEARCH_PAGE_OPENED, f"scope=snapshot:{snapshot.name}")
 
     def __on_f5_pressed(self):
-        log_action("Dashboard", "dashboard.f5.pressed", "")
+        log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_F5_PRESSED, "")
         self.model.update()
 
     def __on_page_changed(self, index: int):
         widget = self.view.stackedWidget.widget(index)
         page_name = getattr(widget, "window_name", "")
         if page_name:
-            log_action("Dashboard", "dashboard.page.changed", page_name)
+            log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_PAGE_CHANGED, page_name)
 
     def __connect_signals(self):
         self.view.f5_pressed.connect(self.__on_f5_pressed)
@@ -132,7 +132,7 @@ class DashboardController:
 
     def start(self):
         logger.info("Application is starting...")
-        log_action("Dashboard", "dashboard.application.started", "")
+        log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_APPLICATION_STARTED, "")
         self.view.show()
         self.__connect_signals()
         self.history.reload()

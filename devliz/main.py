@@ -31,5 +31,5 @@ def main():
     return qt_app.exec()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())
