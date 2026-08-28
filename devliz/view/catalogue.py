@@ -36,7 +36,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_update_with_local_dirs_requested = Signal(Snapshot)
 
     def __init__(self, model: CatalogueModel, parent=None):
-        super().__init__(name=tr("Catalogue"), parent=parent)
+        super().__init__(
+            name=tr("Catalogue"), 
+            parent=parent, 
+            subtitle=tr("Manage all your snapshot configurations, import new ones, or install them.")
+        )
 
         # Il modello è l'unica fonte di verità per i dati
         self.model = model

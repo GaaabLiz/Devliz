@@ -32,10 +32,11 @@ class DevlizQFrameUiBuilder:
 
 class DevlizQFrame(QFrame):
 
-    def __init__(self, name: str, parent=None):
+    def __init__(self, name: str, parent=None, subtitle: str = ""):
         super().__init__(parent=parent)
         self.setObjectName(name.replace(' ', '-'))
         self.window_name = name
+        self.window_subtitle = subtitle
         self.__builder = DevlizQFrameUiBuilder(self)
 
         # --- Layout per il widget di aggiornamento
@@ -93,6 +94,14 @@ class DevlizQFrame(QFrame):
     def install_label_title(self):
         title_label = self.__builder.get_label_title(self.window_name)
         self.master_layout.addWidget(title_label)
+        
+        if self.window_subtitle:
+            from qfluentwidgets import CaptionLabel
+            subtitle_label = CaptionLabel(self.window_subtitle, self)
+            subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            subtitle_label.setWordWrap(True)
+            subtitle_label.setTextColor("#606060", "#c5c5c5")
+            self.master_layout.addWidget(subtitle_label)
         
     def set_updating_progress(self, progress: int):
         self.__det_prog_bar.setValue(progress)

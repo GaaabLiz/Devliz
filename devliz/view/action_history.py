@@ -55,7 +55,12 @@ class ActionHistoryTableModel(QAbstractTableModel):
 class ActionHistoryView(DevlizQFrame):
 
     def __init__(self, parent=None):
-        super().__init__(name=tr("Action History"), parent=parent)
+        super().__init__(
+            name=tr("Action History"), 
+            parent=parent, 
+            subtitle=tr("View a detailed log of all your actions in the application.")
+        )
+        self.layout = self.get_scroll_layout()
         self.model = ActionHistoryTableModel()
         self.__setup_ui()
 
