@@ -2,13 +2,15 @@ import os
 from pathlib import Path
 
 from PySide6.QtWidgets import QFileDialog
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import QUrl
 from loguru import logger
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
 from devliz.application.app import app, AppSettings, app_settings
-from devliz.application.action_history import log_action
+from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.domain.data import DevlizSnapshotData
 from devliz.model.catalogue import CatalogueModel
 from devliz.model.dashboard import DashboardModel
@@ -48,7 +50,7 @@ class CatalogueController:
         self.view.reload_data()
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
-        log_action("Catalogue", "catalogue.config.dialog.opened", "edit" if edit_mode else "create")
+        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_CONFIG_DIALOG_OPENED, "edit" if edit_mode else "create")
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
         try:
             if dialog.exec():
@@ -61,7 +63,7 @@ class CatalogueController:
                         old = snap
                         new = dialog.output_data
                         self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
-                        log_action("Catalogue", "catalogue.snapshot.updated", new.name)
+                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_UPDATED, new.name)
                         
                     titolo = tr("Configuration modified")
                     testo = tr("The configuration has been modified successfully.")
@@ -71,7 +73,7 @@ class CatalogueController:
                     
                     def action(task):
                         self.dash_model.snap_catalogue.add(dialog.output_data, progress_callback=task.update_task_progress)
-                        log_action("Catalogue", "catalogue.snapshot.created", dialog.output_data.name)
+                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_CREATED, dialog.output_data.name)
                         
                     titolo = tr("Configuration created")
                     testo = tr("The configuration has been created successfully.")
@@ -99,7 +101,7 @@ class CatalogueController:
                     if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
                         self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
                     self.dash_model.snap_catalogue.install(snap, progress_callback=task.update_task_progress)
-                    log_action("Catalogue", "catalogue.snapshot.installed", snap.name)
+                    log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_INSTALLED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
                     tr("Install configuration"),
@@ -124,7 +126,7 @@ class CatalogueController:
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.delete(snap)
-                    log_action("Catalogue", "catalogue.snapshot.deleted", snap.name)
+                    log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DELETED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
                     tr("Delete configuration"),
@@ -145,7 +147,7 @@ class CatalogueController:
         try:
             def action(task):
                 self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
-                log_action("Catalogue", "catalogue.snapshot.duplicated", snap.name)
+                log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DUPLICATED, snap.name)
             
             self.dash_model.run_heavy_operation(
                 tr("Duplicate configuration"),
@@ -170,7 +172,7 @@ class CatalogueController:
                 if directory:
                     def action(task):
                         self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
-                        log_action("Catalogue", "catalogue.snapshot.exported", f"{snap.name} -> {directory}")
+                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_EXPORTED, f"{snap.name} -> {directory}")
                     
                     self.dash_model.run_heavy_operation(
                         tr("Export snapshot"),
@@ -193,7 +195,7 @@ class CatalogueController:
                 if directory:
                     def action(task):
                         self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
-                        log_action("Catalogue", "catalogue.associated.folders.exported", f"{snap.name} -> {directory}")
+                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED, f"{snap.name} -> {directory}")
                     
                     self.dash_model.run_heavy_operation(
                         tr("Export associated folders"),
@@ -210,7 +212,7 @@ class CatalogueController:
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
-                    log_action("Catalogue", "catalogue.installed.folders.deleted", snap.name)
+                    log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_INSTALLED_FOLDERS_DELETED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
                     tr("Delete installed folders"),
@@ -227,7 +229,7 @@ class CatalogueController:
             if w.exec_():
                 def action(task):
                     self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
-                    log_action("Catalogue", "catalogue.associated.folders.updated", snap.name)
+                    log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_UPDATED, snap.name)
                 
                 self.dash_model.run_heavy_operation(
                     tr("Update associated folders"),
@@ -240,8 +242,6 @@ class CatalogueController:
 
     def __open_directory(self, path: Path):
         if path.exists():
-            from PySide6.QtGui import QDesktopServices
-            from PySide6.QtCore import QUrl
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
         else:
             UiUtils.show_message(tr("Warning"), tr("The folder no longer exists in {path}", path=path.__str__()))
