@@ -45,6 +45,7 @@ class CatalogueSearcherController:
         self.view.signal_delete_requested.connect(self._on_delete_requested)
         self.view.signal_file_double_clicked.connect(self._on_file_double_clicked)
         self.view.signal_tree_open_parent_folder.connect(self._on_tree_open_parent_folder)
+        self.view.signal_snapshot_double_clicked.connect(self._on_snapshot_double_clicked)
 
         # Connect the status card update signal directly to the view's slot
         self.model.signal_status_card_update.connect(self.view.update_status_card)
@@ -85,6 +86,29 @@ class CatalogueSearcherController:
         parent_dir = os.path.dirname(file_path)
         if os.path.exists(parent_dir):
             QDesktopServices.openUrl(QUrl.fromLocalFile(parent_dir))
+
+    def _on_snapshot_double_clicked(self, row: int):
+        """
+        Handles the double-click event on the snapshot table.
+        Opens a dialog with search results specifically for the clicked snapshot.
+        """
+        from devliz.view.catalogue_searcher import SnapshotResultsDialog
+        from devliz.model.catalogue_searcher import SearchResultsTreeModel
+
+        snapshot = self.model.table_model.get_data()[row]
+        results = self.model.get_results_for_snapshot(snapshot.id)
+
+        dialog = SnapshotResultsDialog(snapshot.name, self.view)
+        
+        tree_model_manager = SearchResultsTreeModel()
+        tree_model_manager.populate_from_results(results)
+        
+        dialog.tree_view.setModel(tree_model_manager.model)
+        
+        dialog.signal_file_double_clicked.connect(self._on_file_double_clicked)
+        dialog.signal_tree_open_parent_folder.connect(self._on_tree_open_parent_folder)
+        
+        dialog.exec()
 
     def _perform_search(self):
         """

@@ -16,7 +16,9 @@ from qfluentwidgets import (
     ProgressBar,
     CaptionLabel,
     ComboBox,
-    RoundMenu
+    RoundMenu,
+    MessageBoxBase,
+    SubtitleLabel
 )
 from pylizlib.core.os.snap import QueryType, SearchTarget
 
@@ -41,6 +43,7 @@ class CatalogueSearcherView(DevlizQFrame):
     signal_delete_requested = Signal(int)
     signal_file_double_clicked = Signal(str)
     signal_tree_open_parent_folder = Signal(str)
+    signal_snapshot_double_clicked = Signal(int)
 
     def __init__(self, parent=None):
         """
@@ -134,6 +137,7 @@ class CatalogueSearcherView(DevlizQFrame):
         self.column_percents = [0.25, 0.25, 0.15, 0.1625, 0.1875]
         self._distribuisci_colonne_perc()
         self.results_table.resizeEvent = self._table_resize_event
+        self.results_table.doubleClicked.connect(self._on_results_table_double_clicked)
 
         # Tree view (Results List)
         self.tree_view = TreeView(self)
@@ -163,6 +167,17 @@ class CatalogueSearcherView(DevlizQFrame):
 
         # Set initial placeholder
         self._update_search_bar_placeholder()
+
+    def _on_results_table_double_clicked(self, index):
+        """
+        Handles the double-click event on the results table.
+        Emits signal_snapshot_double_clicked with the row index.
+
+        Args:
+            index (QModelIndex): The model index of the clicked item.
+        """
+        if index.isValid():
+            self.signal_snapshot_double_clicked.emit(index.row())
 
     def _on_tree_view_double_clicked(self, index: QModelIndex):
         """
@@ -444,3 +459,59 @@ class CatalogueSearcherView(DevlizQFrame):
         """Handles the resize event for the results table to redistribute columns."""
         self._distribuisci_colonne_perc()
         super(type(self.results_table), self.results_table).resizeEvent(event)
+
+
+class SnapshotResultsDialog(MessageBoxBase):
+    """
+    A dialog that displays search results for a specific snapshot.
+    """
+    signal_file_double_clicked = Signal(str)
+    signal_tree_open_parent_folder = Signal(str)
+
+    def __init__(self, snapshot_name: str, parent=None):
+        super().__init__(parent)
+        
+        self.title_label = SubtitleLabel(tr("Results for: {snapshot}", snapshot=snapshot_name), self)
+        self.viewLayout.addWidget(self.title_label)
+        
+        self.tree_view = TreeView(self)
+        self.tree_view.header().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        self.tree_view.header().setStretchLastSection(False)
+        self.tree_view.setIndentation(20)
+        self.tree_view.header().hide()
+        
+        self.tree_view.doubleClicked.connect(self._on_tree_view_double_clicked)
+        self.tree_view.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tree_view.customContextMenuRequested.connect(self._show_tree_context_menu)
+        
+        self.viewLayout.addWidget(self.tree_view)
+        
+        self.widget.setMinimumSize(800, 600)
+        self.yesButton.hide() # We can hide the yes/no if we want, or keep "Close"
+        self.cancelButton.setText(tr("Close"))
+
+    def _on_tree_view_double_clicked(self, index: QModelIndex):
+        item = self.tree_view.model().itemFromIndex(index)
+        if item and item.parent():
+            file_path = item.text()
+            self.signal_file_double_clicked.emit(file_path)
+
+    def _show_tree_context_menu(self, pos):
+        index = self.tree_view.indexAt(pos)
+        if not index.isValid():
+            return
+        item = self.tree_view.model().itemFromIndex(index)
+        if item and item.parent():
+            file_path = item.text()
+            
+            menu = RoundMenu(parent=self)
+            
+            action_open_folder = Action(FluentIcon.FOLDER, tr("Open parent folder"))
+            action_open_folder.triggered.connect(lambda: self.signal_tree_open_parent_folder.emit(file_path))
+            menu.addAction(action_open_folder)
+            
+            action_open_file = Action(FluentIcon.DOCUMENT, tr("Open file"))
+            action_open_file.triggered.connect(lambda: self.signal_file_double_clicked.emit(file_path))
+            menu.addAction(action_open_file)
+            
+            menu.exec(self.tree_view.viewport().mapToGlobal(pos))

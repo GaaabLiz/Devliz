@@ -462,6 +462,19 @@ class CatalogueSearcherModel(QObject):
 
         self.tree_model_manager.populate_from_results(all_results)
 
+    def get_results_for_snapshot(self, snap_id: str) -> list[SnapshotSearchResult]:
+        """
+        Retrieves the search results for a specific snapshot.
+        """
+        results = []
+        for op in self.runner._all_operations:
+            if self._op_id_to_snap_id.get(op.id) == snap_id:
+                task_results = op.get_task_results()
+                if task_results and task_results[0]:
+                    results.extend(task_results[0])
+                break
+        return results
+
     def on_operation_finished(self, op: Operation):
         """
         Slot to handle the completion of a single search operation.
