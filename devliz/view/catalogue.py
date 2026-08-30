@@ -21,7 +21,7 @@ class SnapshotCatalogueUiBuilder:
 
 class SnapshotCatalogueWidget(DevlizQFrame):
     signal_import_requested = Signal()
-    signal_sort_requested = Signal(SnapshotSortKey)
+    signal_sort_requested = Signal(object, bool)
     signal_edit_requested = Signal(Snapshot)
     signal_install_requested = Signal(Snapshot)
     signal_delete_requested = Signal(Snapshot)
@@ -44,6 +44,8 @@ class SnapshotCatalogueWidget(DevlizQFrame):
 
         # Il modello è l'unica fonte di verità per i dati
         self.model = model
+        self._current_sort_key = SnapshotSortKey.NAME
+        self._current_sort_reverse = False
 
         # Aggiungo i widgets
         self.__setup_label()
@@ -84,11 +86,21 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def __get_sort_menu(self, pos=None):
         menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
-        action_sort_name = Action(FluentIcon.QUICK_NOTE, tr("Name"), checkable=True, triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.NAME))
-        action_sort_author = Action(FluentIcon.PEOPLE, tr("Author"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.AUTHOR))
-        action_sort_date_create = Action(FluentIcon.CALENDAR, tr("Creation date"), checkable=True,triggered=lambda: self.signal_sort_requested.emit( SnapshotSortKey.DATE_CREATED))
-        action_sort_date_modify = Action(FluentIcon.EDIT, tr("Modification date"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.DATE_MODIFIED))
-        action_sort_date_dim_mb_assoc = Action(FluentIcon.FOLDER, tr("Size"), checkable=True,triggered=lambda: self.signal_sort_requested.emit(SnapshotSortKey.ASSOC_DIR_MB_SIZE))
+        action_order_asc = Action(FluentIcon.UP, tr("Ascending"), checkable=True, checked=True, triggered=lambda: self._on_sort_direction_changed(False))
+        action_order_desc = Action(FluentIcon.DOWN, tr("Descending"), checkable=True, triggered=lambda: self._on_sort_direction_changed(True))
+
+        action_order_group = QActionGroup(self)
+        action_order_group.addAction(action_order_asc)
+        action_order_group.addAction(action_order_desc)
+
+        menu.addActions([action_order_asc, action_order_desc])
+        menu.addSeparator()
+
+        action_sort_name = Action(FluentIcon.QUICK_NOTE, tr("Name"), checkable=True, checked=True, triggered=lambda: self._on_sort_type_changed(SnapshotSortKey.NAME))
+        action_sort_author = Action(FluentIcon.PEOPLE, tr("Author"), checkable=True, triggered=lambda: self._on_sort_type_changed(SnapshotSortKey.AUTHOR))
+        action_sort_date_create = Action(FluentIcon.CALENDAR, tr("Creation date"), checkable=True, triggered=lambda: self._on_sort_type_changed(SnapshotSortKey.DATE_CREATED))
+        action_sort_date_modify = Action(FluentIcon.EDIT, tr("Modification date"), checkable=True, triggered=lambda: self._on_sort_type_changed(SnapshotSortKey.DATE_MODIFIED))
+        action_sort_date_dim_mb_assoc = Action(FluentIcon.FOLDER, tr("Size"), checkable=True, triggered=lambda: self._on_sort_type_changed(SnapshotSortKey.ASSOC_DIR_MB_SIZE))
 
         action_sort_group = QActionGroup(self)
         action_sort_group.addAction(action_sort_name)
@@ -109,6 +121,14 @@ class SnapshotCatalogueWidget(DevlizQFrame):
             menu.exec(pos, ani=True)
 
         return menu
+
+    def _on_sort_type_changed(self, sort_key: SnapshotSortKey):
+        self._current_sort_key = sort_key
+        self.signal_sort_requested.emit(self._current_sort_key, self._current_sort_reverse)
+
+    def _on_sort_direction_changed(self, reverse: bool):
+        self._current_sort_reverse = reverse
+        self.signal_sort_requested.emit(self._current_sort_key, self._current_sort_reverse)
 
     def __setup_table(self):
         self.table = TableView(self)
@@ -226,9 +246,9 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self._distribuisci_colonne_perc()
         super(type(self.table), self.table).resizeEvent(event)
 
-    def sort(self, method: SnapshotSortKey):
+    def sort(self, method: SnapshotSortKey, reverse: bool = False):
         self.search_line_edit.clear()
-        self.model.sort(method)
+        self.model.sort(method, reverse)
 
     def reload_data(self):
         self.footer_stats_label.setText(tr("Total configurations: {count} ({size})", count=self.model.count(), size=self.model.get_mb_size()))

@@ -92,9 +92,9 @@ class CatalogueModel:
         """Gets the snapshot at a specific row of the current view (filtered or not)."""
         return self.table_model.get_snapshot(row)
 
-    def sort(self, sort_key: SnapshotSortKey):
+    def sort(self, sort_key: SnapshotSortKey, reverse: bool = False):
         """Sorts the master list of snapshots and updates the view."""
-        self._all_snapshots = SnapshotUtils.sort_snapshots(self._all_snapshots, sort_key)
+        self._all_snapshots = SnapshotUtils.sort_snapshots(self._all_snapshots, sort_key, reverse=reverse)
         # After sorting, the view should reflect the sorted, unfiltered data
         self._is_filtered = False
         self._filtered_snapshots = []
