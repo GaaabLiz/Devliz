@@ -1,5 +1,5 @@
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
-from PySide6.QtWidgets import QVBoxLayout
+from PySide6.QtWidgets import QVBoxLayout, QHeaderView
 from qfluentwidgets import BodyLabel, TableView
 
 from devliz.application.i18n import tr
@@ -72,9 +72,17 @@ class ActionHistoryView(DevlizQFrame):
         self.table.setModel(self.model)
         self.table.verticalHeader().hide()
         self.table.setWordWrap(False)
+        
+        # Fai in modo che la tabella occupi tutto lo spazio orizzontale
+        # e che l'intestazione non appaia tagliata ai lati.
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+        self.table.horizontalHeader().setStretchLastSection(True)
 
         container_layout = QVBoxLayout()
-        container_layout.setContentsMargins(8, 8, 8, 8)
+        container_layout.setContentsMargins(0, 0, 0, 0)
         container_layout.setSpacing(10)
         container_layout.addWidget(self.empty_label)
         container_layout.addWidget(self.table, 1)
