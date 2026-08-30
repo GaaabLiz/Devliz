@@ -30,6 +30,7 @@ class CatalogueController:
 
     def init(self):
         self.view.signal_import_requested.connect(lambda: self.__open_config_dialog(False, None))
+        self.view.signal_open_catalogue_folder_requested.connect(self.__open_catalogue_directory)
         self.view.signal_install_requested.connect(self.__install_snapshot)
         self.view.signal_edit_requested.connect(self.__edit_snapshot)
         self.view.signal_delete_requested.connect(self.__delete_snapshot)
@@ -253,6 +254,10 @@ class CatalogueController:
                 )
         except Exception as e:
             UiUtils.show_message(tr("Update error"), tr("An error occurred during update: {error}", error=str(e)))
+
+    def __open_catalogue_directory(self):
+        path = app_settings.get(AppSettings.catalogue_path)
+        self.__open_directory(Path(path))
 
     def __open_directory(self, path: Path):
         logger.debug(f"Opening directory {path}")

@@ -21,6 +21,7 @@ class SnapshotCatalogueUiBuilder:
 
 class SnapshotCatalogueWidget(DevlizQFrame):
     signal_import_requested = Signal()
+    signal_open_catalogue_folder_requested = Signal()
     signal_sort_requested = Signal(object, bool)
     signal_edit_requested = Signal(Snapshot)
     signal_install_requested = Signal(Snapshot)
@@ -61,6 +62,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.search_line_edit.textChanged.connect(self.model.filter)
 
         self.action_import = Action(FluentIcon.ADD, tr('Import'), triggered=lambda: self.signal_import_requested.emit())
+        self.action_open_catalogue = Action(FluentIcon.FOLDER, tr('Open Folder'), triggered=lambda: self.signal_open_catalogue_folder_requested.emit())
         self.action_edit = Action(FluentIcon.EDIT, tr('Edit'), enabled=False,triggered=lambda: self.signal_edit_requested.emit())
 
         menu_combobox_sort = TransparentDropDownPushButton(tr("Sort"), self, FluentIcon.SCROLL)
@@ -71,6 +73,7 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         left_command_bar.setMinimumWidth(600)
         left_command_bar.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonTextBesideIcon)
         left_command_bar.addAction(self.action_import)
+        left_command_bar.addAction(self.action_open_catalogue)
         left_command_bar.addWidget(menu_combobox_sort)
 
         lay = QHBoxLayout()
