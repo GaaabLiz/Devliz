@@ -2,7 +2,7 @@ from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QVBoxLayout
 from pylizlib.core.data.unit import get_normalized_gb_mb_str
 from pylizlib.qtfw.widgets.card import MasterListSettingCard
-from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard, OptionsSettingCard
+from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard, OptionsSettingCard, ToolTipFilter, ToolTipPosition
 
 from devliz.application.app import app, app_settings, AppSettings
 from devliz.view.util.frame import DevlizQFrame
@@ -39,6 +39,10 @@ class WidgetSettings(DevlizQFrame):
         self.install_scroll_on(self.master_layout)
 
 
+
+    def __install_tooltip(self, widget, text):
+        widget.setToolTip(text)
+        widget.installEventFilter(ToolTipFilter(widget, 2500, ToolTipPosition.TOP))
 
     def __add_groups(self, layout: QVBoxLayout):
         self.__add_group_snapshot(layout)
@@ -105,6 +109,11 @@ class WidgetSettings(DevlizQFrame):
             configItem=setting_clear_snap_attached_folders_before_install
         )
 
+        self.__install_tooltip(self.card_general_catalogue, tr("Select the main catalogue directory for configurations"))
+        self.__install_tooltip(self.card_fav_tags, tr("Manage the tags available for your configurations"))
+        self.__install_tooltip(self.card_snap_custom_data, tr("Define custom variables to be used within snapshots"))
+        self.__install_tooltip(self.card_clear_snap_attached_folders_before_install, tr("Automatically clean up local folders attached to a snapshot before installing it"))
+
         grp_manager = SettingGroupManager(tr("Snapshots"), self)
         grp_manager.add_widget(setting_catalogue, self.card_general_catalogue, self.signal_ask_catalogue_path)
         grp_manager.add_widget(setting_tags, self.card_fav_tags, None)
@@ -151,11 +160,26 @@ class WidgetSettings(DevlizQFrame):
             configItem=setting_backup_before_delete
         )
 
+        # Cancella backups
+        self.card_clear_backups = PushSettingCard(
+            text=tr("Clear backups"),
+            icon=FluentIcon.DELETE,
+            title=tr("Clear Backups of {name}", name=app.name),
+            content=tr("This operation will delete all backup files created by the application.")
+        )
+
+        self.__install_tooltip(self.card_backup_path, tr("Choose the directory where your backups will be saved"))
+        self.__install_tooltip(self.card_backup_before_install, tr("Enable or disable automatic backup before installing a configuration"))
+        self.__install_tooltip(self.card_backup_before_edit, tr("Enable or disable automatic backup before editing a configuration"))
+        self.__install_tooltip(self.card_backup_before_delete, tr("Enable or disable automatic backup before deleting a configuration"))
+        self.__install_tooltip(self.card_clear_backups, tr("Permanently delete all application backups to free up space"))
+
         grp_manager = SettingGroupManager(tr("Backups"), self)
         grp_manager.add_widget(setting_backup_path, self.card_backup_path, self.signal_ask_backup_path)
         grp_manager.add_widget(setting_backup_before_install, self.card_backup_before_install, None)
         grp_manager.add_widget(setting_backup_before_edit, self.card_backup_before_edit, None)
         grp_manager.add_widget(setting_backup_before_delete, self.card_backup_before_delete, None)
+        grp_manager.add_widget(None, self.card_clear_backups, self.signal_clear_backups_request)
         grp_manager.install_group_on(layout)
 
     def __add_group_favorites(self, layout: QVBoxLayout):
@@ -220,6 +244,11 @@ class WidgetSettings(DevlizQFrame):
             deletion_content=tr("Are you sure you want to delete this service?")
         )
 
+        self.__install_tooltip(self.card_fav_dirs, tr("Manage your favorite folders for quick access"))
+        self.__install_tooltip(self.card_fav_files, tr("Manage your favorite files for quick access"))
+        self.__install_tooltip(self.card_fav_exes, tr("Manage your favorite executables to monitor their status"))
+        self.__install_tooltip(self.card_fav_services, tr("Manage the Windows services you want to monitor"))
+
         grp_manager = SettingGroupManager(tr("Favorites"), self)
         grp_manager.add_widget(setting_fav_dirs, self.card_fav_dirs, None)
         grp_manager.add_widget(setting_fav_files, self.card_fav_files, None)
@@ -237,16 +266,6 @@ class WidgetSettings(DevlizQFrame):
             icon=FluentIcon.FOLDER,
             title=tr("Working folder of {name}", name=app.name),
             content=app.path.__str__()
-        )
-
-        # Cancella backups
-        size_str = get_normalized_gb_mb_str(0)
-        self.card_clear_backups = PushSettingCard(
-            text=tr("Clear backups"),
-            icon=FluentIcon.DELETE,
-            title=tr("Clear Backups of {name}", name=app.name),
-            #content="Questa operazione eliminerà tutti i file di backup creati dall'applicazione. (Attualmente: " + size_str + ")"
-            content=tr("This operation will delete all backup files created by the application.")
         )
 
         # Tema applicazione
@@ -269,9 +288,12 @@ class WidgetSettings(DevlizQFrame):
         )
         self.card_language.optionChanged.connect(lambda: self.signal_language_changed.emit())
 
+        self.__install_tooltip(self.card_working_folder, tr("Open the current working folder of the application"))
+        self.__install_tooltip(self.card_theme, tr("Change the visual appearance of the application"))
+        self.__install_tooltip(self.card_language, tr("Change the display language of the application"))
+
         grp_manager = SettingGroupManager(tr("Application"), self)
         grp_manager.add_widget(None, self.card_working_folder, self.signal_open_dir_request)
-        grp_manager.add_widget(None, self.card_clear_backups, self.signal_clear_backups_request)
         grp_manager.add_widget(None, self.card_theme, None)
         grp_manager.add_widget(None, self.card_language, None)
         grp_manager.install_group_on(layout)
@@ -285,6 +307,8 @@ class WidgetSettings(DevlizQFrame):
             title=tr("About {name}", name=app.name),
             content=app.version
         )
+
+        self.__install_tooltip(self.card_info_app, tr("View information about the application version"))
 
         grp_manager = SettingGroupManager(tr("Information"), self)
         grp_manager.add_widget(None, self.card_info_app, self.signal_open_about_dialog_request)
