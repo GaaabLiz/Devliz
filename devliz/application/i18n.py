@@ -143,6 +143,8 @@ _translations: dict[str, dict[str, str]] = {
 
         # ── Catalogue Searcher View ──
         "Catalogue Search": {"it": "Ricerca nel Catalogo"},
+        "Snapshot": {"it": "Snapshot"},
+        "All Snapshots": {"it": "Tutti gli snapshot"},
         "View": {"it": "Visualizzazione"},
         "Snapshot Table": {"it": "Tabella degli snapshot"},
         "Results List": {"it": "Lista di risultati"},
@@ -436,8 +438,26 @@ _translations: dict[str, dict[str, str]] = {
         "Displays the date of the oldest snapshot in the catalogue.": {"it": "Mostra la data dello snapshot più vecchio nel catalogo."},
         "Shows the average size of a snapshot.": {"it": "Mostra la dimensione media di uno snapshot."},
         "Displays the current location of the catalogue folder.": {"it": "Mostra la posizione corrente della cartella del catalogo."},
+        
+        # ── Tooltips Impostazioni ──
+        "Select the main catalogue directory for configurations": {"it": "Seleziona la directory principale del catalogo per le configurazioni"},
+        "Manage the tags available for your configurations": {"it": "Gestisci i tag disponibili per le tue configurazioni"},
+        "Define custom variables to be used within snapshots": {"it": "Definisci variabili personalizzate da utilizzare all'interno degli snapshot"},
+        "Automatically clean up local folders attached to a snapshot before installing it": {"it": "Pulisci automaticamente le cartelle locali allegate a uno snapshot prima di installarlo"},
+        "Choose the directory where your backups will be saved": {"it": "Scegli la directory in cui verranno salvati i tuoi backup"},
+        "Enable or disable automatic backup before installing a configuration": {"it": "Abilita o disabilita il backup automatico prima di installare una configurazione"},
+        "Enable or disable automatic backup before editing a configuration": {"it": "Abilita o disabilita il backup automatico prima di modificare una configurazione"},
+        "Enable or disable automatic backup before deleting a configuration": {"it": "Abilita o disabilita il backup automatico prima di eliminare una configurazione"},
+        "Permanently delete all application backups to free up space": {"it": "Elimina definitivamente tutti i backup dell'applicazione per liberare spazio"},
+        "Manage your favorite folders for quick access": {"it": "Gestisci le tue cartelle preferite per un accesso rapido"},
+        "Manage your favorite files for quick access": {"it": "Gestisci i tuoi file preferiti per un accesso rapido"},
+        "Manage your favorite executables to monitor their status": {"it": "Gestisci i tuoi eseguibili preferiti per monitorarne lo stato"},
+        "Manage the Windows services you want to monitor": {"it": "Gestisci i servizi di Windows che desideri monitorare"},
+        "Open the current working folder of the application": {"it": "Apri l'attuale cartella di lavoro dell'applicazione"},
+        "Change the visual appearance of the application": {"it": "Cambia l'aspetto visivo dell'applicazione"},
+        "Change the display language of the application": {"it": "Cambia la lingua di visualizzazione dell'applicazione"},
+        "View information about the application version": {"it": "Visualizza informazioni sulla versione dell'applicazione"},
 }
-
 
 def set_language(lang: str):
     """Set the current language ('en' or 'it')."""
