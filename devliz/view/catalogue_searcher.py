@@ -44,6 +44,7 @@ class CatalogueSearcherView(DevlizQFrame):
     signal_file_double_clicked = Signal(str)
     signal_tree_open_parent_folder = Signal(str)
     signal_snapshot_double_clicked = Signal(int)
+    signal_snapshot_filter_changed = Signal(object) # passing snapshot id or None for all
 
     def __init__(self, parent=None):
         """
@@ -82,6 +83,10 @@ class CatalogueSearcherView(DevlizQFrame):
         self.extensions_button = TransparentDropDownPushButton(tr("Extensions"), self, FluentIcon.FILTER)
         self.extensions_button.setMenu(self.__create_extensions_menu())
 
+        self.snapshot_button = TransparentDropDownPushButton(tr("Snapshot"), self, FluentIcon.FOLDER)
+        self.snapshot_menu = CheckableMenu(parent=self)
+        self.snapshot_button.setMenu(self.snapshot_menu)
+
         self.view_button = TransparentDropDownPushButton(tr("View"), self, FluentIcon.VIEW)
         self.view_button.setMenu(self.__create_view_menu())
 
@@ -91,6 +96,7 @@ class CatalogueSearcherView(DevlizQFrame):
         self.command_bar.addWidget(self.target_button)
         self.command_bar.addWidget(self.query_type_button)
         self.command_bar.addWidget(self.extensions_button)
+        self.command_bar.addWidget(self.snapshot_button)
         self.command_bar.addSeparator()
         self.command_bar.addWidget(self.view_button)
 
@@ -459,6 +465,72 @@ class CatalogueSearcherView(DevlizQFrame):
         """Handles the resize event for the results table to redistribute columns."""
         self._distribuisci_colonne_perc()
         super(type(self.results_table), self.results_table).resizeEvent(event)
+    def update_snapshot_menu(self, snapshots, selected_snapshot_ids: list[str] | None = None):
+        """
+        Updates the snapshot dropdown menu with the available snapshots.
+        """
+        if selected_snapshot_ids is None:
+            selected_snapshot_ids = []
+
+        if not hasattr(self, '_snapshot_actions'):
+            self._snapshot_actions = {}
+            
+        current_snapshot_ids = set(self._snapshot_actions.keys())
+        new_snapshot_ids = set(s.id for s in snapshots)
+        
+        # Only rebuild the menu if the available snapshots have changed or menu is missing
+        if current_snapshot_ids != new_snapshot_ids or not getattr(self, 'snapshot_menu', None):
+            self.snapshot_menu = CheckableMenu(parent=self)
+            self._snapshot_actions = {}
+
+            self.action_all_snapshots = Action(tr("All Snapshots"), self, checkable=True)
+            self.action_all_snapshots.triggered.connect(self._on_all_snapshots_triggered)
+            self.snapshot_menu.addAction(self.action_all_snapshots)
+            
+            self.snapshot_menu.addSeparator()
+            
+            for snapshot in snapshots:
+                action = Action(snapshot.name, self, checkable=True)
+                def make_handler(snap_id):
+                    return lambda: self._on_single_snapshot_triggered(snap_id)
+                action.triggered.connect(make_handler(snapshot.id))
+                self.snapshot_menu.addAction(action)
+                self._snapshot_actions[snapshot.id] = action
+
+            self.snapshot_button.setMenu(self.snapshot_menu)
+
+        # Update checked states silently
+        self.action_all_snapshots.blockSignals(True)
+        self.action_all_snapshots.setChecked(len(selected_snapshot_ids) == 0)
+        self.action_all_snapshots.blockSignals(False)
+
+        for snap_id, action in self._snapshot_actions.items():
+            action.blockSignals(True)
+            action.setChecked(snap_id in selected_snapshot_ids)
+            action.blockSignals(False)
+
+    def _on_all_snapshots_triggered(self):
+        # If "All" is clicked, uncheck all individual and emit None/empty
+        for action in self._snapshot_actions.values():
+            action.setChecked(False)
+        self.action_all_snapshots.setChecked(True)
+        self.signal_snapshot_filter_changed.emit([])
+
+    def _on_single_snapshot_triggered(self, toggled_id: str):
+        # Gather all checked individual snapshots
+        selected_ids = []
+        for snap_id, action in self._snapshot_actions.items():
+            if action.isChecked():
+                selected_ids.append(snap_id)
+        
+        # Uncheck "All" if anything is selected, else check it
+        if selected_ids:
+            self.action_all_snapshots.setChecked(False)
+        else:
+            self.action_all_snapshots.setChecked(True)
+            
+        self.signal_snapshot_filter_changed.emit(selected_ids)
+
 
 
 class SnapshotResultsDialog(MessageBoxBase):

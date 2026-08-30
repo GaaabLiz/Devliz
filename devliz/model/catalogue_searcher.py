@@ -325,16 +325,19 @@ class CatalogueSearcherModel(QObject):
             ops.append(op)
         return ops
 
-    def load_snapshots_from_catalogue(self, snapshot: Snapshot | None = None):
+    def load_snapshots_from_catalogue(self, snapshot_or_snapshots: Snapshot | list[Snapshot] | None = None):
         """
         Loads snapshot names from the catalogue and populates the table model.
-        If a snapshot is provided, only that snapshot is loaded. Otherwise, all snapshots are loaded.
+        If snapshots are provided, only those are loaded. Otherwise, all snapshots are loaded.
         
         Args:
-            snapshot (Snapshot | None, optional): A specific snapshot to load. Defaults to None.
+            snapshot_or_snapshots: A specific snapshot, a list of snapshots, or None. Defaults to None.
         """
-        if snapshot:
-            snapshots = [snapshot]
+        if snapshot_or_snapshots:
+            if isinstance(snapshot_or_snapshots, list):
+                snapshots = snapshot_or_snapshots
+            else:
+                snapshots = [snapshot_or_snapshots]
         else:
             snapshots = self.catalogue.get_all()
         self.table_model.update_data(snapshots)

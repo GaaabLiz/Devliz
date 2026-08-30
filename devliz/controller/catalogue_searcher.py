@@ -46,9 +46,21 @@ class CatalogueSearcherController:
         self.view.signal_file_double_clicked.connect(self._on_file_double_clicked)
         self.view.signal_tree_open_parent_folder.connect(self._on_tree_open_parent_folder)
         self.view.signal_snapshot_double_clicked.connect(self._on_snapshot_double_clicked)
+        self.view.signal_snapshot_filter_changed.connect(self._on_snapshot_filter_changed)
 
         # Connect the status card update signal directly to the view's slot
         self.model.signal_status_card_update.connect(self.view.update_status_card)
+
+    def _on_snapshot_filter_changed(self, snap_ids):
+        """
+        Handles the snapshot filter change from the dropdown menu.
+        """
+        if not snap_ids:
+            self.open(None)
+        else:
+            snapshots = [s for s in self.model.catalogue.get_all() if s.id in snap_ids]
+            if snapshots:
+                self.open(snapshots)
 
     def _on_delete_requested(self, row: int):
         """
@@ -157,16 +169,21 @@ class CatalogueSearcherController:
         logger.info("Search completed")
         log_action(ActionCategory.SEARCH, ActionType.SEARCH_COMPLETED, "")
 
-    def open(self, snapshot: Snapshot | None = None):
+    def open(self, snapshot_or_snapshots: Snapshot | list[Snapshot] | None = None):
         """
         Loads snapshots into the search page.
 
-        If a snapshot is provided, the page is scoped to that snapshot only.
+        If snapshots are provided, the page is scoped to those snapshots only.
         Otherwise it shows all snapshots.
-
-        Args:
-            snapshot (Snapshot | None, optional): A specific snapshot to load,
-                                                  or None to load all. Defaults to None.
         """
-        logger.debug(f"Opening search page with snapshot_scope={snapshot.name if snapshot else 'ALL'}")
-        self.model.load_snapshots_from_catalogue(snapshot)
+        self.model.load_snapshots_from_catalogue(snapshot_or_snapshots)
+        
+        all_snapshots = self.model.catalogue.get_all()
+        selected_ids = []
+        if snapshot_or_snapshots:
+            if isinstance(snapshot_or_snapshots, list):
+                selected_ids = [s.id for s in snapshot_or_snapshots]
+            else:
+                selected_ids = [snapshot_or_snapshots.id]
+                
+        self.view.update_snapshot_menu(all_snapshots, selected_ids)
