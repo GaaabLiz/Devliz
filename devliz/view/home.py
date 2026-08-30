@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget
 from qfluentwidgets import (
     ElevatedCardWidget, SubtitleLabel, CaptionLabel, TitleLabel,
-    setFont, FluentIcon, IconWidget, BodyLabel, SingleDirectionScrollArea
+    setFont, FluentIcon, IconWidget, BodyLabel, SingleDirectionScrollArea, ToolTipFilter
 )
 
 from devliz.domain.data import HomeStatistics
@@ -13,11 +13,15 @@ from devliz.application.i18n import tr
 class StatCard(ElevatedCardWidget):
     """Card che mostra una singola statistica con icona, titolo e valore."""
 
-    def __init__(self, icon: FluentIcon, title: str, value: str = "—", subtitle: str = "", parent=None):
+    def __init__(self, icon: FluentIcon, title: str, tooltip_text: str = "", value: str = "—", subtitle: str = "", parent=None):
         super().__init__(parent)
         self.setFixedHeight(140)
         self.setMinimumWidth(200)
         self.setBorderRadius(8)
+
+        if tooltip_text:
+            self.setToolTip(tooltip_text)
+            self.installEventFilter(ToolTipFilter(self, showDelay=1500))
 
         self.iconWidget = IconWidget(icon, self)
         self.iconWidget.setFixedSize(32, 32)
@@ -65,34 +69,34 @@ class HomeView(DevlizQFrame):
         self.install_label_title()
 
         self.card_snap_count = StatCard(
-            FluentIcon.PHOTO, tr("Snapshot Count"), parent=self
+            FluentIcon.PHOTO, tr("Snapshot Count"), tr("Shows the total number of snapshots in the catalogue."), parent=self
         )
         self.card_total_size = StatCard(
-            FluentIcon.CLOUD, tr("Total Size"), parent=self
+            FluentIcon.CLOUD, tr("Total Size"), tr("Shows the combined size of all snapshots."), parent=self
         )
         self.card_total_files = StatCard(
-            FluentIcon.DOCUMENT, tr("Total Files"), parent=self
+            FluentIcon.DOCUMENT, tr("Total Files"), tr("Shows the total number of files across all snapshots."), parent=self
         )
         self.card_total_dirs = StatCard(
-            FluentIcon.FOLDER, tr("Total Folders"), parent=self
+            FluentIcon.FOLDER, tr("Total Folders"), tr("Shows the total number of folders across all snapshots."), parent=self
         )
         self.card_heaviest_file = StatCard(
-            FluentIcon.CALORIES, tr("Heaviest File"), parent=self
+            FluentIcon.CALORIES, tr("Heaviest File"), tr("Displays the largest file found in the catalogue."), parent=self
         )
         self.card_backup_count = StatCard(
-            FluentIcon.SAVE, tr("Backup Count"), parent=self
+            FluentIcon.SAVE, tr("Backup Count"), tr("Shows the number of automatic backups created."), parent=self
         )
         self.card_last_snap_date = StatCard(
-            FluentIcon.CALENDAR, tr("Latest Snapshot"), parent=self
+            FluentIcon.CALENDAR, tr("Latest Snapshot"), tr("Displays the date of the most recently created snapshot."), parent=self
         )
         self.card_oldest_snap_date = StatCard(
-            FluentIcon.HISTORY, tr("Oldest Snapshot"), parent=self
+            FluentIcon.HISTORY, tr("Oldest Snapshot"), tr("Displays the date of the oldest snapshot in the catalogue."), parent=self
         )
         self.card_avg_size = StatCard(
-            FluentIcon.PIE_SINGLE, tr("Average Snap Size"), parent=self
+            FluentIcon.PIE_SINGLE, tr("Average Snap Size"), tr("Shows the average size of a snapshot."), parent=self
         )
         self.card_catalogue_path = StatCard(
-            FluentIcon.BOOK_SHELF, tr("Catalogue Path"), parent=self
+            FluentIcon.BOOK_SHELF, tr("Catalogue Path"), tr("Displays the current location of the catalogue folder."), parent=self
         )
 
         grid = QGridLayout()
