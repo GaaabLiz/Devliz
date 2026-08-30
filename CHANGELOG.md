@@ -1,3 +1,29 @@
+## [0.3.0] - 2026-08-30
+
+### 🚀 Features
+
+- *(home)* Add tooltips to StatCard components for enhanced user guidance
+- *(vcs)* Enable spell checking for commit messages to improve quality
+- *(catalogue)* Enhance sorting functionality with direction option
+- *(catalogue)* Add double-click functionality for snapshot results
+- *(catalogue)* Implement snapshot filtering functionality in the UI
+- *(i18n)* Add Italian translations for snapshot-related terms and tooltips
+- *(settings)* Add tooltips for various settings to enhance user guidance
+- *(action_history)* Improve table header resizing and layout margins
+
+### 🐛 Bug Fixes
+
+- *(modules)* Correct module file name casing in project configuration
+- *(modules)* Rename Devliz.iml to devliz.iml for consistency
+- *(build)* Add pyinstaller dependency and macos icns icon
+
+### 💼 Other
+
+- V0.3.0
+
+### ⚙️ Miscellaneous Tasks
+
+- Update changelog [skip ci]
 ## [0.2.0] - 2026-08-28
 
 ### 🚀 Features
