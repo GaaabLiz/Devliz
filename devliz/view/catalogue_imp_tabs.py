@@ -55,22 +55,57 @@ class DialogConfigTabs(QWidget):
 
     def get_actual_data(self) -> Snapshot | None:
         try:
+            from pylizlib.core.os.snap.domain import SnapshotSettings
+            settings = SnapshotSettings()
+
             assoc: list[SnapDirAssociation] = []
+            
+            # Map existing paths to their associations if in edit mode
+            existing_assocs = {a.original_path: a for a in self.edit_data.directories} if self.edit_data else {}
+
             index = 0
             for directory in self.tab_directories.directories:
-                assoc.append(
-                    SnapDirAssociation(original_path=directory.__str__(), folder_id=gen_random_string(4), index=index))
+                path_str = directory.__str__()
+                if path_str in existing_assocs:
+                    # Reuse existing association but update its index
+                    old_a = existing_assocs[path_str]
+                    assoc.append(
+                        SnapDirAssociation(
+                            original_path=old_a.original_path,
+                            folder_id=old_a.folder_id,
+                            index=index,
+                            mb_size=old_a.mb_size
+                        )
+                    )
+                else:
+                    # Create new association
+                    assoc.append(
+                        SnapDirAssociation(
+                            original_path=path_str,
+                            folder_id=gen_random_string(settings.folder_id_length),
+                            index=index
+                        )
+                    )
                 index += 1
-            data = Snapshot(
-                id=self.tab_details.form_id_value.text(),
-                name=self.tab_details.form_name_input.text(),
-                desc=self.tab_details.form_desc_input.text(),
-                tags=self.tab_details.form_tags_input.get_items(),
-                date_created=datetime.datetime.now(),
-                author=get_system_username(),
-                directories=assoc,
-                data=self.tab_details.get_custom_data()
-            )
+
+            if self.edit_data:
+                data = self.edit_data.clone()
+                data.name = self.tab_details.form_name_input.text()
+                data.desc = self.tab_details.form_desc_input.text()
+                data.tags = self.tab_details.form_tags_input.get_items()
+                data.directories = assoc
+                data.data = self.tab_details.get_custom_data()
+            else:
+                data = Snapshot(
+                    id=self.tab_details.form_id_value.text(),
+                    name=self.tab_details.form_name_input.text(),
+                    desc=self.tab_details.form_desc_input.text(),
+                    tags=self.tab_details.form_tags_input.get_items(),
+                    date_created=datetime.datetime.now(),
+                    author=get_system_username(),
+                    directories=assoc,
+                    data=self.tab_details.get_custom_data()
+                )
             return data
         except Exception as e:
             logger.error(e)
