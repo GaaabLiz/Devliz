@@ -100,9 +100,8 @@ class CatalogueController:
             w = MessageBox(tr("Install configuration"), tr("Are you sure you want to install the selected snapshot? All current directories will be replaced with those contained in the snapshot."), parent=self.view)
             if w.exec_():
                 def action(task):
-                    if app_settings.get(AppSettings.clear_snap_attached_folders_before_install):
-                        self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
-                    self.dash_model.snap_catalogue.install(snap, progress_callback=task.update_task_progress)
+                    clear_dest = app_settings.get(AppSettings.clear_snap_attached_folders_before_install)
+                    self.dash_model.snap_catalogue.install(snap, clear_destination=clear_dest, progress_callback=task.update_task_progress)
                     logger.info(f"Configuration installation {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_INSTALLED, snap.name)
                 
