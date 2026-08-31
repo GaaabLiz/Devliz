@@ -2,7 +2,10 @@ import sys
 import types
 from pathlib import Path
 
-def test_setting_controller(monkeypatch):
+from pylizlib.core.os.snap.domain import BackupType
+
+
+def test_setting_controller(monkeypatch, tmp_path):
     import devliz.application.i18n
     monkeypatch.setattr(devliz.application.i18n, "tr", lambda x, **kw: x.format(**kw) if kw else x)
     
@@ -45,8 +48,26 @@ def test_setting_controller(monkeypatch):
     monkeypatch.setattr(qfluentwidgets, "MessageBox", FakeMessageBox)
     
     # Mock QFileDialog
+    backup_dir = tmp_path / "custom-backups"
+    backup_dir.mkdir()
+    default_backup_dir = tmp_path / "default-backups"
+    default_backup_dir.mkdir()
+    managed_backup = backup_dir / "backup_beforeDelete_id_sd_20260831_120000.zip"
+    exported_backup = backup_dir / "export_id_sd_20260831_120001.zip"
+    unknown_backup = backup_dir / "backup_unknown.zip"
+    unrelated_file = backup_dir / "notes.txt"
+    default_backup = default_backup_dir / "backup_default_id_sd_20260831_120002.zip"
+    for path in (
+        managed_backup,
+        exported_backup,
+        unknown_backup,
+        unrelated_file,
+        default_backup,
+    ):
+        path.touch()
+
     class FakeQFileDialog:
-        ret = "/some/dir"
+        ret = str(backup_dir)
         @classmethod
         def getExistingDirectory(cls, *args): return cls.ret
     monkeypatch.setattr("PySide6.QtWidgets.QFileDialog", FakeQFileDialog)
@@ -71,10 +92,17 @@ def test_setting_controller(monkeypatch):
     app_mod = types.ModuleType("devliz.application.app")
     class ASK: catalogue_path="c"; backup_path="b"
     class AS:
-        def set(self, k, v): pass
+        def __init__(self):
+            self.values = {"b": str(backup_dir)}
+        def set(self, k, v):
+            self.values[k] = v
+        def get(self, k):
+            return self.values[k]
+    settings = AS()
     app_mod.AppSettings = ASK
-    app_mod.app_settings = AS()
-    app_mod.PATH_BACKUPS = "/backups"
+    app_mod.app_settings = settings
+    app_mod.snap_settings = types.SimpleNamespace(backup_path=None)
+    app_mod.PATH_BACKUPS = default_backup_dir
     app_mod.RESOURCE_ID_LOGO = "logo.png"
     class FakeApp: path = "/app_path"; name="app"; version="1.0"
     app_mod.app = FakeApp()
@@ -105,7 +133,36 @@ def test_setting_controller(monkeypatch):
     
     dash_mod = types.ModuleType("devliz.model.dashboard")
     class FakeCat:
+        def __init__(self):
+            self.list_calls = []
+            self.deleted_paths = []
+            self.list_error = None
+            self.backups = [
+                types.SimpleNamespace(
+                    path=managed_backup,
+                    is_export=False,
+                    backup_type=BackupType.SNAPSHOT_DIRECTORY,
+                ),
+                types.SimpleNamespace(
+                    path=exported_backup,
+                    is_export=True,
+                    backup_type=BackupType.SNAPSHOT_DIRECTORY,
+                ),
+                types.SimpleNamespace(
+                    path=unknown_backup,
+                    is_export=False,
+                    backup_type=None,
+                ),
+            ]
         def set_catalogue_path(self, p): pass
+        def list_backups(self, path):
+            self.list_calls.append(path)
+            if self.list_error:
+                raise self.list_error
+            return self.backups
+        def delete_backup(self, path):
+            self.deleted_paths.append(path)
+            path.unlink()
     class FakeDash:
         def __init__(self): self.snap_catalogue = FakeCat()
         def update(self): pass
@@ -114,8 +171,8 @@ def test_setting_controller(monkeypatch):
     
     sys.modules.pop("devliz.controller.setting_controller", None)
     from devliz.controller.setting_controller import SettingController
-    
-    ctrl = SettingController(FakeDash())
+    dash = FakeDash()
+    ctrl = SettingController(dash)
     
     from devliz.application.action_history import ActionType
     
@@ -132,15 +189,20 @@ def test_setting_controller(monkeypatch):
     # ask backup
     ctrl.view.signal_ask_backup_path.emit()
     assert actions[-1][1] == ActionType.SETTINGS_BACKUP_PATH_CHANGED
+    assert settings.values["b"] == backup_dir
+    assert app_mod.snap_settings.backup_path == backup_dir
     
     # clear backups
-    import shutil
-    rmtrees = []
-    def fake_rmtree(p): rmtrees.append(p)
-    monkeypatch.setattr(shutil, "rmtree", fake_rmtree)
     ctrl.view.signal_clear_backups_request.emit()
     assert actions[-1][1] == ActionType.SETTINGS_BACKUP_CLEANED
-    assert len(rmtrees) == 1
+    assert actions[-1][2] == f"path={backup_dir}; deleted=1"
+    assert dash.snap_catalogue.list_calls == [backup_dir]
+    assert dash.snap_catalogue.deleted_paths == [managed_backup]
+    assert not managed_backup.exists()
+    assert exported_backup.exists()
+    assert unknown_backup.exists()
+    assert unrelated_file.exists()
+    assert default_backup.exists()
     
     # open info dialog
     ctrl.view.signal_open_about_dialog_request.emit()
@@ -155,20 +217,29 @@ def test_setting_controller(monkeypatch):
     # test cancel / None / errors
     FakeQFileDialog.ret = None
     FakeMessageBox.res = False
-    
+
+    list_calls_before_cancel = len(dash.snap_catalogue.list_calls)
     ctrl.view.signal_language_changed.emit()
     ctrl.view.signal_ask_catalogue_path.emit()
     ctrl.view.signal_ask_backup_path.emit()
     ctrl.view.signal_clear_backups_request.emit()
+    assert len(dash.snap_catalogue.list_calls) == list_calls_before_cancel
     
     # info dialog fail
     FakeAbout.exec_ = lambda self: False
     ctrl.view.signal_open_about_dialog_request.emit()
     
-    # test clear backups exception
+    # test clear backups error
     FakeMessageBox.res = True
-    def fake_rm_fail(p): raise Exception("rm fail")
-    monkeypatch.setattr(shutil, "rmtree", fake_rm_fail)
+    dash.snap_catalogue.list_error = OSError("list fail")
     ctrl.view.signal_clear_backups_request.emit()
-    assert "rm fail" in msgs[-1]
+    assert "list fail" in msgs[-1]
 
+    # A missing configured directory is treated as an empty backup folder.
+    dash.snap_catalogue.list_error = None
+    missing_dir = tmp_path / "missing-backups"
+    settings.values["b"] = missing_dir
+    list_calls_before_missing = len(dash.snap_catalogue.list_calls)
+    ctrl.view.signal_clear_backups_request.emit()
+    assert len(dash.snap_catalogue.list_calls) == list_calls_before_missing
+    assert actions[-1][2] == f"path={missing_dir}; deleted=0"

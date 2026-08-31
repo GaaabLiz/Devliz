@@ -353,8 +353,10 @@ _translations: dict[str, dict[str, str]] = {
         # ── Settings Controller ──
         "Select the catalogue folder": {"it": "Seleziona la cartella del catalogo"},
         "Backup folder cleanup": {"it": "Pulizia cartella di backup"},
-        "Are you sure you want to clean the backup folder? This operation will delete all files in the backup folder.": {
-            "it": "Sei sicuro di voler pulire la cartella di backup ? Questa operazione eliminerà tutti i file presenti nella cartella di backup."
+        "Are you sure you want to delete all backups created by the application? "
+        "Other files in the folder will be preserved.": {
+            "it": "Vuoi eliminare tutti i backup creati dall'applicazione? "
+            "Gli altri file presenti nella cartella verranno conservati."
         },
         "An error occurred while cleaning the backup folder: {error}": {
             "it": "Si è verificato un errore durante la pulizia della cartella di backup: {error}"

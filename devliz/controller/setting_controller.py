@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 from pathlib import Path
 
@@ -7,11 +6,12 @@ from PySide6.QtCore import QProcess, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QApplication
 from loguru import logger
+from pylizlib.core.os.snap.domain import BackupType
 from pylizlib.qtfw.util.ui import UiUtils
 from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
-from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS, RESOURCE_ID_LOGO, app
+from devliz.application.app import app_settings, AppSettings, RESOURCE_ID_LOGO, app, snap_settings
 from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.model.dashboard import DashboardModel
@@ -60,7 +60,9 @@ class SettingController:
         directory = QFileDialog.getExistingDirectory(None, tr("Select the backup folder"))
         if directory:
             logger.info(f"Backup path changed to: {directory}")
-            app_settings.set(AppSettings.backup_path, Path(directory))
+            backup_path = Path(directory)
+            app_settings.set(AppSettings.backup_path, backup_path)
+            snap_settings.backup_path = backup_path
             self.view.card_backup_path.setContent(directory)
             log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_BACKUP_PATH_CHANGED, directory)
         else:
@@ -74,12 +76,48 @@ class SettingController:
 
     def __clear_backup_directory(self):
         try:
-            w = MessageBox(tr("Backup folder cleanup"), tr("Are you sure you want to clean the backup folder? This operation will delete all files in the backup folder."), parent=self.view)
-            if  w.exec_():
-                logger.info("Backup directory cleanup confirmed by user")
-                shutil.rmtree(PATH_BACKUPS)
-                log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_BACKUP_CLEANED, str(PATH_BACKUPS))
-        except Exception as e:
+            w = MessageBox(
+                tr("Backup folder cleanup"),
+                tr(
+                    "Are you sure you want to delete all backups created by the application? "
+                    "Other files in the folder will be preserved."
+                ),
+                parent=self.view,
+            )
+            if not w.exec_():
+                logger.debug("Backup directory cleanup cancelled by user.")
+                return
+
+            backup_path = Path(app_settings.get(AppSettings.backup_path))
+            deleted_count = 0
+
+            if backup_path.exists():
+                if not backup_path.is_dir():
+                    raise ValueError(
+                        f"Configured backup path '{backup_path}' is not a directory."
+                    )
+
+                managed_types = (
+                    BackupType.ASSOCIATED_DIRECTORIES,
+                    BackupType.SNAPSHOT_DIRECTORY,
+                )
+                for backup in self.dash_model.snap_catalogue.list_backups(backup_path):
+                    if backup.is_export or backup.backup_type not in managed_types:
+                        continue
+                    self.dash_model.snap_catalogue.delete_backup(backup.path)
+                    deleted_count += 1
+
+            logger.info(
+                "Backup directory cleanup completed: {} file(s) deleted from {}",
+                deleted_count,
+                backup_path,
+            )
+            log_action(
+                ActionCategory.SETTINGS,
+                ActionType.SETTINGS_BACKUP_CLEANED,
+                f"path={backup_path}; deleted={deleted_count}",
+            )
+        except (OSError, ValueError) as e:
             logger.error(f"Error during backup folder cleanup: {str(e)}")
             UiUtils.show_message(tr("Error"), tr("An error occurred while cleaning the backup folder: {error}", error=str(e)))
             return
