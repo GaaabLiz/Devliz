@@ -61,12 +61,6 @@ class DashboardController:
 
         self.model.snap_catalogue.path_catalogue = Path(app_settings.get(AppSettings.catalogue_path))
 
-        # Sync snap_settings with current app_settings values
-        snap_settings.backup_path = Path(app_settings.get(AppSettings.backup_path))
-        snap_settings.backup_pre_install = app_settings.get(AppSettings.backup_before_install)
-        snap_settings.backup_pre_modify = app_settings.get(AppSettings.backup_before_edit)
-        snap_settings.backup_pre_delete = app_settings.get(AppSettings.backup_before_delete)
-
 
     def __handle_update_started(self):
         log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_REFRESH_STARTED, "F5/dashboard refresh")

@@ -33,6 +33,18 @@ class SettingController:
         self.view.signal_language_changed.connect(self.__on_language_or_theme_changed)
         self.view.signal_theme_changed.connect(self.__on_language_or_theme_changed)
 
+        # Sync snap_settings reactively
+        AppSettings.backup_path.valueChanged.connect(self.__sync_snap_settings)
+        AppSettings.backup_before_install.valueChanged.connect(self.__sync_snap_settings)
+        AppSettings.backup_before_edit.valueChanged.connect(self.__sync_snap_settings)
+        AppSettings.backup_before_delete.valueChanged.connect(self.__sync_snap_settings)
+
+    def __sync_snap_settings(self, *args, **kwargs):
+        snap_settings.backup_path = Path(app_settings.get(AppSettings.backup_path))
+        snap_settings.backup_pre_install = app_settings.get(AppSettings.backup_before_install)
+        snap_settings.backup_pre_modify = app_settings.get(AppSettings.backup_before_edit)
+        snap_settings.backup_pre_delete = app_settings.get(AppSettings.backup_before_delete)
+
     def __on_language_or_theme_changed(self):
         w = MessageBox(tr("Restart required"), tr("The application needs to restart to apply the changes. Restart now?"), parent=self.view)
         if w.exec_():
