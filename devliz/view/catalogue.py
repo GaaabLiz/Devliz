@@ -152,8 +152,6 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self._show_context_menu)
 
-        # Percentuali colonne
-        self.column_percents = [0.20, 0.25, 0.10, 0.10, 0.18, 0.17]
         self._distribuisci_colonne_perc()
         self.table.resizeEvent = self._table_resize_event
 
@@ -241,7 +239,19 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     def _distribuisci_colonne_perc(self):
         total_width = self.table.viewport().width()
         if total_width > 0:
-            for idx, perc in enumerate(self.column_percents):
+            cols = self.model.table_model.columnCount()
+            # If there are exactly 6 columns, distribute exactly. If more, adjust.
+            percents = [0.20, 0.25]  # Name, Description
+            # Custom columns
+            custom_count = max(0, cols - 6)
+            for _ in range(custom_count):
+                percents.append(0.10)
+            percents.extend([0.10, 0.18, 0.17, 0.10])  # Size, Date/Time, Tags, Author
+            
+            total_perc = sum(percents)
+            normalized_percents = [p / total_perc for p in percents]
+
+            for idx, perc in enumerate(normalized_percents):
                 width = int(total_width * perc)
                 self.table.setColumnWidth(idx, width)
 

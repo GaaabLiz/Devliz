@@ -23,8 +23,10 @@ class SnapshotTableModel(QAbstractTableModel):
         snap_custom_data = app_settings.get(AppSettings.snap_custom_data)
         for i in snap_custom_data:
             headers.append(i)
+        headers.append(tr("Size"))
         headers.append(tr("Date/Time"))
         headers.append(tr("Tags"))
+        headers.append(tr("Author"))
         self._headers = headers
         self.headerDataChanged.emit(Qt.Orientation.Horizontal, 0, len(self._headers) - 1)
 
@@ -46,6 +48,18 @@ class SnapshotTableModel(QAbstractTableModel):
             snapshot = self._snapshots[index.row()]
             snap_custom_data_keys = app_settings.get(AppSettings.snap_custom_data)
             table_data = snapshot.get_for_table_array(snap_custom_data_keys)
+            
+            tags = table_data.pop()
+            date = table_data.pop()
+            
+            author = snapshot.author
+            size = f"{snapshot.get_assoc_dir_mb_size:.2f} MB"
+            
+            table_data.append(size)
+            table_data.append(date)
+            table_data.append(tags)
+            table_data.append(author)
+            
             return str(table_data[index.column()])
         except (IndexError, KeyError):
             return None
