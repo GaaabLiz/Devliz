@@ -79,6 +79,7 @@ def test_catalogue_controller(monkeypatch):
         def __init__(self, m):
             self.m = m
             self.signal_import_requested = FakeSignal()
+            self.signal_open_catalogue_folder_requested = FakeSignal()
             self.signal_install_requested = FakeSignal()
             self.signal_edit_requested = FakeSignal()
             self.signal_delete_requested = FakeSignal()

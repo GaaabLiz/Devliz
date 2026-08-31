@@ -46,7 +46,7 @@ def test_snapshot_table_model_empty(monkeypatch):
     model = catalogue_module.SnapshotTableModel()
     
     assert model.rowCount() == 0
-    assert model.columnCount() == 6
+    assert model.columnCount() == 8
     
     # Test valid parent in rowCount and columnCount
     assert model.rowCount(model.createIndex(0, 0)) == 0
