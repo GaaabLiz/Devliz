@@ -116,7 +116,7 @@ def test_catalogue_controller(monkeypatch):
         def update_snapshot_by_objs(self, o, n): pass
         def add(self, o, progress_callback): progress_callback(10)
         def remove_installed_copies(self, id): pass
-        def install(self, s, progress_callback): progress_callback(10)
+        def install(self, s, clear_destination=True, progress_callback=None): progress_callback(10) if progress_callback else None
         def delete(self, s): pass
         def get_snap_directory_path(self, s): return Path("/snap/dir")
         def duplicate_by_id(self, id): pass
