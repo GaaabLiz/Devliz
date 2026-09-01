@@ -1,6 +1,3 @@
-import pytest
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication
 
 def test_dashboard_f5_refresh(qtbot):
     """

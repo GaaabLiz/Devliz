@@ -1,4 +1,3 @@
-import pytest
 import sys
 from devliz.controller.splash import SplashController
 

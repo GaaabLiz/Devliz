@@ -1,5 +1,4 @@
-import pytest
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import QPoint
 from devliz.view.catalogue_imp_tab_directories import TabDirectories
 from pylizlib.core.os.snap import Snapshot, SnapDirAssociation
 from pathlib import Path

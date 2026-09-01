@@ -1,4 +1,3 @@
-import pytest
 from devliz.application import i18n
 
 def test_i18n():

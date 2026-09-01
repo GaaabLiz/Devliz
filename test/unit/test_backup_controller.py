@@ -61,14 +61,12 @@ def test_backup_controller(monkeypatch):
             if "error" in str(p): raise Exception("fail delete")
             
     # Mock QDesktopServices
-    import PySide6.QtGui
     opened = []
     class FakeQDS:
         @classmethod
         def openUrl(cls, u): opened.append(u.toLocalFile())
     
     # Mock MessageBox
-    import qfluentwidgets
     class FakeMessageBox:
         res = True
         def __init__(self, t, d, parent=None): pass

@@ -1,4 +1,3 @@
-import sys
 import types
 
 def test_main(monkeypatch):

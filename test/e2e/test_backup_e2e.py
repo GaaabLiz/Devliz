@@ -1,5 +1,4 @@
-import pytest
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import QPoint
 
 def test_backup_e2e_empty(qtbot, monkeypatch):
     """

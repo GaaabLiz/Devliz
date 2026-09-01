@@ -1,4 +1,3 @@
-import pytest
 from PySide6.QtCore import Qt
 
 def test_help_e2e(qtbot, monkeypatch):

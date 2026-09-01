@@ -3,7 +3,6 @@ import types
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QStandardItemModel
 
 from pylizlib.core.os.snap import Snapshot, SnapshotSearchResult, SnapshotSearchParams, QueryType, SearchTarget
 

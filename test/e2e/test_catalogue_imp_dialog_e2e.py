@@ -1,4 +1,3 @@
-import pytest
 from PySide6.QtCore import Qt
 
 def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
@@ -8,7 +7,6 @@ def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
     """
     from devliz.view.catalogue_imp_dialog import DialogConfig
     from devliz.domain.data import DevlizData
-    import PySide6.QtWidgets
     
     # Mock MessageBox to prevent blocking
     class FakeMessageBox:

@@ -1,5 +1,4 @@
-import pytest
-from PySide6.QtCore import Qt, QModelIndex
+from PySide6.QtCore import Qt
 from devliz.view.action_history import ActionHistoryTableModel, ActionHistoryView
 
 def test_action_history_model():

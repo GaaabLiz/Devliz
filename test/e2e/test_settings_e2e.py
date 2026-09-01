@@ -1,4 +1,3 @@
-import pytest
 from PySide6.QtCore import Qt
 
 def test_settings_toggle_switch(qtbot):
@@ -7,7 +6,7 @@ def test_settings_toggle_switch(qtbot):
     Navigates to settings and toggles a SwitchSettingCard.
     """
     from devliz.controller.dashboard import DashboardController
-    from devliz.application.app import AppSettings, snap_settings
+    from devliz.application.app import snap_settings
 
     # Initialize
     dashboard = DashboardController()

@@ -1,5 +1,3 @@
-import pytest
-from PySide6.QtCore import Qt, QPoint
 from devliz.view.catalogue_searcher import CatalogueSearcherView
 
 def test_catalogue_searcher_view(qtbot):

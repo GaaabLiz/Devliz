@@ -1,5 +1,3 @@
-import pytest
-from pathlib import Path
 
 def test_action_history(monkeypatch, tmp_path):
     db_path = tmp_path / "test_history.db"

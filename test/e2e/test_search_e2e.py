@@ -1,5 +1,3 @@
-import pytest
-from PySide6.QtCore import Qt
 
 def test_search_e2e(qtbot):
     """

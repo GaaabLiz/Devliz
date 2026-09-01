@@ -1,6 +1,5 @@
 import sys
 import types
-from pathlib import Path
 
 def test_home_controller(monkeypatch, tmp_path):
     # Mock view

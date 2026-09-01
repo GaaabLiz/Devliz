@@ -1,6 +1,3 @@
-import sys
-import types
-from pathlib import Path
 
 def test_catalogue_searcher_controller(monkeypatch):
     import sys

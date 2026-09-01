@@ -1,8 +1,5 @@
-import pytest
-from PySide6.QtCore import Qt, QPoint
 from devliz.view.catalogue import SnapshotCatalogueWidget
 from pylizlib.core.os.snap import SnapshotSortKey
-from qfluentwidgets import Action
 
 def test_catalogue_view(qtbot):
     from PySide6.QtGui import QStandardItemModel

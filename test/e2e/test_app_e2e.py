@@ -1,5 +1,3 @@
-import pytest
-from PySide6.QtCore import Qt
 
 def test_app_dashboard_launch(qtbot):
     """

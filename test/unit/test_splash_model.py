@@ -1,6 +1,5 @@
 import sys
 import types
-from pathlib import Path
 
 def _import_splash_module(monkeypatch):
     app_module = types.ModuleType("devliz.application.app")

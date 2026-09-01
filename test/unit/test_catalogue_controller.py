@@ -1,7 +1,6 @@
 import sys
 import types
 from pathlib import Path
-from devliz.application.app import AppSettings
 
 def test_catalogue_controller(monkeypatch):
     # Mock i18n
@@ -17,7 +16,6 @@ def test_catalogue_controller(monkeypatch):
     monkeypatch.setattr(qfluentwidgets, "MessageBox", FakeMessageBox)
     
     # Mock QFileDialog
-    from PySide6.QtWidgets import QFileDialog
     class FakeQFileDialog:
         ret = "/some/dir"
         @classmethod
