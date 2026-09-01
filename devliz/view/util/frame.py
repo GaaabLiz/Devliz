@@ -23,6 +23,12 @@ class DevlizQFrameUiBuilder:
         updating_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return updating_label
 
+    def get_label_updating_details(self):
+        from qfluentwidgets import CaptionLabel
+        label = CaptionLabel("", parent=self.parent)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        return label
+
     def get_label_title(self, text) -> SubtitleLabel:
         label = SubtitleLabel(text, self.parent)
         setFont(label, 24)
@@ -51,10 +57,12 @@ class DevlizQFrame(QFrame):
         
         self.__det_prog_bar = self.__builder.get_updating_progress_bar()
         self.__upd_label = self.__builder.get_label_updating()
+        self.__upd_detail_label = self.__builder.get_label_updating_details()
         
         updating_layout.addWidget(self.__det_prog_bar)
         updating_layout.addStretch()
         updating_layout.addWidget(self.__upd_label)
+        updating_layout.addWidget(self.__upd_detail_label)
         updating_layout.addStretch()
         self._top_level_layout.addWidget(self.__updating_widget)
 
@@ -108,3 +116,6 @@ class DevlizQFrame(QFrame):
         
     def set_updating_text(self, text: str):
         self.__upd_label.setText(text)
+
+    def set_updating_detail_text(self, text: str):
+        self.__upd_detail_label.setText(text)
