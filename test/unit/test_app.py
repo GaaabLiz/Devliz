@@ -11,21 +11,16 @@ def test_network_folder_validator():
     assert validator.correct(123) == "123"
     assert validator.correct(None) == ""
 
-def test_sync_snap_settings_immediate():
+def test_sync_snap_settings_immediate(qtbot):
     from devliz.application.app import app_settings, AppSettings, snap_settings
     from devliz.controller.setting_controller import SettingController
-    from PySide6.QtWidgets import QApplication
     import qfluentwidgets
-    
-    # Needs a QApplication for WidgetSettings
-    app = QApplication.instance()
-    if not app:
-        app = QApplication([])
     
     # Initialize the controller so it attaches the signals
     class DummyModel:
         def update(self): pass
     ctrl = SettingController(DummyModel())
+    qtbot.addWidget(ctrl.view)
     
     # Inizialmente impostiamo un valore noto
     qfluentwidgets.qconfig.set(AppSettings.backup_before_install, False)

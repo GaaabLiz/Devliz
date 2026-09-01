@@ -54,6 +54,8 @@ def test_catalogue_searcher_controller(monkeypatch):
             self.signal_delete_requested = FakeSignal()
             self.signal_file_double_clicked = FakeSignal()
             self.signal_tree_open_parent_folder = FakeSignal()
+            self.signal_snapshot_double_clicked = FakeSignal()
+            self.signal_snapshot_filter_changed = FakeSignal()
             self.search_bar = FakeBar()
             class FakeTree:
                 def setModel(self, m): pass
@@ -65,6 +67,7 @@ def test_catalogue_searcher_controller(monkeypatch):
         def get_selected_search_target(self): return "T"
         def get_selected_extensions(self): return []
         def update_status_card(self, *args): pass
+        def update_snapshot_menu(self, *args): pass
     view_mod.CatalogueSearcherView = FakeView
     monkeypatch.setitem(sys.modules, "devliz.view.catalogue_searcher", view_mod)
     
@@ -73,12 +76,15 @@ def test_catalogue_searcher_controller(monkeypatch):
         def remove_snapshot(self, row): pass
     class FakeTreeMan:
         def __init__(self): self.model = None
+    class FakeCat:
+        def get_all(self): return []
     class FakeModel:
         def __init__(self, cat):
             self.table_model = FakeTM()
             self.tree_model_manager = FakeTreeMan()
             self.signal_search_finished = FakeSignal()
             self.signal_status_card_update = FakeSignal()
+            self.catalogue = FakeCat()
         def search(self, t, q, s, e): pass
         def stop_search(self): pass
         def load_snapshots_from_catalogue(self, s): pass
@@ -135,6 +141,38 @@ def test_catalogue_searcher_controller(monkeypatch):
     # finish
     ctrl.model.signal_search_finished.emit()
     assert actions[-1][1] == ActionType.SEARCH_COMPLETED
+    
+    # filter changed
+    ctrl.view.signal_snapshot_filter_changed.emit(["some_id"])
+    ctrl.view.signal_snapshot_filter_changed.emit([])
+    
+    # snapshot double click
+    class FakeSnap:
+        id = "some_id"
+        name = "some_name"
+    class FakeTMData:
+        def get_data(self): return [FakeSnap()]
+    ctrl.model.table_model = FakeTMData()
+    
+    class FakeResultsDialog:
+        def __init__(self, n, v): 
+            class FakeTree:
+                def setModel(self, m): pass
+            self.tree_view = FakeTree()
+            self.signal_file_double_clicked = FakeSignal()
+            self.signal_tree_open_parent_folder = FakeSignal()
+        def exec(self): pass
+    view_mod.SnapshotResultsDialog = FakeResultsDialog
+    
+    class FakeTreeModelManager:
+        def __init__(self): self.model = None
+        def populate_from_results(self, r): pass
+    model_mod.SearchResultsTreeModel = FakeTreeModelManager
+    
+    def fake_get_results(i): return []
+    ctrl.model.get_results_for_snapshot = fake_get_results
+    
+    ctrl.view.signal_snapshot_double_clicked.emit(0)
     
     os.path.isfile = old_isfile
     os.path.isdir = old_isdir

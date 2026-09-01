@@ -21,6 +21,10 @@ def test_main(monkeypatch):
         def __init__(self, argv): self.argv = argv
         def installTranslator(self, t): pass
         def exec(self): return 42
+        @classmethod
+        def instance(cls): return cls
+        @classmethod
+        def processEvents(cls, *args, **kwargs): pass
     monkeypatch.setattr(PySide6.QtWidgets, "QApplication", FakeApp)
     
     import PySide6.QtCore

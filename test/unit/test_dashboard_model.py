@@ -256,7 +256,7 @@ def test_dashboard_model_on_runner_stopped(monkeypatch):
     dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)
     model = dashboard_model_module.DashboardModel(view=object())
     model.on_runner_stopped()
-    assert any("Aggiornamento Dashboard fermato." in msg for msg in logs["info"])
+    assert any("Dashboard update stopped." in msg for msg in logs["info"])
 
 def test_dashboard_model_run_heavy_operation_success_update(monkeypatch):
     dashboard_model_module, logs = _import_dashboard_model_module(monkeypatch)

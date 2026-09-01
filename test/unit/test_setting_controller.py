@@ -34,6 +34,7 @@ def test_setting_controller(monkeypatch, tmp_path):
     quits = []
     class FakeAppInst:
         def quit(self): quits.append(1)
+        def processEvents(self, *args, **kwargs): pass
     class FakeQApp:
         @classmethod
         def instance(cls): return FakeAppInst()
@@ -88,16 +89,33 @@ def test_setting_controller(monkeypatch, tmp_path):
     about_mod.AboutMessageBox = FakeAbout
     monkeypatch.setitem(sys.modules, "pylizlib.qtfw.widgets.dialog.about", about_mod)
     
+    class FakeSignal:
+        def __init__(self): self.c = None
+        def connect(self, f): self.c = f
+        def emit(self, *args): self.c(*args) if self.c else None
+
     # Mock app_settings
     app_mod = types.ModuleType("devliz.application.app")
-    class ASK: catalogue_path="c"; backup_path="b"
+    class FakeConfigItem:
+        def __init__(self, key):
+            self.key = key
+            self.valueChanged = FakeSignal()
+    class ASK:
+        catalogue_path = FakeConfigItem("c")
+        backup_path = FakeConfigItem("b")
+        backup_before_install = FakeConfigItem("bi")
+        backup_before_edit = FakeConfigItem("be")
+        backup_before_delete = FakeConfigItem("bd")
+        clear_snap_attached_folders_before_install = FakeConfigItem("cb")
     class AS:
         def __init__(self):
             self.values = {"b": str(backup_dir)}
         def set(self, k, v):
-            self.values[k] = v
+            key = k.key if hasattr(k, 'key') else k
+            self.values[key] = v
         def get(self, k):
-            return self.values[k]
+            key = k.key if hasattr(k, 'key') else k
+            return self.values.get(key)
     settings = AS()
     app_mod.AppSettings = ASK
     app_mod.app_settings = settings
@@ -110,10 +128,6 @@ def test_setting_controller(monkeypatch, tmp_path):
     
     # Mock View & Model
     view_mod = types.ModuleType("devliz.view.setting")
-    class FakeSignal:
-        def __init__(self): self.c = None
-        def connect(self, f): self.c = f
-        def emit(self, *args): self.c(*args) if self.c else None
     class FakeCard:
         def setContent(self, c): pass
     class FakeView:

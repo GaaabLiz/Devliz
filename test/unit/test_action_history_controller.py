@@ -22,6 +22,8 @@ def test_action_history_controller(monkeypatch):
     import devliz.controller.action_history as c
     
     controller = c.ActionHistoryController()
+    if hasattr(controller, "view") and "qtbot" in locals() and hasattr(qtbot, "addWidget"):
+        qtbot.addWidget(controller.view)
     controller.reload()
     
     assert controller.view.rows == ["action1", "action2"]

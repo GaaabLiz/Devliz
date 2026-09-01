@@ -224,6 +224,8 @@ def _import_dashboard_module(monkeypatch):
 def test_start_connects_signals_and_runs_initial_refresh(monkeypatch):
     dashboard_module, actions = _import_dashboard_module(monkeypatch)
     controller = dashboard_module.DashboardController()
+    if hasattr(controller, "view") and "qtbot" in locals() and hasattr(qtbot, "addWidget"):
+        qtbot.addWidget(controller.view)
 
     assert len(controller.view.added_sub_interfaces) == 7
 
@@ -247,6 +249,8 @@ def test_start_connects_signals_and_runs_initial_refresh(monkeypatch):
 def test_open_search_page_switches_view_and_logs_scope(monkeypatch):
     dashboard_module, actions = _import_dashboard_module(monkeypatch)
     controller = dashboard_module.DashboardController()
+    if hasattr(controller, "view") and "qtbot" in locals() and hasattr(qtbot, "addWidget"):
+        qtbot.addWidget(controller.view)
 
     controller._DashboardController__open_search_page()
     assert controller.searcher.open_calls[-1] is None
@@ -262,6 +266,8 @@ def test_open_search_page_switches_view_and_logs_scope(monkeypatch):
 def test_update_started_and_complete_toggle_all_states(monkeypatch):
     dashboard_module, actions = _import_dashboard_module(monkeypatch)
     controller = dashboard_module.DashboardController()
+    if hasattr(controller, "view") and "qtbot" in locals() and hasattr(qtbot, "addWidget"):
+        qtbot.addWidget(controller.view)
 
     controller._DashboardController__handle_update_started()
     assert controller.home.view.states[-1] == "UPDATING"
@@ -294,6 +300,8 @@ def test_update_started_and_complete_toggle_all_states(monkeypatch):
 def test_handle_data_updated_updates_children_and_catalogue_path(monkeypatch):
     dashboard_module, actions = _import_dashboard_module(monkeypatch)
     controller = dashboard_module.DashboardController()
+    if hasattr(controller, "view") and "qtbot" in locals() and hasattr(qtbot, "addWidget"):
+        qtbot.addWidget(controller.view)
 
     data = types.SimpleNamespace(snapshots=["s1", "s2", "s3"])
     controller._DashboardController__handle_data_updated(data)

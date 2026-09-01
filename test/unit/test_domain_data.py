@@ -104,7 +104,7 @@ def test_compute_home_statistics_logs_permission_error(monkeypatch, tmp_path):
     stats = snap_data.compute_home_statistics()
     assert stats.total_files == 0
     assert len(warnings) == 1
-    assert "Permesso negato" in warnings[0]
+    assert "Permission denied" in warnings[0]
 
 def test_home_statistics_str_properties(monkeypatch):
     data_module = _import_domain_data_module(monkeypatch)
