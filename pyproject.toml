@@ -36,5 +36,6 @@ dev = [
     "pytest-cov",
     "ruff",
     "pyinstaller>=6.22.2",
+    "pytest-qt>=4.5.0",
 ]
 
