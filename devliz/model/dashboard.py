@@ -22,6 +22,7 @@ class DashboardModel(QObject):
     signal_on_update_complete = Signal()
     signal_on_update_progress = Signal(int)
     signal_on_update_text = Signal(str)
+    signal_on_update_detail_text = Signal(str)
     signal_on_updated_data_available = Signal(DevlizData)
 
     def __init__(self, view: DashboardView):
@@ -45,8 +46,7 @@ class DashboardModel(QObject):
         self.runner.runner_finish.connect(self.on_runner_finished)
         self.runner.runner_update_progress.connect(self.signal_on_update_progress.emit)
         
-        # We will need to capture task text from the runner's tasks if we want to show text.
-        self.runner.task_update_message.connect(lambda task_name, msg: self.signal_on_update_text.emit(msg))
+        self.runner.task_update_message.connect(lambda task_name, msg: self.signal_on_update_detail_text.emit(msg))
         
         self._heavy_runners = []
 
@@ -88,10 +88,11 @@ class DashboardModel(QObject):
 
         runner.runner_finish.connect(on_finish)
         runner.runner_update_progress.connect(self.signal_on_update_progress.emit)
-        runner.task_update_message.connect(lambda task_name, msg: self.signal_on_update_text.emit(msg))
+        runner.task_update_message.connect(lambda task_name, msg: self.signal_on_update_detail_text.emit(msg))
         
         self.signal_on_update_started.emit()
         self.signal_on_update_text.emit(op_desc)
+        self.signal_on_update_detail_text.emit("")
         self.signal_on_update_progress.emit(0)
         
         runner.add(op)
@@ -120,6 +121,7 @@ class DashboardModel(QObject):
         logger.info("Dashboard update started.")
         self.signal_on_update_started.emit()
         self.signal_on_update_text.emit(tr("Updating dashboard data..."))
+        self.signal_on_update_detail_text.emit("")
         self.signal_on_update_progress.emit(0)
 
     def on_runner_stopped(self):
