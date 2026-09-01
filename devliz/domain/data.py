@@ -42,21 +42,14 @@ class DevlizSnapshotData:
 
     @property
     def get_mb_size(self) -> str:
-        total_size = 0
+        total_size_mb = 0
         for config in self.snapshot_list:
-            for dir_assoc in config.directories:
-                path = Path(dir_assoc.original_path)
-                if path.exists() and path.is_dir():
-                    for file in path.rglob('*'):
-                        if file.is_file():
-                            total_size += file.stat().st_size
-        return get_normalized_gb_mb_str(total_size)
+            total_size_mb += config.get_assoc_dir_mb_size
+        return get_normalized_gb_mb_str(int(total_size_mb * 1024 * 1024))
 
     def compute_home_statistics(self) -> HomeStatistics:
         logger.debug("Starting statistics calculation for Home...")
         stats = HomeStatistics(snapshot_count=self.count)
-        heaviest_size = 0
-        heaviest_path = ""
         
         dates = []
 
@@ -64,29 +57,14 @@ class DevlizSnapshotData:
             if snap.date_created:
                 dates.append(snap.date_created)
 
-            for dir_assoc in snap.directories:
-                path = Path(dir_assoc.original_path)
-                if not path.exists() or not path.is_dir():
-                    continue
-                try:
-                    for entry in path.rglob('*'):
-                        if entry.is_file():
-                            stats.total_files += 1
-                            try:
-                                size = entry.stat().st_size
-                            except OSError:
-                                continue
-                            stats.total_size_bytes += size
-                            if size > heaviest_size:
-                                heaviest_size = size
-                                heaviest_path = str(entry)
-                        elif entry.is_dir():
-                            stats.total_dirs += 1
-                except PermissionError:
-                    logger.warning(f"Permission denied for directory: {path}")
+            # Optimize: use pre-calculated size from snapshot instead of scanning disk
+            stats.total_size_bytes += int(snap.get_assoc_dir_mb_size * 1024 * 1024)
 
-        stats.heaviest_file_path = heaviest_path
-        stats.heaviest_file_size = heaviest_size
+        # File-level statistics are no longer computed to prevent slow dashboard loading
+        stats.heaviest_file_path = ""
+        stats.heaviest_file_size = 0
+        stats.total_files = 0
+        stats.total_dirs = 0
         
         if dates:
             dates.sort()
