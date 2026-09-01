@@ -77,7 +77,7 @@ ENABLE_WINDOWS_INSTALLER ?= 1
 #   dist/*                                          – wheel + sdist only
 #   dist/* Output/*.exe                             – wheel + sdist + installer
 #   $(foreach a,$(APPS_LIST),dist/$($(a)_NAME)-*)  – per-app wheel globs
-RELEASE_ARTIFACTS ?= dist/*
+RELEASE_ARTIFACTS ?= dist/* Output/*.exe
 
 # Python version used by CI jobs via uv-managed environments.
 CI_PYTHON_VERSION ?= 3.13
