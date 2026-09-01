@@ -479,7 +479,7 @@ class CatalogueSearcherView(DevlizQFrame):
         new_snapshot_ids = set(s.id for s in snapshots)
         
         # Only rebuild the menu if the available snapshots have changed or menu is missing
-        if current_snapshot_ids != new_snapshot_ids or not getattr(self, 'snapshot_menu', None):
+        if current_snapshot_ids != new_snapshot_ids or not hasattr(self, 'action_all_snapshots'):
             self.snapshot_menu = CheckableMenu(parent=self)
             self._snapshot_actions = {}
 

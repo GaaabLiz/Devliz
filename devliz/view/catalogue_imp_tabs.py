@@ -61,7 +61,7 @@ class DialogConfigTabs(QWidget):
             assoc: list[SnapDirAssociation] = []
             
             # Map existing paths to their associations if in edit mode
-            existing_assocs = {a.original_path: a for a in self.edit_data.directories} if self.edit_data else {}
+            existing_assocs = {a.original_path: a for a in self.payload_data.directories} if self.payload_data else {}
 
             index = 0
             for directory in self.tab_directories.directories:
@@ -88,8 +88,8 @@ class DialogConfigTabs(QWidget):
                     )
                 index += 1
 
-            if self.edit_data:
-                data = self.edit_data.clone()
+            if self.payload_data:
+                data = self.payload_data.clone()
                 data.name = self.tab_details.form_name_input.text()
                 data.desc = self.tab_details.form_desc_input.text()
                 data.tags = self.tab_details.form_tags_input.get_items()
