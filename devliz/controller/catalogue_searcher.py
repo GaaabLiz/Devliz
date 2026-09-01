@@ -1,6 +1,4 @@
 import os
-import sys
-import subprocess
 
 from qfluentwidgets import MessageBox
 from PySide6.QtGui import QDesktopServices

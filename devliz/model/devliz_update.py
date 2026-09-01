@@ -1,7 +1,6 @@
 from pathlib import Path
-from time import sleep
 
-from pylizlib.core.os.snap import Snapshot, SnapshotUtils, SnapshotCatalogue
+from pylizlib.core.os.snap import SnapshotCatalogue
 from pylizlib.core.os.utils import is_software_installed, WindowsOsUtils
 from pylizlib.qt.handler.operation_core import Task
 from pylizlib.qtfw.domain.sw import SoftwareData

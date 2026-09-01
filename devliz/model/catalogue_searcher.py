@@ -1,4 +1,3 @@
-from time import sleep
 
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, Signal, QObject
 from PySide6.QtGui import QStandardItemModel, QStandardItem

@@ -1,6 +1,5 @@
-from PySide6.QtCore import Signal, Qt
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QVBoxLayout
-from pylizlib.core.data.unit import get_normalized_gb_mb_str
 from pylizlib.qtfw.widgets.card import MasterListSettingCard
 from qfluentwidgets import PushSettingCard, FluentIcon, PushButton, SwitchSettingCard, OptionsSettingCard, ToolTipFilter, ToolTipPosition
 

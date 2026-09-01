@@ -1,6 +1,5 @@
 from PySide6.QtCore import Signal, Qt, QMargins
 from PySide6.QtWidgets import QHBoxLayout, QWidget, QHeaderView
-from pylizlib.core.os.snap.domain import SnapshotBackupInfo
 from qfluentwidgets import Action, FluentIcon, BodyLabel, RoundMenu, TableView, setFont
 
 from devliz.model.backup import BackupModel

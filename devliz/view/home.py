@@ -1,8 +1,8 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget
 from qfluentwidgets import (
-    ElevatedCardWidget, SubtitleLabel, CaptionLabel, TitleLabel,
-    setFont, FluentIcon, IconWidget, BodyLabel, SingleDirectionScrollArea, ToolTipFilter
+    ElevatedCardWidget, CaptionLabel, TitleLabel,
+    setFont, FluentIcon, IconWidget, SingleDirectionScrollArea, ToolTipFilter
 )
 
 from devliz.domain.data import HomeStatistics

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from devliz.application.app import app_settings, AppSettings, PATH_BACKUPS
+from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizSnapshotData
 from devliz.view.home import HomeView
 

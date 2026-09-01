@@ -1,6 +1,6 @@
 from PySide6.QtCore import QAbstractItemModel, Qt, Signal, QModelIndex
 from PySide6.QtGui import QActionGroup
-from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QFrame, QHeaderView, QStackedWidget
+from PySide6.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QHeaderView, QStackedWidget
 from qfluentwidgets import (
     LineEdit,
     TableView,
@@ -15,7 +15,6 @@ from qfluentwidgets import (
     BodyLabel,
     ProgressBar,
     CaptionLabel,
-    ComboBox,
     RoundMenu,
     MessageBoxBase,
     SubtitleLabel

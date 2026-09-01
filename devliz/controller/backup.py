@@ -1,5 +1,3 @@
-import platform
-import subprocess
 from pathlib import Path
 
 from PySide6.QtCore import Signal, QObject, QUrl

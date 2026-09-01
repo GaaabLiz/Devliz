@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QFormLayout, QVBoxLayout, QWidget
 from pylizlib.core.data.gen import gen_random_string
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.widgets.input import MultiSelectionComboBox
-from qfluentwidgets import BodyLabel, LineEdit, ComboBox
+from qfluentwidgets import BodyLabel, LineEdit
 
 from devliz.application.app import snap_settings
 from devliz.application.i18n import tr

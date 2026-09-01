@@ -4,7 +4,7 @@ import sys
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QShortcut, QKeySequence, QIcon
 from pylizlib.qt.domain.view import UiWidgetMode
-from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme, FluentIcon, NavigationItemPosition
+from qfluentwidgets import FluentWindow, Theme, setTheme, setThemeColor, isDarkTheme
 from qframelesswindow.utils import getSystemAccentColor
 
 from devliz.application.app import app, RESOURCE_ID_LOGO

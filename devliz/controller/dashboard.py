@@ -4,7 +4,7 @@ from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
 from qfluentwidgets import FluentIcon, NavigationItemPosition
 
-from devliz.application.app import app_settings, AppSettings, snap_settings
+from devliz.application.app import app_settings, AppSettings
 from devliz.application.action_history import log_action, ActionCategory, ActionType
 from devliz.controller.action_history import ActionHistoryController
 from devliz.controller.backup import BackupController

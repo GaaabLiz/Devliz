@@ -1,4 +1,4 @@
-from PySide6.QtCore import QSize, QEventLoop, QTimer
+from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
 from qfluentwidgets import SplashScreen
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
