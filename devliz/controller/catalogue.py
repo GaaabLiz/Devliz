@@ -63,7 +63,7 @@ class CatalogueController:
                     def action(task):
                         old = snap
                         new = dialog.output_data
-                        self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new)
+                        self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new, message_callback=task.update_task_message)
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_UPDATED, new.name)
                         
                     titolo = tr("Configuration modified")
@@ -73,7 +73,7 @@ class CatalogueController:
                     op_desc = tr("Creating configuration")
                     
                     def action(task):
-                        self.dash_model.snap_catalogue.add(dialog.output_data, progress_callback=task.update_task_progress)
+                        self.dash_model.snap_catalogue.add(dialog.output_data, progress_callback=task.update_task_progress, message_callback=task.update_task_message)
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_CREATED, dialog.output_data.name)
                         
                     titolo = tr("Configuration created")
@@ -101,7 +101,7 @@ class CatalogueController:
             if w.exec_():
                 def action(task):
                     clear_dest = app_settings.get(AppSettings.clear_snap_attached_folders_before_install)
-                    self.dash_model.snap_catalogue.install(snap, clear_destination=clear_dest, progress_callback=task.update_task_progress)
+                    self.dash_model.snap_catalogue.install(snap, clear_destination=clear_dest, progress_callback=task.update_task_progress, message_callback=task.update_task_message)
                     logger.info(f"Configuration installation {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_INSTALLED, snap.name)
                 
@@ -128,7 +128,7 @@ class CatalogueController:
             w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected configuration? This operation cannot be undone."), parent=self.view)
             if w.exec_():
                 def action(task):
-                    self.dash_model.snap_catalogue.delete(snap)
+                    self.dash_model.snap_catalogue.delete(snap, message_callback=task.update_task_message)
                     logger.info(f"Configuration deletion {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DELETED, snap.name)
                 
@@ -151,7 +151,7 @@ class CatalogueController:
         logger.debug(f"Duplication requested for {snap.name}")
         try:
             def action(task):
-                self.dash_model.snap_catalogue.duplicate_by_id(snap.id)
+                self.dash_model.snap_catalogue.duplicate_by_id(snap.id, message_callback=task.update_task_message)
                 logger.info(f"Configuration duplication {snap.name} completed.")
                 log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_DUPLICATED, snap.name)
             
@@ -178,7 +178,7 @@ class CatalogueController:
                 )
                 if directory:
                     def action(task):
-                        self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory))
+                        self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory), message_callback=task.update_task_message)
                         logger.info(f"Export of {snap.name} to {directory} completed.")
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_EXPORTED, f"{snap.name} -> {directory}")
                     
@@ -203,7 +203,7 @@ class CatalogueController:
                 )
                 if directory:
                     def action(task):
-                        self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory))
+                        self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory), message_callback=task.update_task_message)
                         logger.info(f"Folder export of {snap.name} to {directory} completed.")
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED, f"{snap.name} -> {directory}")
                     
@@ -222,7 +222,7 @@ class CatalogueController:
             w = MessageBox(tr("Delete installed folders"), tr("Are you sure you want to delete the currently installed folders for the selected snapshot?"), parent=self.view)
             if w.exec_():
                 def action(task):
-                    self.dash_model.snap_catalogue.remove_installed_copies(snap.id)
+                    self.dash_model.snap_catalogue.remove_installed_copies(snap.id, message_callback=task.update_task_message)
                     logger.info(f"Installed folders deletion for {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_INSTALLED_FOLDERS_DELETED, snap.name)
                 
@@ -241,7 +241,7 @@ class CatalogueController:
             w = MessageBox(tr("Update associated folders"), tr("Are you sure you want to update the associated folders of the selected snapshot with the currently installed ones?"), parent=self.view)
             if w.exec_():
                 def action(task):
-                    self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id)
+                    self.dash_model.snap_catalogue.update_assoc_with_installed(snap.id, message_callback=task.update_task_message)
                     logger.info(f"Associated folders update for {snap.name} completed.")
                     log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_UPDATED, snap.name)
                 
