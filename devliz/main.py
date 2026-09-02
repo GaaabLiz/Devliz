@@ -8,12 +8,14 @@ from devliz.application.app import app_settings, AppSettings
 from devliz.application.i18n import set_language
 from devliz.controller.dashboard import DashboardController
 from devliz.controller.splash import SplashController
-
+from devliz.model.action_history import init_action_history_db
 
 def main():
     # Initialize language from settings
     lang = app_settings.get(AppSettings.language)
     set_language(lang)
+    
+    init_action_history_db()
 
     qt_app = QApplication(sys.argv)
 
