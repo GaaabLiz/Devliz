@@ -1,4 +1,4 @@
-from devliz.application.action_history import list_actions
+from devliz.model.action_history import list_actions
 from devliz.view.action_history import ActionHistoryView
 
 

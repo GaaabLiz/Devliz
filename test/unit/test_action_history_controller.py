@@ -13,9 +13,9 @@ def test_action_history_controller(monkeypatch):
     monkeypatch.setitem(sys.modules, "devliz.view.action_history", view_mod)
     
     # Mock list_actions
-    app_history_mod = types.ModuleType("devliz.application.action_history")
+    app_history_mod = types.ModuleType("devliz.model.action_history")
     app_history_mod.list_actions = lambda: ["action1", "action2"]
-    monkeypatch.setitem(sys.modules, "devliz.application.action_history", app_history_mod)
+    monkeypatch.setitem(sys.modules, "devliz.model.action_history", app_history_mod)
     
     # Import
     sys.modules.pop("devliz.controller.action_history", None)

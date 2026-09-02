@@ -6,7 +6,7 @@ def test_action_history(monkeypatch, tmp_path):
     import devliz.application.app
     monkeypatch.setattr(devliz.application.app.app, "get_path", lambda: str(tmp_path))
     
-    import devliz.application.action_history as ah
+    import devliz.model.action_history as ah
     monkeypatch.setattr(ah, "PATH_ACTION_HISTORY_DB", db_path)
     
     ah.init_action_history_db()

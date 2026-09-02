@@ -1,8 +1,12 @@
 import sqlite3
+from enum import Enum
 from pathlib import Path
 
+from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
+
 from devliz.application.app import app
-from enum import Enum
+from devliz.application.i18n import tr
+
 
 class ActionCategory(str, Enum):
     BACKUPS = "Backups"
@@ -12,6 +16,7 @@ class ActionCategory(str, Enum):
     SETTINGS = "Settings"
     HELP = "Help"
     HOME = "Home"
+
 
 class ActionType(str, Enum):
     BACKUP_OPENED_IN_FINDER = "backup.opened.in.finder"
@@ -45,7 +50,6 @@ class ActionType(str, Enum):
     HELP_CARD_OPENED = "help.card.opened"
     OPEN = "open"
     REFRESH = "refresh"
-
 
 
 PATH_ACTION_HISTORY_DB = Path(app.get_path()).joinpath("ActionHistory.db")
@@ -100,4 +104,47 @@ def list_actions() -> list[dict[str, str]]:
     ]
 
 
-init_action_history_db()
+class ActionHistoryTableModel(QAbstractTableModel):
+
+    def __init__(self):
+        super().__init__()
+        self._rows: list[dict[str, str]] = []
+        self._headers = [tr("Timestamp"), tr("Screen"), tr("Action"), tr("Details")]
+
+    def set_rows(self, rows: list[dict[str, str]]):
+        self.beginResetModel()
+        self._rows = rows
+        self.endResetModel()
+
+    def rowCount(self, parent=QModelIndex()):
+        if parent.isValid():
+            return 0
+        return len(self._rows)
+
+    def columnCount(self, parent=QModelIndex()):
+        if parent.isValid():
+            return 0
+        return 4
+
+    def headerData(self, section: int, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if role != Qt.ItemDataRole.DisplayRole:
+            return None
+        if orientation == Qt.Orientation.Horizontal and 0 <= section < len(self._headers):
+            return self._headers[section]
+        return None
+
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
+        if not index.isValid() or role != Qt.ItemDataRole.DisplayRole:
+            return None
+
+        row = self._rows[index.row()]
+        col = index.column()
+        if col == 0:
+            return row.get("created_at", "")
+        if col == 1:
+            return tr(row.get("screen_key", ""))
+        if col == 2:
+            return tr(row.get("action_key", ""))
+        if col == 3:
+            return row.get("details", "")
+        return None
