@@ -103,12 +103,15 @@ def _import_dashboard_module(monkeypatch):
             self.view = FakePageView("Settings")
 
     class FakeDashboardModel:
-        def __init__(self, _view):
+        def __init__(self):
             self.signal_on_update_started = FakeSignal()
             self.signal_on_update_complete = FakeSignal()
             self.signal_on_updated_data_available = FakeSignal()
             self.signal_on_update_progress = FakeSignal()
             self.signal_on_update_text = FakeSignal()
+            self.signal_on_update_detail_text = FakeSignal()
+            self.signal_on_heavy_operation_success = FakeSignal()
+            self.signal_on_heavy_operation_error = FakeSignal()
             self.snap_catalogue = types.SimpleNamespace(path_catalogue=None)
             self.update_count = 0
 
@@ -160,13 +163,13 @@ def _import_dashboard_module(monkeypatch):
         def update_data(self):
             pass
 
-    fake_action_history_module = types.ModuleType("devliz.application.action_history")
+    fake_action_history_module = types.ModuleType("devliz.model.action_history")
 
     def fake_log_action(screen_key, action_key, details=""):
         actions.append((getattr(screen_key, "value", screen_key), getattr(action_key, "value", action_key), details))
 
     fake_action_history_module.log_action = fake_log_action
-    from devliz.application.action_history import ActionCategory, ActionType
+    from devliz.model.action_history import ActionCategory, ActionType
     fake_action_history_module.ActionCategory = ActionCategory
     fake_action_history_module.ActionType = ActionType
 
@@ -193,7 +196,15 @@ def _import_dashboard_module(monkeypatch):
     fake_logger_module = types.ModuleType("loguru")
     fake_logger_module.logger = types.SimpleNamespace(debug=lambda *a, **k: None, info=lambda *a, **k: None)
 
-    monkeypatch.setitem(sys.modules, "devliz.application.action_history", fake_action_history_module)
+    fake_ui_utils_module = types.ModuleType("pylizlib.qtfw.util.ui")
+    class FakeUiUtils:
+        @staticmethod
+        def show_message(title, message):
+            pass
+    fake_ui_utils_module.UiUtils = FakeUiUtils
+    monkeypatch.setitem(sys.modules, "pylizlib.qtfw.util.ui", fake_ui_utils_module)
+
+    monkeypatch.setitem(sys.modules, "devliz.model.action_history", fake_action_history_module)
     monkeypatch.setitem(sys.modules, "devliz.application.app", fake_app_module)
     monkeypatch.setitem(sys.modules, "devliz.domain.data", fake_data_module)
     monkeypatch.setitem(sys.modules, "qfluentwidgets", fake_qfluentwidgets)

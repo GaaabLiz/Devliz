@@ -7,7 +7,7 @@ def test_backup_controller(monkeypatch):
     monkeypatch.setattr(devliz.application.i18n, "tr", lambda x, **kw: x.format(**kw) if kw else x)
     
     # Mock action history
-    import devliz.application.action_history as hist_mod
+    import devliz.model.action_history as hist_mod
     actions = []
     def fake_log(c, t, d): actions.append((c, t, d))
     monkeypatch.setattr(hist_mod, "log_action", fake_log)

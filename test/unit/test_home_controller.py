@@ -1,3 +1,4 @@
+import shutil
 import sys
 import types
 
@@ -48,7 +49,6 @@ def test_home_controller(monkeypatch, tmp_path):
     assert updated[0][2] == "/cat"
     
     # test backup_path not exists
-    import shutil
     shutil.rmtree(b_path)
     ctrl.update_data(FakeSnapData())
     assert updated[-1][1] == 0

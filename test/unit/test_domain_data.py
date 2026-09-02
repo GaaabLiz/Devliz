@@ -1,5 +1,6 @@
 import sys
 import types
+from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,7 +115,6 @@ def test_home_statistics_str_properties(monkeypatch):
 
 def test_compute_home_statistics_dates_and_missing_dir(monkeypatch, tmp_path):
     data_module = _import_domain_data_module(monkeypatch)
-    from datetime import datetime
     
     missing_dir = tmp_path / "missing"
     snap1 = _make_snapshot(missing_dir)

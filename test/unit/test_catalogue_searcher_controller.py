@@ -11,7 +11,7 @@ def test_catalogue_searcher_controller(monkeypatch):
     # Mocks removed from here
     
     # Mock log_action
-    import devliz.application.action_history as hist_mod
+    import devliz.model.action_history as hist_mod
     actions = []
     def fake_log(c, t, n): actions.append((c,t,n))
     monkeypatch.setattr(hist_mod, "log_action", fake_log)
@@ -97,7 +97,7 @@ def test_catalogue_searcher_controller(monkeypatch):
     ctrl.open()
     
     # delete
-    from devliz.application.action_history import ActionType
+    from devliz.model.action_history import ActionType
     ctrl.view.signal_delete_requested.emit(1)
     assert actions[-1][1] == ActionType.SEARCH_SNAPSHOT_REMOVED
     

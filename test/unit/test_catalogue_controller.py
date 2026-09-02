@@ -42,7 +42,7 @@ def test_catalogue_controller(monkeypatch):
     monkeypatch.setitem(sys.modules, "devliz.view.catalogue_imp_dialog", dl_mod)
     
     # Mock log_action
-    import devliz.application.action_history as hist_mod
+    import devliz.model.action_history as hist_mod
     actions = []
     def fake_log(c, t, n): actions.append((c,t,n))
     monkeypatch.setattr(hist_mod, "log_action", fake_log)
@@ -142,7 +142,7 @@ def test_catalogue_controller(monkeypatch):
     
     snap = FakeSnapshot("s1", "Snap1")
     
-    from devliz.application.action_history import ActionType
+    from devliz.model.action_history import ActionType
     # __open_config_dialog (edit_mode=False) -> signal_import_requested
     ctrl.view.signal_import_requested.emit()
     assert actions[-1][1] == ActionType.CATALOGUE_SNAPSHOT_CREATED

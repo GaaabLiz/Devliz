@@ -10,7 +10,7 @@ def test_setting_controller(monkeypatch, tmp_path):
     monkeypatch.setattr(devliz.application.i18n, "tr", lambda x, **kw: x.format(**kw) if kw else x)
     
     # Mock log_action
-    import devliz.application.action_history as hist_mod
+    import devliz.model.action_history as hist_mod
     actions = []
     def fake_log(c, t, n): actions.append((c,t,n))
     monkeypatch.setattr(hist_mod, "log_action", fake_log)
@@ -188,7 +188,7 @@ def test_setting_controller(monkeypatch, tmp_path):
     dash = FakeDash()
     ctrl = SettingController(dash)
     
-    from devliz.application.action_history import ActionType
+    from devliz.model.action_history import ActionType
     
     # theme/lang changed
     ctrl.view.signal_language_changed.emit()
