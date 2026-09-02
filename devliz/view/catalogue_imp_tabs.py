@@ -74,69 +74,23 @@ class DialogConfigTabs(QWidget):
         self.stackedWidget.addWidget(widget)
         self.pivot.addItem(routeKey=objectName, text=text)
 
-    def get_actual_data(self) -> Snapshot | None:
+    def get_actual_data(self) -> dict | None:
         """
-        Retrieves the snapshot data collected from the tabs.
-        It maps the selected directories to snapshot directory associations.
-        If a payload_data was provided, it modifies and returns a cloned copy of it.
-        Otherwise, it creates and returns a completely new Snapshot object.
-
+        Retrieves the raw data collected from the tabs as a simple dictionary.
+        
         Returns:
-            Snapshot | None: The resulting snapshot instance with the updated configuration, 
-            or None if an error occurs.
+            dict | None: The resulting data dictionary, or None if an error occurs.
         """
         try:
-            settings = SnapshotSettings()
-
-            assoc: list[SnapDirAssociation] = []
-            
-            # Map existing paths to their associations if in edit mode
-            existing_assocs = {a.original_path: a for a in self.payload_data.directories} if self.payload_data else {}
-
-            index = 0
-            for directory in self.tab_directories.directories:
-                path_str = directory.__str__()
-                if path_str in existing_assocs:
-                    # Reuse existing association but update its index
-                    old_a = existing_assocs[path_str]
-                    assoc.append(
-                        SnapDirAssociation(
-                            original_path=old_a.original_path,
-                            folder_id=old_a.folder_id,
-                            index=index,
-                            mb_size=old_a.mb_size
-                        )
-                    )
-                else:
-                    # Create new association
-                    assoc.append(
-                        SnapDirAssociation(
-                            original_path=path_str,
-                            folder_id=gen_random_string(settings.folder_id_length),
-                            index=index
-                        )
-                    )
-                index += 1
-
-            if self.payload_data:
-                data = self.payload_data.clone()
-                data.name = self.tab_details.form_name_input.text()
-                data.desc = self.tab_details.form_desc_input.text()
-                data.tags = self.tab_details.form_tags_input.get_items()
-                data.directories = assoc
-                data.data = self.tab_details.get_custom_data()
-            else:
-                data = Snapshot(
-                    id=self.tab_details.form_id_value.text(),
-                    name=self.tab_details.form_name_input.text(),
-                    desc=self.tab_details.form_desc_input.text(),
-                    tags=self.tab_details.form_tags_input.get_items(),
-                    date_created=datetime.datetime.now(),
-                    author=get_system_username(),
-                    directories=assoc,
-                    data=self.tab_details.get_custom_data()
-                )
-            return data
+            return {
+                "id": self.tab_details.form_id_value.text(),
+                "name": self.tab_details.form_name_input.text(),
+                "desc": self.tab_details.form_desc_input.text(),
+                "tags": self.tab_details.form_tags_input.get_items(),
+                "custom_data": self.tab_details.get_custom_data(),
+                "directories": [d.__str__() for d in self.tab_directories.directories]
+            }
         except Exception as e:
             logger.error(e)
             UiUtils.show_message(tr("Error"), tr("An error occurred while collecting the data."), self)
+            return None

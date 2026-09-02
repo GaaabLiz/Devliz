@@ -161,6 +161,66 @@ class CatalogueModel:
         self._is_filtered = False
         self.table_model = SnapshotTableModel()
 
+    def build_snapshot_from_raw(self, raw_data: dict, old_snapshot: Snapshot = None) -> Snapshot:
+        """
+        Factory method to build a rich Snapshot domain object from raw dictionary data
+        provided by the View layer. Handles ID generation, timestamps, and authorship.
+        
+        Args:
+            raw_data (dict): The raw data captured from the UI.
+            old_snapshot (Snapshot, optional): The existing snapshot if we are in edit mode.
+
+        Returns:
+            Snapshot: The newly constructed or updated Snapshot object.
+        """
+        import datetime
+        from pylizlib.core.os.utils import get_system_username
+        from pylizlib.core.data.gen import gen_random_string
+        from pylizlib.core.os.snap.domain import SnapshotSettings
+        from pylizlib.core.os.snap import SnapDirAssociation
+
+        settings = SnapshotSettings()
+        assoc = []
+        existing_assocs = {a.original_path: a for a in old_snapshot.directories} if old_snapshot else {}
+
+        index = 0
+        for path_str in raw_data["directories"]:
+            if path_str in existing_assocs:
+                old_a = existing_assocs[path_str]
+                assoc.append(SnapDirAssociation(
+                    original_path=old_a.original_path,
+                    folder_id=old_a.folder_id,
+                    index=index,
+                    mb_size=old_a.mb_size
+                ))
+            else:
+                assoc.append(SnapDirAssociation(
+                    original_path=path_str,
+                    folder_id=gen_random_string(settings.folder_id_length),
+                    index=index
+                ))
+            index += 1
+
+        if old_snapshot:
+            data = old_snapshot.clone()
+            data.name = raw_data["name"]
+            data.desc = raw_data["desc"]
+            data.tags = raw_data["tags"]
+            data.directories = assoc
+            data.data = raw_data["custom_data"]
+            return data
+        else:
+            return Snapshot(
+                id=raw_data["id"],
+                name=raw_data["name"],
+                desc=raw_data["desc"],
+                tags=raw_data["tags"],
+                date_created=datetime.datetime.now(),
+                author=get_system_username(),
+                directories=assoc,
+                data=raw_data["custom_data"]
+            )
+
     def set_snapshots(self, snapshots: list[Snapshot]):
         """
         Sets the master list of snapshots and updates the table view.

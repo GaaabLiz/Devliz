@@ -17,7 +17,7 @@ class DialogConfig(QDialog):
     It contains tabs for detailed information and associated directories.
     """
 
-    signal_payload = Signal(Snapshot, bool)
+    signal_payload = Signal(dict, bool)
 
     def __init__(
             self,
@@ -40,7 +40,7 @@ class DialogConfig(QDialog):
         self.edit_mode = edit_mode
         self.edit_data: Snapshot | None = edit_data
         self.devliz_data = devliz_data
-        self.output_data: Snapshot | None = None
+        self.output_data: dict | None = None
 
         # Global dialog settings
         self.setWindowTitle(self.__get_dialog_text())
@@ -140,18 +140,19 @@ class DialogConfig(QDialog):
         if data is None:
             UiUtils.show_message(tr("Error"), tr("An error occurred while creating the data."), self)
             return
-        if data.name.strip() == "":
+        if data["name"].strip() == "":
             UiUtils.show_message(tr("Error"), tr("The 'Name' field cannot be empty."), self)
             return
             
         invalid_chars = r'[<>:"/\\|?*]'
-        if re.search(invalid_chars, data.name):
+        if re.search(invalid_chars, data["name"]):
             UiUtils.show_message(tr("Error"), tr("The name contains invalid characters for a folder."), self)
             return
             
-        if not data.directories or len(data.directories) == 0:
+        if not data["directories"] or len(data["directories"]) == 0:
             UiUtils.show_message(tr("Error"), tr("At least one folder must be associated with the configuration."), self)
             return
+            
         self.signal_payload.emit(data, self.edit_mode)
         self.output_data = data
         self.accept()

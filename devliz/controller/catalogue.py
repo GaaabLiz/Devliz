@@ -87,14 +87,14 @@ class CatalogueController:
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
         try:
             if dialog.exec():
-                print(dialog.output_data)
+                raw_data = dialog.output_data
                 if edit_mode:
                     op_name = tr("Modify configuration")
                     op_desc = tr("Modifying configuration")
                     
                     def action(task):
                         old = snap
-                        new = dialog.output_data
+                        new = self.model.build_snapshot_from_raw(raw_data, old)
                         self.dash_model.snap_catalogue.update_snapshot_by_objs(old, new, message_callback=task.update_task_message)
                         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_UPDATED, new.name)
                         
@@ -105,8 +105,9 @@ class CatalogueController:
                     op_desc = tr("Creating configuration")
                     
                     def action(task):
-                        self.dash_model.snap_catalogue.add(dialog.output_data, progress_callback=task.update_task_progress, message_callback=task.update_task_message)
-                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_CREATED, dialog.output_data.name)
+                        new = self.model.build_snapshot_from_raw(raw_data)
+                        self.dash_model.snap_catalogue.add(new, progress_callback=task.update_task_progress, message_callback=task.update_task_message)
+                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_CREATED, new.name)
                         
                     titolo = tr("Configuration created")
                     testo = tr("The configuration has been created successfully.")
