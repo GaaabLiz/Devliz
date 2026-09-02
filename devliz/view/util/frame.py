@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
 from pylizlib.qt.domain.view import UiWidgetMode
-from qfluentwidgets import SubtitleLabel, setFont, SingleDirectionScrollArea, ProgressBar, BodyLabel
+from qfluentwidgets import SubtitleLabel, setFont, SingleDirectionScrollArea, ProgressBar, BodyLabel, CaptionLabel
 
 from devliz.application.i18n import tr
 
@@ -24,7 +24,6 @@ class DevlizQFrameUiBuilder:
         return updating_label
 
     def get_label_updating_details(self):
-        from qfluentwidgets import CaptionLabel
         label = CaptionLabel("", parent=self.parent)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return label
@@ -104,7 +103,6 @@ class DevlizQFrame(QFrame):
         self.master_layout.addWidget(title_label)
         
         if self.window_subtitle:
-            from qfluentwidgets import CaptionLabel
             subtitle_label = CaptionLabel(self.window_subtitle, self)
             subtitle_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             subtitle_label.setWordWrap(True)
