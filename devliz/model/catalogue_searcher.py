@@ -199,6 +199,7 @@ class SnapSearchTask(Task):
             self.task_update_message.emit(self.name, tr("Scan: {file_name}", file_name=file_name))
             if total_files > 0:
                 self.gen_update_task_progress(current_file, total_files)
+            return not getattr(self, "is_cancelled", False)
 
         results = self.searcher.search(self.snapshot, self.params, on_progress=on_progress)
         return results
