@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 
@@ -11,7 +12,7 @@ from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
 from devliz.application.app import app_settings, AppSettings, RESOURCE_ID_LOGO, app, snap_settings
-from devliz.application.action_history import log_action, ActionCategory, ActionType
+from devliz.model.action_history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.model.dashboard import DashboardModel
 from devliz.view.setting import WidgetSettings
@@ -49,7 +50,6 @@ class SettingController:
         if w.exec_():
             logger.info("User confirmed restart for language/theme change")
             log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_RESTART_CONFIRMED, "theme/language change")
-            import os
             args = sys.argv[:]
             args[0] = os.path.abspath(args[0])
             QProcess.startDetached(sys.executable, args)
