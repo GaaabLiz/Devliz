@@ -1,12 +1,14 @@
+from pathlib import Path
 from PySide6.QtCore import Qt
+
+from devliz.domain.data import DevlizData
+from devliz.view.catalogue_imp_dialog import DialogConfig
 
 def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
     """
     Test E2E for the Catalogue Import Dialog.
     Navigates to the details tab, inputs text, tests validation, and clicks create.
     """
-    from devliz.view.catalogue_imp_dialog import DialogConfig
-    from devliz.domain.data import DevlizData
     
     # Mock MessageBox to prevent blocking
     class FakeMessageBox:
@@ -62,7 +64,6 @@ def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
     
     # Add a directory to pass validation
     directories_tab = dialog._DialogConfig__tabs.tab_directories
-    from pathlib import Path
     directories_tab.add_directory(Path("/tmp/some_dir"), execute_checks=False)
     
     # Click the create button again
