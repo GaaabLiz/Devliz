@@ -163,13 +163,13 @@ def _import_dashboard_module(monkeypatch):
         def update_data(self):
             pass
 
-    fake_action_history_module = types.ModuleType("devliz.model.action_history")
+    fake_action_history_module = types.ModuleType("devliz.model.history")
 
     def fake_log_action(screen_key, action_key, details=""):
         actions.append((getattr(screen_key, "value", screen_key), getattr(action_key, "value", action_key), details))
 
     fake_action_history_module.log_action = fake_log_action
-    from devliz.model.action_history import ActionCategory, ActionType
+    from devliz.model.history import ActionCategory, ActionType
     fake_action_history_module.ActionCategory = ActionCategory
     fake_action_history_module.ActionType = ActionType
 
@@ -204,7 +204,7 @@ def _import_dashboard_module(monkeypatch):
     fake_ui_utils_module.UiUtils = FakeUiUtils
     monkeypatch.setitem(sys.modules, "pylizlib.qtfw.util.ui", fake_ui_utils_module)
 
-    monkeypatch.setitem(sys.modules, "devliz.model.action_history", fake_action_history_module)
+    monkeypatch.setitem(sys.modules, "devliz.model.history", fake_action_history_module)
     monkeypatch.setitem(sys.modules, "devliz.application.app", fake_app_module)
     monkeypatch.setitem(sys.modules, "devliz.domain.data", fake_data_module)
     monkeypatch.setitem(sys.modules, "qfluentwidgets", fake_qfluentwidgets)
@@ -212,7 +212,7 @@ def _import_dashboard_module(monkeypatch):
     monkeypatch.setitem(sys.modules, "loguru", fake_logger_module)
 
     for module_name, cls_name, cls in [
-        ("devliz.controller.action_history", "ActionHistoryController", FakeActionHistoryController),
+        ("devliz.controller.history", "ActionHistoryController", FakeActionHistoryController),
         ("devliz.controller.catalogue_searcher", "CatalogueSearcherController", FakeSearcherController),
         ("devliz.controller.catalogue", "CatalogueController", FakeCatalogueController),
         ("devliz.controller.help", "HelpController", FakeHelpController),

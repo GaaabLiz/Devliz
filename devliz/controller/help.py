@@ -1,6 +1,6 @@
 from devliz.view.help import HelpView
 from devliz.model.help import HelpModel
-from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.model.history import log_action, ActionCategory, ActionType
 
 
 class HelpController:

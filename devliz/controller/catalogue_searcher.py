@@ -7,7 +7,7 @@ from PySide6.QtCore import QUrl
 from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
-from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.model.history import log_action, ActionCategory, ActionType
 from devliz.model.catalogue_searcher import CatalogueSearcherModel, SearchResultsTreeModel
 from devliz.view.catalogue_searcher import CatalogueSearcherView, SnapshotResultsDialog
 from devliz.application.i18n import tr

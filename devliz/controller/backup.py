@@ -9,7 +9,7 @@ from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import MessageBox
 
 from devliz.application.app import app_settings, AppSettings
-from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.model.history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.model.backup import BackupModel
 from devliz.view.backup import BackupView

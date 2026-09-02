@@ -6,7 +6,7 @@ from loguru import logger
 from pylizlib.core.os.snap.domain import BackupType
 
 from devliz.application.app import app_settings, AppSettings, snap_settings
-from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.model.history import log_action, ActionCategory, ActionType
 
 
 class SettingModel(QObject):
