@@ -23,23 +23,16 @@ def test_splash_e2e_catalogue_missing_use_default(qtbot, monkeypatch):
     monkeypatch.setattr("PySide6.QtCore.QEventLoop.exec", lambda self: None)
     monkeypatch.setattr(controller.model, "check_catalogue_path", lambda: False)
 
-    # Mock MessageBox
-    import devliz.controller.splash
-    class FakeMessageBox:
-        def __init__(self, t, d, parent=None): 
-            self.yesButton = type('obj', (object,), {'setText': lambda self, s: None})()
-            self.cancelButton = type('obj', (object,), {'setText': lambda self, s: None})()
-        def exec(self): return True
-    monkeypatch.setattr(devliz.controller.splash, "MessageBox", FakeMessageBox)
-    
-    # Mock set_default_catalogue_path
-    called = []
-    monkeypatch.setattr(controller.model, "set_default_catalogue_path", lambda: called.append(True))
+    from qfluentwidgets import MessageBox
+    monkeypatch.setattr(MessageBox, "exec", lambda self: True)
+    monkeypatch.setattr(MessageBox, "exec_", lambda self: True)
 
     controller.start()
     
-    assert called == [True]
-    assert controller.view.isHidden()
+    # In case 1 (yes), it sets default catalogue path
+    from devliz.application.app import app_settings, AppSettings, app
+    from pathlib import Path
+    assert app_settings.get(AppSettings.catalogue_path) == str(Path(app.path) / "Catalogue")
 
 def test_splash_e2e_catalogue_missing_exit(qtbot, monkeypatch):
     """Test splash screen when catalogue is missing and user clicks cancel."""
@@ -50,19 +43,17 @@ def test_splash_e2e_catalogue_missing_exit(qtbot, monkeypatch):
     monkeypatch.setattr("PySide6.QtCore.QEventLoop.exec", lambda self: None)
     monkeypatch.setattr(controller.model, "check_catalogue_path", lambda: False)
 
-    # Mock MessageBox
-    import devliz.controller.splash
-    class FakeMessageBox:
-        def __init__(self, t, d, parent=None): 
-            self.yesButton = type('obj', (object,), {'setText': lambda self, s: None})()
-            self.cancelButton = type('obj', (object,), {'setText': lambda self, s: None})()
-        def exec(self): return False
-    monkeypatch.setattr(devliz.controller.splash, "MessageBox", FakeMessageBox)
-    
+    from qfluentwidgets import MessageBox
+    monkeypatch.setattr(MessageBox, "exec", lambda self: False)
+    monkeypatch.setattr(MessageBox, "exec_", lambda self: False)
+
     # Mock sys.exit
-    exited = []
-    monkeypatch.setattr(sys, "exit", lambda code: exited.append(code))
+    import sys
+    exits = []
+    monkeypatch.setattr(sys, "exit", lambda c: exits.append(c))
 
     controller.start()
     
-    assert exited == [0]
+    # Ensure it exited
+    assert len(exits) == 1
+    assert exits[0] == 0

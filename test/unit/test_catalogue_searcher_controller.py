@@ -65,7 +65,16 @@ def test_catalogue_searcher_controller(monkeypatch):
         def get_selected_extensions(self): return []
         def update_status_card(self, *args): pass
         def update_snapshot_menu(self, *args): pass
+    class FakeResultsDialog:
+        def __init__(self, n, v): 
+            class FakeTree:
+                def setModel(self, m): pass
+            self.tree_view = FakeTree()
+            self.signal_file_double_clicked = FakeSignal()
+            self.signal_tree_open_parent_folder = FakeSignal()
+        def exec(self): pass
     view_mod.CatalogueSearcherView = FakeView
+    view_mod.SnapshotResultsDialog = FakeResultsDialog
     monkeypatch.setitem(sys.modules, "devliz.view.catalogue_searcher", view_mod)
     
     model_mod = types.ModuleType("devliz.model.catalogue_searcher")
@@ -73,6 +82,7 @@ def test_catalogue_searcher_controller(monkeypatch):
         def remove_snapshot(self, row): pass
     class FakeTreeMan:
         def __init__(self): self.model = None
+        def populate_from_results(self, r): pass
     class FakeCat:
         def get_all(self): return []
     class FakeModel:
@@ -86,6 +96,7 @@ def test_catalogue_searcher_controller(monkeypatch):
         def stop_search(self): pass
         def load_snapshots_from_catalogue(self, s): pass
     model_mod.CatalogueSearcherModel = FakeModel
+    model_mod.SearchResultsTreeModel = FakeTreeMan
     monkeypatch.setitem(sys.modules, "devliz.model.catalogue_searcher", model_mod)
     
     sys.modules.pop("devliz.controller.catalogue_searcher", None)

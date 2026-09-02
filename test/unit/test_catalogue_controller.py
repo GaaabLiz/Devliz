@@ -103,6 +103,7 @@ def test_catalogue_controller(monkeypatch):
     class FakeModel:
         def __init__(self): self.table_model = FakeTM()
         def set_snapshots(self, l): pass
+        def build_snapshot_from_raw(self, raw, old_id=None): return FakeSnapshot("d1", "D1")
     model_mod.CatalogueModel = FakeModel
     monkeypatch.setitem(sys.modules, "devliz.model.catalogue", model_mod)
     
@@ -110,17 +111,18 @@ def test_catalogue_controller(monkeypatch):
     dash_mod = types.ModuleType("devliz.model.dashboard")
     class FakeTask:
         def update_task_progress(self, p): pass
+        def update_task_message(self, m): pass
     class FakeCat:
-        def update_snapshot_by_objs(self, o, n): pass
-        def add(self, o, progress_callback): progress_callback(10)
-        def remove_installed_copies(self, id): pass
-        def install(self, s, clear_destination=True, progress_callback=None): progress_callback(10) if progress_callback else None
-        def delete(self, s): pass
+        def update_snapshot_by_objs(self, o, n, progress_callback=None, message_callback=None): pass
+        def add(self, o, progress_callback, message_callback=None): progress_callback(10)
+        def remove_installed_copies(self, id, message_callback=None): pass
+        def install(self, s, clear_destination=True, progress_callback=None, message_callback=None): progress_callback(10) if progress_callback else None
+        def delete(self, s, progress_callback=None, message_callback=None): pass
         def get_snap_directory_path(self, s): return Path("/snap/dir")
-        def duplicate_by_id(self, id): pass
-        def export_snapshot(self, id, d): pass
-        def export_assoc_dirs(self, id, d): pass
-        def update_assoc_with_installed(self, id): pass
+        def duplicate_by_id(self, id, progress_callback=None, message_callback=None): pass
+        def export_snapshot(self, id, d, progress_callback=None, message_callback=None): pass
+        def export_assoc_dirs(self, id, d, progress_callback=None, message_callback=None): pass
+        def update_assoc_with_installed(self, id, progress_callback=None, message_callback=None): pass
     class FakeDash:
         def __init__(self):
             self.cached_data = None

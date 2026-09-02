@@ -10,16 +10,9 @@ def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
     Navigates to the details tab, inputs text, tests validation, and clicks create.
     """
     
-    # Mock MessageBox to prevent blocking
-    class FakeMessageBox:
-        res = True
-        def __init__(self, t, d, parent=None):
-            self.yesButton = type('obj', (object,), {'hide': lambda: None})()
-            self.cancelButton = type('obj', (object,), {'setText': lambda s: None})()
-        def exec(self): return self.res
-        def exec_(self): return self.res
-    
-    monkeypatch.setattr("qfluentwidgets.MessageBox", FakeMessageBox)
+    from qfluentwidgets import MessageBox
+    monkeypatch.setattr(MessageBox, "exec", lambda self: True)
+    monkeypatch.setattr(MessageBox, "exec_", lambda self: True)
 
     # Empty data
     data = DevlizData(monitored_software=[], monitored_services=None, snapshots=[])
@@ -71,7 +64,5 @@ def test_catalogue_import_dialog_e2e(qtbot, monkeypatch):
 
     # Check that output data is formed properly
     assert getattr(dialog, 'output_data', None) is not None
-    assert dialog.output_data.name == "Test Config"
-    assert dialog.output_data.desc == "Test Description"
-    dialog.close()
-    dialog.deleteLater()
+    assert dialog.output_data['name'] == "Test Config"
+    assert dialog.output_data['desc'] == "Test Description"

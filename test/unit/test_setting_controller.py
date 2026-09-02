@@ -142,6 +142,8 @@ def test_setting_controller(monkeypatch, tmp_path):
             self.signal_theme_changed = FakeSignal()
             self.card_general_catalogue = FakeCard()
             self.card_backup_path = FakeCard()
+        def update_catalogue_path(self, path): pass
+        def update_backup_path(self, path): pass
     view_mod.WidgetSettings = FakeView
     monkeypatch.setitem(sys.modules, "devliz.view.setting", view_mod)
     
@@ -183,7 +185,10 @@ def test_setting_controller(monkeypatch, tmp_path):
     dash_mod.DashboardModel = FakeDash
     monkeypatch.setitem(sys.modules, "devliz.model.dashboard", dash_mod)
     
-    sys.modules.pop("devliz.controller.setting_controller", None)
+    sys.modules.pop("devliz.controller.setting", None)
+    sys.modules.pop("devliz.model.setting", None)
+    import devliz.model.history as hist_mod
+    monkeypatch.setattr(hist_mod, "log_action", fake_log)
     from devliz.controller.setting import SettingController
     dash = FakeDash()
     ctrl = SettingController(dash)
