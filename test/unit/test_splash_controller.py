@@ -16,24 +16,14 @@ def test_splash_controller(monkeypatch):
     monkeypatch.setattr(PySide6.QtCore, "QEventLoop", FakeLoop)
     monkeypatch.setattr(PySide6.QtCore, "QTimer", FakeTimer)
     
-    # Mock MessageBox
-    import qfluentwidgets
-    class FakeButton:
-        def setText(self, t): pass
-    class FakeMessageBox:
-        res = True
-        def __init__(self, t, d, parent=None):
-            self.yesButton = FakeButton()
-            self.cancelButton = FakeButton()
-        def exec(self): return self.res
-    monkeypatch.setattr(qfluentwidgets, "MessageBox", FakeMessageBox)
-    
     # Mock View & Model
     view_mod = types.ModuleType("devliz.view.splash")
     class FakeView:
+        res = True
         def show_splash(self): pass
         def hide_overlay(self): pass
         def close_splash(self): pass
+        def show_catalogue_error_dialog(self, path): return self.res
     view_mod.SplashWindow = FakeView
     monkeypatch.setitem(sys.modules, "devliz.view.splash", view_mod)
     
@@ -63,7 +53,7 @@ def test_splash_controller(monkeypatch):
     assert ctrl.model.default_set
     
     # start invalid, user says cancel (sys.exit)
-    FakeMessageBox.res = False
+    ctrl.view.res = False
     exits = []
     monkeypatch.setattr(sys, "exit", lambda c: exits.append(c))
     ctrl.start()

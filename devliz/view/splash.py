@@ -1,9 +1,10 @@
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QIcon
-from qfluentwidgets import SplashScreen
+from qfluentwidgets import SplashScreen, MessageBox
 from qfluentwidgets.components.widgets.frameless_window import FramelessWindow
 
 from devliz.application.app import app, RESOURCE_ID_LOGO
+from devliz.application.i18n import tr
 
 from devliz.application.resources import resources_rc
 
@@ -43,3 +44,18 @@ class SplashWindow(FramelessWindow):
         Close the splash screen window completely.
         """
         self.close()
+
+    def show_catalogue_error_dialog(self, catalogue_path_str: str) -> bool:
+        """
+        Shows an error dialog regarding the invalid catalogue path.
+        Returns True if the user wants to use the default catalogue, False otherwise.
+        """
+        msg_box = MessageBox(
+            tr("Catalogue Error"),
+            tr("The catalogue path is not reachable or does not exist:\n{path}\n\nDo you want to use the default catalogue or close the program?", path=catalogue_path_str),
+            self
+        )
+        msg_box.yesButton.setText(tr("Use default catalogue"))
+        msg_box.cancelButton.setText(tr("Close"))
+        
+        return msg_box.exec()

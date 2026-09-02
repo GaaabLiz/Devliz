@@ -1,10 +1,7 @@
 import sys
 from PySide6.QtCore import QEventLoop, QTimer
-from qfluentwidgets import MessageBox
-
 from devliz.model.splash import SplashModel
 from devliz.view.splash import SplashWindow
-from devliz.application.i18n import tr
 
 class SplashController:
     """
@@ -53,15 +50,7 @@ class SplashController:
         if not self.model.check_catalogue_path():
             catalogue_path_str = self.model.get_catalogue_path_str()
 
-            msg_box = MessageBox(
-                tr("Catalogue Error"),
-                tr("The catalogue path is not reachable or does not exist:\n{path}\n\nDo you want to use the default catalogue or close the program?", path=catalogue_path_str),
-                self.view  # Impostiamo la view dello splash screen come parent
-            )
-            msg_box.yesButton.setText(tr("Use default catalogue"))
-            msg_box.cancelButton.setText(tr("Close"))
-            
-            if msg_box.exec():
+            if self.view.show_catalogue_error_dialog(catalogue_path_str):
                 self.model.set_default_catalogue_path()
             else:
                 sys.exit(0)
