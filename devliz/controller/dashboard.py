@@ -2,10 +2,11 @@ from pathlib import Path
 
 from loguru import logger
 from pylizlib.qt.domain.view import UiWidgetMode
+from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import FluentIcon, NavigationItemPosition
 
 from devliz.application.app import app_settings, AppSettings
-from devliz.application.action_history import log_action, ActionCategory, ActionType
+from devliz.model.action_history import log_action, ActionCategory, ActionType
 from devliz.controller.action_history import ActionHistoryController
 from devliz.controller.backup import BackupController
 from devliz.controller.catalogue_searcher import CatalogueSearcherController
@@ -24,7 +25,7 @@ class DashboardController:
         super().__init__()
 
         self.view = DashboardView()
-        self.model = DashboardModel(self.view)
+        self.model = DashboardModel()
 
         self.home = HomeController()
         self.searcher = CatalogueSearcherController(self.model.snap_catalogue, self.view)
@@ -107,6 +108,8 @@ class DashboardController:
         self.model.signal_on_update_progress.connect(self.__handle_update_progress)
         self.model.signal_on_update_text.connect(self.__handle_update_text)
         self.model.signal_on_update_detail_text.connect(self.__handle_update_detail_text)
+        self.model.signal_on_heavy_operation_success.connect(UiUtils.show_message)
+        self.model.signal_on_heavy_operation_error.connect(UiUtils.show_message)
         self.backup.signal_request_refresh.connect(self.model.update)
         
     def __handle_update_progress(self, progress: int):
