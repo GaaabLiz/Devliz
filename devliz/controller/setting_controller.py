@@ -5,16 +5,14 @@ from pathlib import Path
 from PySide6.QtCore import QProcess, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QFileDialog, QApplication
-from loguru import logger
-from pylizlib.core.os.snap.domain import BackupType
 from pylizlib.qtfw.util.ui import UiUtils
 from pylizlib.qtfw.widgets.dialog.about import AboutMessageBox
 from qfluentwidgets import MessageBox
 
-from devliz.application.app import app_settings, AppSettings, RESOURCE_ID_LOGO, app, snap_settings
-from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.application.app import app, RESOURCE_ID_LOGO
 from devliz.application.i18n import tr
 from devliz.model.dashboard import DashboardModel
+from devliz.model.setting import SettingModel
 from devliz.view.setting import WidgetSettings
 
 
@@ -24,7 +22,7 @@ class SettingController:
 
     This controller handles interactions on the settings view, allowing the user
     to modify application configurations such as paths, language, theme, and more.
-    It synchronizes these settings across the application's global configuration.
+    It orchestrates the SettingModel and WidgetSettings by connecting their signals.
     """
 
     def __init__(self, dash_model: DashboardModel):
@@ -35,9 +33,13 @@ class SettingController:
             dash_model (DashboardModel): The dashboard model, required to trigger UI updates
                 and access the catalogue when settings change.
         """
-        self.view = WidgetSettings()
         self.dash_model = dash_model
+        
+        # Instantiate Model and View
+        self.model = SettingModel(dash_model)
+        self.view = WidgetSettings()
 
+        # Connections: View -> Controller/Model
         self.view.signal_request_update.connect(self.dash_model.update)
         self.view.signal_ask_catalogue_path.connect(self.__ask_catalogue_path)
         self.view.signal_ask_backup_path.connect(self.__ask_backup_path)
@@ -47,34 +49,34 @@ class SettingController:
         self.view.signal_language_changed.connect(self.__on_language_or_theme_changed)
         self.view.signal_theme_changed.connect(self.__on_language_or_theme_changed)
 
-        # Sync snap_settings reactively
-        AppSettings.backup_path.valueChanged.connect(self.__sync_snap_settings)
-        AppSettings.backup_before_install.valueChanged.connect(self.__sync_snap_settings)
-        AppSettings.backup_before_edit.valueChanged.connect(self.__sync_snap_settings)
-        AppSettings.backup_before_delete.valueChanged.connect(self.__sync_snap_settings)
+        # Connections: Model -> View/Controller
+        self.model.catalogue_path_updated.connect(self.__on_catalogue_path_updated)
+        self.model.backup_path_updated.connect(self.__on_backup_path_updated)
+        self.model.backup_cleared.connect(self.__on_backup_cleared)
+        self.model.cleanup_failed.connect(self.__on_cleanup_failed)
 
-    def __sync_snap_settings(self, *args, **kwargs):
-        """
-        Synchronizes snapshot-specific settings with global application settings.
+    def __on_catalogue_path_updated(self, directory: str):
+        self.view.update_catalogue_path(directory)
 
-        This ensures that the snapshot catalogue honors the backup preferences
-        configured by the user in the UI.
-        """
-        snap_settings.backup_path = Path(app_settings.get(AppSettings.backup_path))
-        snap_settings.backup_pre_install = app_settings.get(AppSettings.backup_before_install)
-        snap_settings.backup_pre_modify = app_settings.get(AppSettings.backup_before_edit)
-        snap_settings.backup_pre_delete = app_settings.get(AppSettings.backup_before_delete)
+    def __on_backup_path_updated(self, directory: str):
+        self.view.update_backup_path(directory)
+
+    def __on_backup_cleared(self, deleted_count: int, backup_path: str):
+        # We could notify the user via UI, but for now we mirror the old logic which just logs it in the model
+        pass
+
+    def __on_cleanup_failed(self, error_message: str):
+        UiUtils.show_message(tr("Error"), tr("An error occurred while cleaning the backup folder: {error}", error=error_message))
 
     def __on_language_or_theme_changed(self):
         """
         Handles language or theme changes by prompting the user to restart the application.
 
-        If confirmed, it restarts the application programmatically.
+        If confirmed, it logs the restart and restarts the application programmatically.
         """
         w = MessageBox(tr("Restart required"), tr("The application needs to restart to apply the changes. Restart now?"), parent=self.view)
         if w.exec_():
-            logger.info("User confirmed restart for language/theme change")
-            log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_RESTART_CONFIRMED, "theme/language change")
+            self.model.log_restart_confirmed()
             args = sys.argv[:]
             args[0] = os.path.abspath(args[0])
             QProcess.startDetached(sys.executable, args)
@@ -83,104 +85,51 @@ class SettingController:
     def __ask_catalogue_path(self):
         """
         Opens a directory selection dialog to choose a new catalogue path.
-
-        Updates the app configuration and triggers a dashboard update if the path changes.
+        Delegates the logic to the model.
         """
         directory = QFileDialog.getExistingDirectory(None, tr("Select the catalogue folder"))
         if directory:
-            logger.info(f"Catalogue path changed to: {directory}")
-            app_settings.set(AppSettings.catalogue_path, Path(directory))
-            self.view.card_general_catalogue.setContent(directory)
-            self.dash_model.snap_catalogue.set_catalogue_path(Path(directory))
-            log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_CATALOGUE_PATH_CHANGED, directory)
-            self.dash_model.update()
-        else:
-            logger.debug("Catalogue path selection cancelled.")
+            self.model.set_catalogue_path(directory)
 
     def __ask_backup_path(self):
         """
         Opens a directory selection dialog to choose a new backup path.
-
-        Updates the application configuration and UI with the selected path.
+        Delegates the logic to the model.
         """
         directory = QFileDialog.getExistingDirectory(None, tr("Select the backup folder"))
         if directory:
-            logger.info(f"Backup path changed to: {directory}")
-            backup_path = Path(directory)
-            app_settings.set(AppSettings.backup_path, backup_path)
-            snap_settings.backup_path = backup_path
-            self.view.card_backup_path.setContent(directory)
-            log_action(ActionCategory.SETTINGS, ActionType.SETTINGS_BACKUP_PATH_CHANGED, directory)
-        else:
-            logger.debug("Backup path selection cancelled.")
+            self.model.set_backup_path(directory)
 
     def __open_directory(self):
         """
         Opens the application's internal configuration directory in the file explorer.
         """
         path = app.path
-        logger.debug(f"Opening app directory: {path}")
         if Path(path).exists():
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     def __clear_backup_directory(self):
         """
-        Prompts the user for confirmation and then deletes all application-managed backups.
-
-        Other unmanaged files in the directory are preserved. Errors are displayed
-        in a dialog box if the cleanup fails.
+        Prompts the user for confirmation and then commands the model to delete 
+        all application-managed backups.
         """
-        try:
-            w = MessageBox(
-                tr("Backup folder cleanup"),
-                tr(
-                    "Are you sure you want to delete all backups created by the application? "
-                    "Other files in the folder will be preserved."
-                ),
-                parent=self.view,
-            )
-            if not w.exec_():
-                logger.debug("Backup directory cleanup cancelled by user.")
-                return
-
-            backup_path = Path(app_settings.get(AppSettings.backup_path))
-            deleted_count = 0
-
-            if backup_path.exists():
-                if not backup_path.is_dir():
-                    raise ValueError(
-                        f"Configured backup path '{backup_path}' is not a directory."
-                    )
-
-                managed_types = (
-                    BackupType.ASSOCIATED_DIRECTORIES,
-                    BackupType.SNAPSHOT_DIRECTORY,
-                )
-                for backup in self.dash_model.snap_catalogue.list_backups(backup_path):
-                    if backup.is_export or backup.backup_type not in managed_types:
-                        continue
-                    self.dash_model.snap_catalogue.delete_backup(backup.path)
-                    deleted_count += 1
-
-            logger.info(
-                "Backup directory cleanup completed: {} file(s) deleted from {}",
-                deleted_count,
-                backup_path,
-            )
-            log_action(
-                ActionCategory.SETTINGS,
-                ActionType.SETTINGS_BACKUP_CLEANED,
-                f"path={backup_path}; deleted={deleted_count}",
-            )
-        except (OSError, ValueError) as e:
-            logger.error(f"Error during backup folder cleanup: {str(e)}")
-            UiUtils.show_message(tr("Error"), tr("An error occurred while cleaning the backup folder: {error}", error=str(e)))
+        w = MessageBox(
+            tr("Backup folder cleanup"),
+            tr(
+                "Are you sure you want to delete all backups created by the application? "
+                "Other files in the folder will be preserved."
+            ),
+            parent=self.view,
+        )
+        if not w.exec_():
             return
+            
+        self.model.clear_backup_directory()
 
     def __open_info_dialog(self):
         """
         Opens the 'About' dialog displaying application information and version details.
         """
-        w = AboutMessageBox(QIcon(RESOURCE_ID_LOGO), app.name,app.version, self.view)
+        w = AboutMessageBox(QIcon(RESOURCE_ID_LOGO), app.name, app.version, self.view)
         if w.exec_():
             pass

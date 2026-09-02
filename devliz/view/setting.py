@@ -51,6 +51,24 @@ class WidgetSettings(DevlizQFrame):
 
 
 
+    def update_catalogue_path(self, path: str):
+        """
+        Updates the displayed catalogue path on the UI.
+        
+        Args:
+            path (str): The new catalogue path.
+        """
+        self.card_general_catalogue.setContent(path)
+
+    def update_backup_path(self, path: str):
+        """
+        Updates the displayed backup path on the UI.
+        
+        Args:
+            path (str): The new backup path.
+        """
+        self.card_backup_path.setContent(path)
+
     def __install_tooltip(self, widget, text):
         """
         Installs a tooltip with a specified delay and position on a given widget.
