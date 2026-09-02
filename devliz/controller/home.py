@@ -1,9 +1,5 @@
-from pathlib import Path
-
-from loguru import logger
-
-from devliz.application.app import app_settings, AppSettings
 from devliz.domain.data import DevlizSnapshotData
+from devliz.model.home import HomeModel
 from devliz.view.home import HomeView
 
 
@@ -11,38 +7,31 @@ class HomeController:
     """
     Controller for the application's home screen.
 
-    This class manages the data displayed on the home view, particularly
-    computing and updating statistical information regarding snapshots
-    and backups based on the user's configured settings.
+    This class orchestrates the HomeModel and HomeView, connecting
+    their signals and methods to maintain the MVC architecture.
     """
 
     def __init__(self):
         """
         Initializes the HomeController.
 
-        Creates the associated HomeView instance which handles the UI presentation.
+        Creates the associated HomeModel and HomeView instances, 
+        and sets up the signal-slot connections between them.
         """
+        self.model = HomeModel()
         self.view = HomeView()
+        
+        # MVC: Connect model signals to view slots
+        self.model.statistics_updated.connect(self.view.update_statistics)
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
         """
-        Updates the data presented on the home view.
-
-        Computes statistics from the given snapshot data, counts the number of
-        available backups in the configured backup directory, and fetches the
-        current catalogue path to update the view accordingly.
+        Updates the data presented on the home view by commanding the model
+        to re-compute statistics based on the latest snapshot data.
 
         Args:
             snapshot_data (DevlizSnapshotData): The current snapshot data used to compute statistics.
         """
-        logger.debug("Calculating Home statistics...")
-        stats = snapshot_data.compute_home_statistics()
-        logger.debug(f"Statistics calculated: {stats}")
-
-        backup_path = Path(app_settings.get(AppSettings.backup_path))
-        backup_count = 0
-        if backup_path.exists() and backup_path.is_dir():
-            backup_count = len(list(backup_path.glob("*.zip")))
-
-        catalogue_path = app_settings.get(AppSettings.catalogue_path)
-        self.view.update_statistics(stats, backup_count=backup_count, catalogue_path=catalogue_path)
+        # Tell the model to compute new data. 
+        # When it finishes, it will emit 'statistics_updated' triggering the view automatically.
+        self.model.compute_and_emit_statistics(snapshot_data)
