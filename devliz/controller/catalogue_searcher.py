@@ -7,9 +7,9 @@ from PySide6.QtCore import QUrl
 from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue, Snapshot
 
-from devliz.application.action_history import log_action, ActionCategory, ActionType
-from devliz.model.catalogue_searcher import CatalogueSearcherModel
-from devliz.view.catalogue_searcher import CatalogueSearcherView
+from devliz.model.action_history import log_action, ActionCategory, ActionType
+from devliz.model.catalogue_searcher import CatalogueSearcherModel, SearchResultsTreeModel
+from devliz.view.catalogue_searcher import CatalogueSearcherView, SnapshotResultsDialog
 from devliz.application.i18n import tr
 
 class CatalogueSearcherController:
@@ -102,9 +102,6 @@ class CatalogueSearcherController:
         Handles the double-click event on the snapshot table.
         Opens a dialog with search results specifically for the clicked snapshot.
         """
-        from devliz.view.catalogue_searcher import SnapshotResultsDialog
-        from devliz.model.catalogue_searcher import SearchResultsTreeModel
-
         snapshot = self.model.table_model.get_data()[row]
         results = self.model.get_results_for_snapshot(snapshot.id)
 
