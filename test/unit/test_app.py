@@ -12,7 +12,7 @@ def test_network_folder_validator():
 
 def test_sync_snap_settings_immediate(qtbot):
     from devliz.application.app import AppSettings, snap_settings
-    from devliz.controller.setting_controller import SettingController
+    from devliz.controller.setting import SettingController
     import qfluentwidgets
     
     # Initialize the controller so it attaches the signals

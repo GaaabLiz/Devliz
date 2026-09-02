@@ -13,7 +13,7 @@ from devliz.controller.catalogue_searcher import CatalogueSearcherController
 from devliz.controller.catalogue import CatalogueController
 from devliz.controller.help import HelpController
 from devliz.controller.home import HomeController
-from devliz.controller.setting_controller import SettingController
+from devliz.controller.setting import SettingController
 from devliz.domain.data import DevlizData, DevlizSnapshotData
 from devliz.model.dashboard import DashboardModel
 from devliz.view.dashboard import DashboardView

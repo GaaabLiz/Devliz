@@ -184,7 +184,7 @@ def test_setting_controller(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "devliz.model.dashboard", dash_mod)
     
     sys.modules.pop("devliz.controller.setting_controller", None)
-    from devliz.controller.setting_controller import SettingController
+    from devliz.controller.setting import SettingController
     dash = FakeDash()
     ctrl = SettingController(dash)
     
