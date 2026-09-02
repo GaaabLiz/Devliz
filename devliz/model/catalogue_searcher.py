@@ -125,6 +125,16 @@ class SearchResultsTableModel(QAbstractTableModel):
         """
         return self._data
 
+    def _emit_data_changed(self, snap_id: str, column: int):
+        """
+        Helper method to emit dataChanged for a specific snapshot and column.
+        """
+        for i, snapshot in enumerate(self._data):
+            if snapshot.id == snap_id:
+                index = self.index(i, column)
+                self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
+                return
+
     def update_progress_for_snapshot(self, snap_id: str, progress: int):
         """
         Finds a snapshot by its ID and updates its progress percentage.
@@ -134,11 +144,7 @@ class SearchResultsTableModel(QAbstractTableModel):
             progress (int): The new progress value (0-100).
         """
         self._progress_data[snap_id] = progress
-        for i, snapshot in enumerate(self._data):
-            if snapshot.id == snap_id:
-                index = self.index(i, 3)
-                self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
-                return
+        self._emit_data_changed(snap_id, 3)
 
     def update_status_for_snapshot(self, snap_id: str, status: str):
         """
@@ -149,11 +155,7 @@ class SearchResultsTableModel(QAbstractTableModel):
             status (str): The new status string.
         """
         self._status_data[snap_id] = status
-        for i, snapshot in enumerate(self._data):
-            if snapshot.id == snap_id:
-                index = self.index(i, 1)
-                self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
-                return
+        self._emit_data_changed(snap_id, 1)
 
     def update_results_for_snapshot(self, snap_id: str, count: str):
         """
@@ -164,11 +166,7 @@ class SearchResultsTableModel(QAbstractTableModel):
             count (str): The new results count as a string.
         """
         self._results_count_data[snap_id] = count
-        for i, snapshot in enumerate(self._data):
-            if snapshot.id == snap_id:
-                index = self.index(i, 2)
-                self.dataChanged.emit(index, index, [Qt.ItemDataRole.DisplayRole])
-                return
+        self._emit_data_changed(snap_id, 2)
 
 
 class SnapSearchTask(Task):
@@ -359,7 +357,7 @@ class CatalogueSearcherModel(QObject):
         self._current_message = tr("Starting...")
         self._current_progress = 0
         self._current_eta = "--:--"
-        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+        self._emit_status_card_update()
 
         params = SnapshotSearchParams(
             query=text,
@@ -402,6 +400,10 @@ class CatalogueSearcherModel(QObject):
             snap_id = self._op_id_to_snap_id[op_id]
             self.table_model.update_progress_for_snapshot(snap_id, progress)
 
+    def _emit_status_card_update(self):
+        """Helper to emit the signal_status_card_update signal."""
+        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+
     def on_task_start(self, task_name: str):
         """
         Slot to handle the start of a task. Updates the main status card.
@@ -411,7 +413,7 @@ class CatalogueSearcherModel(QObject):
         """
         self._current_message = tr("Searching...")
         self._current_eta = "--:--"
-        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+        self._emit_status_card_update()
 
     def on_task_update_message(self, task_name: str, message: str):
         """
@@ -422,7 +424,7 @@ class CatalogueSearcherModel(QObject):
             message (str): The new message.
         """
         self._current_message = message
-        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+        self._emit_status_card_update()
 
     def on_runner_progress(self, progress: int):
         """
@@ -432,7 +434,7 @@ class CatalogueSearcherModel(QObject):
             progress (int): The overall progress percentage.
         """
         self._current_progress = progress
-        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+        self._emit_status_card_update()
 
     def on_eta_update(self, op_id: str, eta: str):
         """
@@ -443,7 +445,14 @@ class CatalogueSearcherModel(QObject):
             eta (str): The new estimated time remaining string.
         """
         self._current_eta = eta
-        self.signal_status_card_update.emit(self._current_message, self._current_progress, self._current_eta)
+        self._emit_status_card_update()
+
+    def _get_operation_results(self, op: Operation) -> list[SnapshotSearchResult]:
+        """Helper to extract search results from an operation's tasks."""
+        task_results = op.get_task_results()
+        if task_results and isinstance(task_results[0], list):
+            return task_results[0]
+        return []
 
     def on_runner_finished(self, statistics: RunnerStatistics):
         """
@@ -458,9 +467,7 @@ class CatalogueSearcherModel(QObject):
         self.signal_search_finished.emit()
         all_results = []
         for op in self.runner._all_operations:
-            task_results = op.get_task_results()
-            if task_results and task_results[0]:
-                all_results.extend(task_results[0])
+            all_results.extend(self._get_operation_results(op))
 
         self.tree_model_manager.populate_from_results(all_results)
 
@@ -471,9 +478,7 @@ class CatalogueSearcherModel(QObject):
         results = []
         for op in self.runner._all_operations:
             if self._op_id_to_snap_id.get(op.id) == snap_id:
-                task_results = op.get_task_results()
-                if task_results and task_results[0]:
-                    results.extend(task_results[0])
+                results.extend(self._get_operation_results(op))
                 break
         return results
 
@@ -492,12 +497,8 @@ class CatalogueSearcherModel(QObject):
         snap_id = self._op_id_to_snap_id[op.id]
         count_str = ""
         if op.is_completed():
-            task_results = op.get_task_results()
-            if task_results and isinstance(task_results[0], list):
-                count = len(task_results[0])
-                count_str = str(count)
-            else:
-                count_str = "0"
+            op_results = self._get_operation_results(op)
+            count_str = str(len(op_results))
         elif op.is_failed():
             count_str = "?"
 
