@@ -165,55 +165,67 @@ class CatalogueController:
         except Exception as e:
             logger.error(f"Error during duplicate process: {e}")
 
-    def __export_snapshot(self, snap: Snapshot):
-        logger.debug(f"Export requested for {snap.name}")
+    def __execute_export(
+            self,
+            snap: Snapshot,
+            msg_box_title: str,
+            msg_box_text: str,
+            file_dialog_text: str,
+            export_method,
+            action_type: ActionType,
+            log_prefix: str,
+            op_title: str,
+            op_desc: str
+    ):
+        logger.debug(f"{log_prefix} requested for {snap.name}")
         try:
-            w = MessageBox(tr("Export snapshot"), tr("Are you sure you want to export the selected snapshot?"), parent=self.view)
+            w = MessageBox(msg_box_title, msg_box_text, parent=self.view)
             if w.exec_():
                 directory = QFileDialog.getExistingDirectory(
                     None,
-                    tr("Select the save folder for the snapshot"),
+                    file_dialog_text,
                     app.path.__str__()
                 )
                 if directory:
                     def action(task):
-                        self.dash_model.snap_catalogue.export_snapshot(snap.id, Path(directory), message_callback=task.update_task_message)
-                        logger.info(f"Export of {snap.name} to {directory} completed.")
-                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_SNAPSHOT_EXPORTED, f"{snap.name} -> {directory}")
+                        export_method(snap.id, Path(directory), message_callback=task.update_task_message)
+                        logger.info(f"{log_prefix} of {snap.name} to {directory} completed.")
+                        log_action(ActionCategory.CATALOGUE, action_type, f"{snap.name} -> {directory}")
                     
                     self.dash_model.run_heavy_operation(
-                        tr("Export snapshot"),
-                        tr("Exporting snapshot"),
+                        op_title,
+                        op_desc,
                         action,
                         success_msg_title="", success_msg="", update_dashboard=False
                     )
         except Exception as e:
             UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
 
+    def __export_snapshot(self, snap: Snapshot):
+        self.__execute_export(
+            snap,
+            msg_box_title=tr("Export snapshot"),
+            msg_box_text=tr("Are you sure you want to export the selected snapshot?"),
+            file_dialog_text=tr("Select the save folder for the snapshot"),
+            export_method=self.dash_model.snap_catalogue.export_snapshot,
+            action_type=ActionType.CATALOGUE_SNAPSHOT_EXPORTED,
+            log_prefix="Export",
+            op_title=tr("Export snapshot"),
+            op_desc=tr("Exporting snapshot")
+        )
+
     def __export_snapshot_folders(self, snap: Snapshot):
-        logger.debug(f"Folder export requested for {snap.name}")
-        try:
-            w = MessageBox(tr("Export associated folders"), tr("Are you sure you want to export the folders associated with the selected snapshot?"), parent=self.view)
-            if w.exec_():
-                directory = QFileDialog.getExistingDirectory(
-                    None,
-                    tr("Select the save folder for the associated folders"),
-                    app.path.__str__()
-                )
-                if directory:
-                    def action(task):
-                        self.dash_model.snap_catalogue.export_assoc_dirs(snap.id, Path(directory), message_callback=task.update_task_message)
-                        logger.info(f"Folder export of {snap.name} to {directory} completed.")
-                        log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED, f"{snap.name} -> {directory}")
-                    
-                    self.dash_model.run_heavy_operation(
-                        tr("Export associated folders"),
-                        tr("Exporting folders"),
-                        action,
-                        success_msg_title="", success_msg="", update_dashboard=False
-                    )
-        except Exception as e:
-            UiUtils.show_message(tr("Export error"), tr("An error occurred during export: {error}", error=str(e)))
+        self.__execute_export(
+            snap,
+            msg_box_title=tr("Export associated folders"),
+            msg_box_text=tr("Are you sure you want to export the folders associated with the selected snapshot?"),
+            file_dialog_text=tr("Select the save folder for the associated folders"),
+            export_method=self.dash_model.snap_catalogue.export_assoc_dirs,
+            action_type=ActionType.CATALOGUE_ASSOCIATED_FOLDERS_EXPORTED,
+            log_prefix="Folder export",
+            op_title=tr("Export associated folders"),
+            op_desc=tr("Exporting folders")
+        )
 
     def __delete_snap_installed_dirs(self, snap: Snapshot):
         logger.debug(f"Installed folders deletion requested for {snap.name}")
