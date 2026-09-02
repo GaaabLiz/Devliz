@@ -12,11 +12,26 @@ from devliz.application.i18n import tr
 
 
 class TaskGetMonitoredSoftware(Task):
+    """
+    Task to retrieve the list of monitored software.
+
+    This task fetches the configured software executables from settings and 
+    checks their installation status, running state, and version.
+    """
 
     def __init__(self):
+        """
+        Initializes the TaskGetMonitoredSoftware task.
+        """
         super().__init__(tr("Retrieving Monitored Software"))
 
-    def execute(self):
+    def execute(self) -> list[SoftwareData]:
+        """
+        Executes the task to fetch and process monitored software.
+
+        Returns:
+            list[SoftwareData]: A list of SoftwareData objects representing the monitored applications.
+        """
         logger.debug("Fetching monitored software list...")
         data_list: list[str] = app_settings.get(AppSettings.starred_exes)
         data_objs: list[SoftwareData] = []
@@ -38,11 +53,26 @@ class TaskGetMonitoredSoftware(Task):
 
 
 class TaskGetSnapshots(Task):
+    """
+    Task to retrieve all saved snapshots from the catalogue.
+    """
 
     def __init__(self, catalogue: SnapshotCatalogue):
+        """
+        Initializes the TaskGetSnapshots task.
+
+        Args:
+            catalogue (SnapshotCatalogue): The snapshot catalogue instance to query.
+        """
         super().__init__(tr("Retrieving saved snapshots"))
         self.catalogue = catalogue
 
     def execute(self):
+        """
+        Executes the task to fetch all snapshots.
+
+        Returns:
+            list[Snapshot]: A list of all available snapshots in the catalogue.
+        """
         logger.debug("Fetching saved snapshots...")
         return self.catalogue.get_all()

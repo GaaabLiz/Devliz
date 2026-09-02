@@ -17,12 +17,24 @@ from devliz.application.i18n import tr
 
 
 class DialogConfigTabs(QWidget):
+    """
+    A widget that provides a tabbed interface for configuring a snapshot.
+    It contains two main tabs: 'Details' for snapshot metadata and 'Folders' for directory selection.
+    """
 
     def __init__(
             self,
             devliz_data: DevlizData,
             payload_data: Snapshot | None = None,
     ):
+        """
+        Initializes the DialogConfigTabs widget.
+
+        Args:
+            devliz_data (DevlizData): The main application data object.
+            payload_data (Snapshot | None, optional): An existing snapshot to edit. 
+                If None, the dialog acts in creation mode. Defaults to None.
+        """
         super().__init__()
         self.payload_data: Snapshot | None = payload_data
 
@@ -50,11 +62,29 @@ class DialogConfigTabs(QWidget):
         self.pivot.currentItemChanged.connect(lambda k: self.stackedWidget.setCurrentWidget(self.findChild(QWidget, k)))
 
     def __add_sub_interface(self, widget: QWidget, objectName, text):
+        """
+        Helper method to add a new tab to the stacked widget and the segmented control pivot.
+
+        Args:
+            widget (QWidget): The widget to be added as a tab.
+            objectName (str): The object name which acts as the route key for the pivot.
+            text (str): The display text for the tab in the pivot.
+        """
         widget.setObjectName(objectName)
         self.stackedWidget.addWidget(widget)
         self.pivot.addItem(routeKey=objectName, text=text)
 
     def get_actual_data(self) -> Snapshot | None:
+        """
+        Retrieves the snapshot data collected from the tabs.
+        It maps the selected directories to snapshot directory associations.
+        If a payload_data was provided, it modifies and returns a cloned copy of it.
+        Otherwise, it creates and returns a completely new Snapshot object.
+
+        Returns:
+            Snapshot | None: The resulting snapshot instance with the updated configuration, 
+            or None if an error occurs.
+        """
         try:
             settings = SnapshotSettings()
 

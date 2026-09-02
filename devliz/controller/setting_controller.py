@@ -19,8 +19,22 @@ from devliz.view.setting import WidgetSettings
 
 
 class SettingController:
+    """
+    Controller for managing application settings.
+
+    This controller handles interactions on the settings view, allowing the user
+    to modify application configurations such as paths, language, theme, and more.
+    It synchronizes these settings across the application's global configuration.
+    """
 
     def __init__(self, dash_model: DashboardModel):
+        """
+        Initializes the SettingController.
+
+        Args:
+            dash_model (DashboardModel): The dashboard model, required to trigger UI updates
+                and access the catalogue when settings change.
+        """
         self.view = WidgetSettings()
         self.dash_model = dash_model
 
@@ -40,12 +54,23 @@ class SettingController:
         AppSettings.backup_before_delete.valueChanged.connect(self.__sync_snap_settings)
 
     def __sync_snap_settings(self, *args, **kwargs):
+        """
+        Synchronizes snapshot-specific settings with global application settings.
+
+        This ensures that the snapshot catalogue honors the backup preferences
+        configured by the user in the UI.
+        """
         snap_settings.backup_path = Path(app_settings.get(AppSettings.backup_path))
         snap_settings.backup_pre_install = app_settings.get(AppSettings.backup_before_install)
         snap_settings.backup_pre_modify = app_settings.get(AppSettings.backup_before_edit)
         snap_settings.backup_pre_delete = app_settings.get(AppSettings.backup_before_delete)
 
     def __on_language_or_theme_changed(self):
+        """
+        Handles language or theme changes by prompting the user to restart the application.
+
+        If confirmed, it restarts the application programmatically.
+        """
         w = MessageBox(tr("Restart required"), tr("The application needs to restart to apply the changes. Restart now?"), parent=self.view)
         if w.exec_():
             logger.info("User confirmed restart for language/theme change")
@@ -56,6 +81,11 @@ class SettingController:
             QApplication.instance().quit()
 
     def __ask_catalogue_path(self):
+        """
+        Opens a directory selection dialog to choose a new catalogue path.
+
+        Updates the app configuration and triggers a dashboard update if the path changes.
+        """
         directory = QFileDialog.getExistingDirectory(None, tr("Select the catalogue folder"))
         if directory:
             logger.info(f"Catalogue path changed to: {directory}")
@@ -68,6 +98,11 @@ class SettingController:
             logger.debug("Catalogue path selection cancelled.")
 
     def __ask_backup_path(self):
+        """
+        Opens a directory selection dialog to choose a new backup path.
+
+        Updates the application configuration and UI with the selected path.
+        """
         directory = QFileDialog.getExistingDirectory(None, tr("Select the backup folder"))
         if directory:
             logger.info(f"Backup path changed to: {directory}")
@@ -80,12 +115,21 @@ class SettingController:
             logger.debug("Backup path selection cancelled.")
 
     def __open_directory(self):
+        """
+        Opens the application's internal configuration directory in the file explorer.
+        """
         path = app.path
         logger.debug(f"Opening app directory: {path}")
         if Path(path).exists():
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     def __clear_backup_directory(self):
+        """
+        Prompts the user for confirmation and then deletes all application-managed backups.
+
+        Other unmanaged files in the directory are preserved. Errors are displayed
+        in a dialog box if the cleanup fails.
+        """
         try:
             w = MessageBox(
                 tr("Backup folder cleanup"),
@@ -134,6 +178,9 @@ class SettingController:
             return
 
     def __open_info_dialog(self):
+        """
+        Opens the 'About' dialog displaying application information and version details.
+        """
         w = AboutMessageBox(QIcon(RESOURCE_ID_LOGO), app.name,app.version, self.view)
         if w.exec_():
             pass

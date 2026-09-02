@@ -16,10 +16,23 @@ from devliz.view.backup import BackupView
 
 
 class BackupController(QObject):
+    """
+    Controller responsible for managing backups of the catalogue.
+
+    Provides mechanisms to list, open, restore, and delete backups by
+    interacting with the SnapshotCatalogue and communicating with the UI view.
+    """
 
     signal_request_refresh = Signal()
 
     def __init__(self, snap_catalogue: SnapshotCatalogue):
+        """
+        Initializes the BackupController.
+
+        Args:
+            snap_catalogue (SnapshotCatalogue): The system catalogue manager used to
+                interact with snapshots and backups.
+        """
         super().__init__()
         self.snap_catalogue = snap_catalogue
         self.model = BackupModel()
@@ -30,12 +43,24 @@ class BackupController(QObject):
         self.view.signal_delete_requested.connect(self.__handle_delete)
 
     def update_data(self):
+        """
+        Updates the list of available backups from the configured directory.
+
+        Reloads the internal model and triggers a UI refresh to display
+        the current backups.
+        """
         logger.debug("Updating backup data...")
         backup_path = Path(app_settings.get(AppSettings.backup_path))
         self.model.load_backups(self.snap_catalogue, backup_path)
         self.view.reload_data()
 
     def __handle_open(self, backup: SnapshotBackupInfo):
+        """
+        Opens the directory containing the specified backup in the system's file explorer.
+
+        Args:
+            backup (SnapshotBackupInfo): Information about the backup to locate.
+        """
         logger.info(f"Opening backup folder in file system: {backup.file_name}")
         folder = backup.path.parent
         try:
@@ -45,6 +70,15 @@ class BackupController(QObject):
             logger.error(f"Error opening backup folder: {e}")
 
     def __handle_restore(self, backup: SnapshotBackupInfo):
+        """
+        Prompts the user for confirmation and restores a given backup if confirmed.
+
+        Overwrites current data with the backup contents and emits a refresh signal
+        to update the rest of the application.
+
+        Args:
+            backup (SnapshotBackupInfo): Information about the backup to restore.
+        """
         w = MessageBox(
             tr("Confirm Restore"),
             tr("Are you sure you want to restore this backup? This will overwrite current data."),
@@ -65,6 +99,12 @@ class BackupController(QObject):
             UiUtils.show_message(tr("Error"), tr("An error occurred during restore: {error}", error=str(e)))
 
     def __handle_delete(self, backup: SnapshotBackupInfo):
+        """
+        Prompts the user for confirmation and deletes the specified backup.
+
+        Args:
+            backup (SnapshotBackupInfo): Information about the backup to delete.
+        """
         w = MessageBox(
             tr("Confirm Delete"),
             tr("Are you sure you want to delete this backup? This action cannot be undone."),

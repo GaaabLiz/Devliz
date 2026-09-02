@@ -471,6 +471,13 @@ class CatalogueSearcherView(DevlizQFrame):
     def update_snapshot_menu(self, snapshots, selected_snapshot_ids: list[str] | None = None):
         """
         Updates the snapshot dropdown menu with the available snapshots.
+        It rebuilds the menu if the available snapshots have changed, and updates
+        the checked state of each snapshot action according to selected_snapshot_ids.
+
+        Args:
+            snapshots (list): A list of available snapshot objects.
+            selected_snapshot_ids (list[str] | None, optional): A list of snapshot IDs 
+                that should be marked as checked. Defaults to None.
         """
         if selected_snapshot_ids is None:
             selected_snapshot_ids = []
@@ -513,6 +520,11 @@ class CatalogueSearcherView(DevlizQFrame):
             action.blockSignals(False)
 
     def _on_all_snapshots_triggered(self):
+        """
+        Handles the event when the 'All Snapshots' option is toggled.
+        Unchecks all individual snapshot options and emits a signal with an empty list
+        to indicate that all snapshots should be searched.
+        """
         # If "All" is clicked, uncheck all individual and emit None/empty
         for action in self._snapshot_actions.values():
             action.setChecked(False)
@@ -520,6 +532,14 @@ class CatalogueSearcherView(DevlizQFrame):
         self.signal_snapshot_filter_changed.emit([])
 
     def _on_single_snapshot_triggered(self, toggled_id: str):
+        """
+        Handles the event when a single snapshot option is toggled.
+        Gathers all currently checked individual snapshots and emits them.
+        Updates the 'All Snapshots' option state accordingly.
+
+        Args:
+            toggled_id (str): The ID of the snapshot that was toggled.
+        """
         # Gather all checked individual snapshots
         selected_ids = []
         for snap_id, action in self._snapshot_actions.items():
@@ -544,6 +564,13 @@ class SnapshotResultsDialog(MessageBoxBase):
     signal_tree_open_parent_folder = Signal(str)
 
     def __init__(self, snapshot_name: str, parent=None):
+        """
+        Initializes the SnapshotResultsDialog.
+
+        Args:
+            snapshot_name (str): The name of the snapshot being inspected, used in the title.
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(parent)
         
         self.title_label = SubtitleLabel(tr("Results for: {snapshot}", snapshot=snapshot_name), self)
@@ -566,12 +593,26 @@ class SnapshotResultsDialog(MessageBoxBase):
         self.cancelButton.setText(tr("Close"))
 
     def _on_tree_view_double_clicked(self, index: QModelIndex):
+        """
+        Handles the double-click event on the results tree view within the dialog.
+        Emits signal_file_double_clicked if a valid file path item is clicked.
+
+        Args:
+            index (QModelIndex): The model index of the clicked item.
+        """
         item = self.tree_view.model().itemFromIndex(index)
         if item and item.parent():
             file_path = item.text()
             self.signal_file_double_clicked.emit(file_path)
 
     def _show_tree_context_menu(self, pos):
+        """
+        Shows a context menu for items in the dialog's results tree.
+        Provides actions to open the file or its parent folder.
+
+        Args:
+            pos (QPoint): The position where the context menu was requested.
+        """
         index = self.tree_view.indexAt(pos)
         if not index.isValid():
             return

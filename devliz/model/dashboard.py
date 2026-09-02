@@ -13,9 +13,14 @@ from devliz.model.devliz_update import TaskGetMonitoredSoftware, TaskGetSnapshot
 from devliz.application.i18n import tr
 
 
-
 # noinspection PyMethodMayBeStatic
 class DashboardModel(QObject):
+    """
+    Model responsible for handling data and logic for the application's dashboard.
+    
+    This class manages asynchronous operations, tracks dashboard statistics,
+    and emits signals to update the UI when data changes or operations complete.
+    """
 
     signal_on_update_started = Signal()
     signal_on_update_complete = Signal()
@@ -27,6 +32,9 @@ class DashboardModel(QObject):
     signal_on_heavy_operation_error = Signal(str, str)
 
     def __init__(self):
+        """
+        Initializes the DashboardModel, setting up internal tasks, signals, and catalogue handlers.
+        """
         super().__init__()
         self.cached_data: DevlizData | None = None
         self.snap_catalogue = SnapshotCatalogue(
@@ -59,6 +67,17 @@ class DashboardModel(QObject):
         success_msg: str = "", 
         update_dashboard: bool = True
     ):
+        """
+        Executes a potentially time-consuming heavy operation asynchronously.
+
+        Args:
+            op_name (str): The name of the operation.
+            op_desc (str): A description of what the operation does.
+            func (callable): The function to execute.
+            success_msg_title (str, optional): The title of the success message to show when finished. Defaults to "".
+            success_msg (str, optional): The detailed success message to show when finished. Defaults to "".
+            update_dashboard (bool, optional): Whether to trigger a dashboard update upon success. Defaults to True.
+        """
         task = GenericTask(op_name, func)
         op_info = OperationInfo(name=op_name, description=op_desc)
         op = Operation([task], op_info)
@@ -97,9 +116,18 @@ class DashboardModel(QObject):
 
 
     def get_cached_data(self) -> DevlizData | None:
+        """
+        Retrieves the most recently cached dashboard data.
+
+        Returns:
+            DevlizData | None: The cached data, or None if no data has been fetched yet.
+        """
         return self.cached_data
 
     def update(self):
+        """
+        Triggers an asynchronous update of the dashboard data by retrieving snapshots and monitored software.
+        """
         try:
             tasks = [
                 self.task_monitored_soft,
@@ -115,6 +143,9 @@ class DashboardModel(QObject):
             return
 
     def on_runner_started(self):
+        """
+        Slot called when the main update runner starts execution. Emits relevant signals to UI.
+        """
         logger.info("Dashboard update started.")
         self.signal_on_update_started.emit()
         self.signal_on_update_text.emit(tr("Updating dashboard data..."))
@@ -122,9 +153,18 @@ class DashboardModel(QObject):
         self.signal_on_update_progress.emit(0)
 
     def on_runner_stopped(self):
+        """
+        Slot called when the main update runner stops execution prematurely.
+        """
         logger.info("Dashboard update stopped.")
 
     def on_runner_finished(self, stats: RunnerStatistics):
+        """
+        Slot called when the main update runner finishes execution. Analyzes results and updates cached data.
+
+        Args:
+            stats (RunnerStatistics): The statistics and results from the completed operation.
+        """
         logger.info("Dashboard update completed.")
         self.signal_on_update_complete.emit()
         if stats.has_ops_failed():

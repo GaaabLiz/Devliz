@@ -14,12 +14,24 @@ from devliz.application.i18n import tr
 
 
 class SnapshotCatalogueUiBuilder:
+    """
+    Builder utility for creating UI components used within the catalogue view.
+    """
 
     def __init__(self, parent):
+        """
+        Initialize the UI builder.
+
+        :param parent: Parent widget to attach UI components to.
+        """
         self.parent = parent
 
 
 class SnapshotCatalogueWidget(DevlizQFrame):
+    """
+    Main widget for displaying and interacting with the snapshot catalogue.
+    Features a table view with searching, sorting, and context actions for snapshots.
+    """
     signal_import_requested = Signal()
     signal_open_catalogue_folder_requested = Signal()
     signal_sort_requested = Signal(object, bool)
@@ -37,27 +49,39 @@ class SnapshotCatalogueWidget(DevlizQFrame):
     signal_update_with_local_dirs_requested = Signal(Snapshot)
 
     def __init__(self, model: CatalogueModel, parent=None):
+        """
+        Initialize the catalogue widget.
+
+        :param model: The data model providing snapshot items.
+        :param parent: Optional parent widget.
+        """
         super().__init__(
             name=tr("Catalogue"), 
             parent=parent, 
             subtitle=tr("Manage all your snapshot configurations, import new ones, or install them.")
         )
 
-        # Il modello è l'unica fonte di verità per i dati
+        # The model acts as the single source of truth for the table data
         self.model = model
         self._current_sort_key = SnapshotSortKey.NAME
         self._current_sort_reverse = False
 
-        # Aggiungo i widgets
+        # Add UI widgets
         self.__setup_label()
         self.__setup_action_bar()
         self.__setup_table()
         self.__setup_footer()
 
     def __setup_label(self):
+        """
+        Setup the main title label of the catalogue view.
+        """
         self.install_label_title()
 
     def __setup_action_bar(self):
+        """
+        Setup the top action bar containing the search input and command buttons.
+        """
         self.search_line_edit = SearchLineEdit(self)
         self.search_line_edit.textChanged.connect(self.model.filter)
 
@@ -87,6 +111,12 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.master_layout.addWidget(container)
 
     def __get_sort_menu(self, pos=None):
+        """
+        Create and return the dropdown menu for sorting options.
+
+        :param pos: Optional screen position to display the menu immediately.
+        :return: A RoundMenu containing the sort actions.
+        """
         menu = CheckableMenu(parent=self, indicatorType=MenuIndicatorType.RADIO)
 
         action_order_asc = Action(FluentIcon.UP, tr("Ascending"), checkable=True, checked=True, triggered=lambda: self._on_sort_direction_changed(False))
@@ -126,14 +156,28 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         return menu
 
     def _on_sort_type_changed(self, sort_key: SnapshotSortKey):
+        """
+        Handle a change in the selected sorting criterion.
+
+        :param sort_key: The new key to sort by.
+        """
         self._current_sort_key = sort_key
         self.signal_sort_requested.emit(self._current_sort_key, self._current_sort_reverse)
 
     def _on_sort_direction_changed(self, reverse: bool):
+        """
+        Handle a change in the sorting direction.
+
+        :param reverse: True for descending, False for ascending.
+        """
         self._current_sort_reverse = reverse
         self.signal_sort_requested.emit(self._current_sort_key, self._current_sort_reverse)
 
     def __setup_table(self):
+        """
+        Configure the main table view for displaying snapshots.
+        Sets up styling, selection behavior, and connects context menu signals.
+        """
         self.table = TableView(self)
         self.table.setModel(self.model.table_model)
 
@@ -158,6 +202,12 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.master_layout.addWidget(self.table)
 
     def __setup_footer(self, count: int = 0, size: str = "0"):
+        """
+        Setup the footer displaying the catalogue path and storage statistics.
+
+        :param count: Total number of snapshots.
+        :param size: Formatted total size string.
+        """
         lay = QHBoxLayout()
         self.footer_path_label = BodyLabel(app_settings.get(AppSettings.catalogue_path), self)
         setFont(self.footer_path_label, 12)
@@ -178,6 +228,12 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         self.master_layout.addWidget(container)
 
     def _get_export_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        """
+        Create the submenu for export actions.
+
+        :param snapshot: The snapshot to export.
+        :return: A RoundMenu containing export options.
+        """
         submenu = RoundMenu(tr("Export"), self)
         submenu.setIcon(FluentIcon.DOWNLOAD)
         submenu.addActions([
@@ -187,6 +243,12 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         return submenu
 
     def _get_delete_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        """
+        Create the submenu for deletion actions.
+
+        :param snapshot: The snapshot to delete.
+        :return: A RoundMenu containing delete options.
+        """
         submenu = RoundMenu(tr("Delete"), self)
         submenu.setIcon(FluentIcon.DELETE)
         submenu.addActions([
@@ -196,6 +258,12 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         return submenu
 
     def _get_open_context_menu(self, snapshot: Snapshot) -> RoundMenu:
+        """
+        Create the submenu for 'Open' actions (e.g. open in file explorer).
+
+        :param snapshot: The target snapshot.
+        :return: A RoundMenu containing open folder options.
+        """
         submenu = RoundMenu(tr("Open"), self)
         submenu.setIcon(FluentIcon.VIEW)
         submenu.addActions([
@@ -206,6 +274,11 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         return submenu
 
     def _show_context_menu(self, pos):
+        """
+        Build and display the context menu for a selected row in the table.
+
+        :param pos: The position where the menu was requested.
+        """
         index = self.table.indexAt(pos)
         if not index.isValid():
             return
@@ -228,15 +301,26 @@ class SnapshotCatalogueWidget(DevlizQFrame):
         menu.exec(global_pos)
 
     def _on_table_item_double_clicked(self, index: QModelIndex):
+        """
+        Handle a double-click on a table row by opening the snapshot's folder.
+
+        :param index: The model index of the clicked item.
+        """
         config = self.model.get_snapshot_at(index.row())
         if config:
             self.signal_open_folder_requested.emit(config)
 
     def _on_item_selection_changed(self):
+        """
+        Update the UI state based on table selection changes (e.g. enabling the Edit button).
+        """
         has_selection = self.table.selectionModel().hasSelection()
         self.action_edit.setEnabled(has_selection)
 
     def _distribuisci_colonne_perc(self):
+        """
+        Distribute the table column widths proportionally based on the viewport width.
+        """
         total_width = self.table.viewport().width()
         if total_width > 0:
             cols = self.model.table_model.columnCount()
@@ -256,14 +340,28 @@ class SnapshotCatalogueWidget(DevlizQFrame):
                 self.table.setColumnWidth(idx, width)
 
     def _table_resize_event(self, event):
+        """
+        Handle resize events on the table to update column widths.
+
+        :param event: The QResizeEvent.
+        """
         self._distribuisci_colonne_perc()
         super(type(self.table), self.table).resizeEvent(event)
 
     def sort(self, method: SnapshotSortKey, reverse: bool = False):
+        """
+        Programmatically sort the table and clear the search filter.
+
+        :param method: The sorting key.
+        :param reverse: True for descending order.
+        """
         self.search_line_edit.clear()
         self.model.sort(method, reverse)
 
     def reload_data(self):
+        """
+        Refresh the footer statistics and adjust UI layout after data reloading.
+        """
         self.footer_stats_label.setText(tr("Total configurations: {count} ({size})", count=self.model.count(), size=self.model.get_mb_size()))
 
         # Aggiorna il path se necessario e le intestazioni della tabella

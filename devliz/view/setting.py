@@ -10,6 +10,12 @@ from devliz.application.i18n import tr
 
 
 class WidgetSettings(DevlizQFrame):
+    """
+    The main settings view of the application.
+    Displays various configuration options grouped by categories such as Snapshots, Backups,
+    Favorites, Application, and Information.
+    Emits signals when the user interacts with actionable settings (e.g., changing paths).
+    """
 
     signal_open_dir_request = Signal()
     signal_close_and_clear_request = Signal()
@@ -23,6 +29,12 @@ class WidgetSettings(DevlizQFrame):
     signal_theme_changed = Signal()
 
     def __init__(self, parent=None):
+        """
+        Initializes the WidgetSettings view.
+
+        Args:
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(
             name=tr("Settings"), 
             parent=parent, 
@@ -40,10 +52,23 @@ class WidgetSettings(DevlizQFrame):
 
 
     def __install_tooltip(self, widget, text):
+        """
+        Installs a tooltip with a specified delay and position on a given widget.
+
+        Args:
+            widget (QWidget): The widget to apply the tooltip to.
+            text (str): The text content of the tooltip.
+        """
         widget.setToolTip(text)
         widget.installEventFilter(ToolTipFilter(widget, 2500, ToolTipPosition.TOP))
 
     def __add_groups(self, layout: QVBoxLayout):
+        """
+        Adds all setting groups to the main layout.
+
+        Args:
+            layout (QVBoxLayout): The target layout where setting groups will be appended.
+        """
         self.__add_group_snapshot(layout)
         self.__add_group_backups(layout)
         self.__add_group_favorites(layout)
@@ -51,6 +76,13 @@ class WidgetSettings(DevlizQFrame):
         self.__add_group_info(layout)
 
     def __add_group_snapshot(self, layout: QVBoxLayout):
+        """
+        Builds and adds the 'Snapshots' setting group to the layout.
+        This includes catalogue path, configuration tags, custom variables, and cleanup settings.
+
+        Args:
+            layout (QVBoxLayout): The layout to append the group to.
+        """
 
         # Percorso catalogo generale
         setting_catalogue = AppSettings.catalogue_path
@@ -122,6 +154,13 @@ class WidgetSettings(DevlizQFrame):
 
 
     def __add_group_backups(self, layout: QVBoxLayout):
+        """
+        Builds and adds the 'Backups' setting group to the layout.
+        This includes the backup path, toggles for various automatic backups, and a clear backups action.
+
+        Args:
+            layout (QVBoxLayout): The layout to append the group to.
+        """
 
         # Percorso backup
         setting_backup_path = AppSettings.backup_path
@@ -182,6 +221,13 @@ class WidgetSettings(DevlizQFrame):
         grp_manager.install_group_on(layout)
 
     def __add_group_favorites(self, layout: QVBoxLayout):
+        """
+        Builds and adds the 'Favorites' setting group to the layout.
+        This allows users to manage their starred folders, files, executables, and services.
+
+        Args:
+            layout (QVBoxLayout): The layout to append the group to.
+        """
 
         # Cartelle preferite
         setting_fav_dirs = AppSettings.starred_dirs
@@ -258,6 +304,13 @@ class WidgetSettings(DevlizQFrame):
 
 
     def __add_group_app(self, layout: QVBoxLayout):
+        """
+        Builds and adds the 'Application' setting group to the layout.
+        This includes UI themes, language selection, and an action to open the working folder.
+
+        Args:
+            layout (QVBoxLayout): The layout to append the group to.
+        """
 
         # Directory di lavoro
         self.card_working_folder = PushSettingCard(
@@ -298,6 +351,13 @@ class WidgetSettings(DevlizQFrame):
         grp_manager.install_group_on(layout)
 
     def __add_group_info(self, layout: QVBoxLayout):
+        """
+        Builds and adds the 'Information' setting group to the layout.
+        This includes a card that triggers the application's About dialog.
+
+        Args:
+            layout (QVBoxLayout): The layout to append the group to.
+        """
 
         # Informazioni applicazione
         self.card_info_app = PushSettingCard(

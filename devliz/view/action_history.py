@@ -7,8 +7,18 @@ from devliz.model.action_history import ActionHistoryTableModel
 
 
 class ActionHistoryView(DevlizQFrame):
+    """
+    A view that displays a log of actions performed by the user within the application.
+    It uses a table to present the history in a readable format.
+    """
 
     def __init__(self, parent=None):
+        """
+        Initializes the ActionHistoryView.
+
+        Args:
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(
             name=tr("Action History"), 
             parent=parent, 
@@ -19,6 +29,10 @@ class ActionHistoryView(DevlizQFrame):
         self.__setup_ui()
 
     def __setup_ui(self):
+        """
+        Sets up the user interface for the action history view, including the title,
+        empty state label, and the main table view with column configurations.
+        """
         self.install_label_title()
 
         self.empty_label = BodyLabel(tr("No actions recorded yet."), self)
@@ -44,5 +58,13 @@ class ActionHistoryView(DevlizQFrame):
         self.master_layout.addLayout(container_layout, 1)
 
     def update_rows(self, rows: list[dict[str, str]]):
+        """
+        Updates the table model with new action history rows.
+        Also toggles the visibility of the empty state label based on the row count.
+
+        Args:
+            rows (list[dict[str, str]]): A list of dictionaries, where each dictionary
+                represents a row in the action history table.
+        """
         self.model.set_rows(rows)
         self.empty_label.setVisible(len(rows) == 0)

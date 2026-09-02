@@ -12,6 +12,10 @@ from devliz.application.i18n import tr
 
 
 class DialogConfig(QDialog):
+    """
+    Dialog window for creating or editing a snapshot configuration.
+    It contains tabs for detailed information and associated directories.
+    """
 
     signal_payload = Signal(Snapshot, bool)
 
@@ -22,77 +26,105 @@ class DialogConfig(QDialog):
             edit_data: Snapshot | None = None,
             parent=None
     ):
+        """
+        Initialize the DialogConfig window.
+
+        :param devliz_data: Core data access object for the application.
+        :param edit_mode: True if editing an existing snapshot, False for creating a new one.
+        :param edit_data: The snapshot data to edit, required if edit_mode is True.
+        :param parent: The parent widget.
+        """
         super().__init__(parent)
 
-        # Setto le variabili
+        # Initialize variables
         self.edit_mode = edit_mode
         self.edit_data: Snapshot | None = edit_data
         self.devliz_data = devliz_data
         self.output_data: Snapshot | None = None
 
-        # Impostazioni globali del dialog
+        # Global dialog settings
         self.setWindowTitle(self.__get_dialog_text())
         self.resize(900, 550)
 
-        # Impostazioni layout globale
+        # Global layout settings
         self.layout = QVBoxLayout(self)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
         self.layout.setContentsMargins(50, 0, 50, 50)
         self.layout.setSpacing(30)
 
-        # Creo i widgets
+        # Create widgets
         self.__tabs = DialogConfigTabs(self.devliz_data, self.edit_data)
         self.__btn_layout = self.__get_btn_layout()
 
-        # Gestisco lo stato combinato delle modifiche
+        # Track combined modification state
         self._form_modified = False
         self._directories_modified = False
 
-        # Collego il segnale di cambio dati del tab dettagli
+        # Connect signals from tabs
         self.__tabs.tab_details.signal_data_changed.connect(self._on_form_changed)
         self.__tabs.tab_directories.signal_data_changed.connect(self._on_directories_changed)
 
-        # Aggiungo i widgets al layout
+        # Add widgets to layout
         self.layout.addWidget(self.__tabs)
         self.layout.addLayout(self.__btn_layout)
 
         FluentStyleSheet.DIALOG.apply(self)
 
     def __get_dialog_text(self):
+        """
+        Determine the appropriate title text for the dialog based on its current mode.
+
+        :return: A localized string for the dialog title.
+        """
         if not self.edit_mode:
             return tr("Import")
         config_name = self.edit_data.name if self.edit_data else ""
         return tr("Edit a configuration") + (f": {config_name}" if config_name else "")
 
     def _on_form_changed(self, changed: bool):
-        """Gestisce le modifiche del form"""
+        """
+        Handle modification state changes from the details form.
+
+        :param changed: True if the form data has been modified.
+        """
         self._form_modified = changed
         self._update_button_state()
 
     def _on_directories_changed(self, changed: bool):
-        """Gestisce le modifiche delle directory"""
+        """
+        Handle modification state changes from the directories tab.
+
+        :param changed: True if the directories data has been modified.
+        """
         self._directories_modified = changed
         self._update_button_state()
 
     def _update_button_state(self):
-        """Aggiorna lo stato del pulsante basandosi su entrambe le modifiche"""
-        # Il pulsante è abilitato se ci sono modifiche nel form O nelle directory
+        """
+        Update the enabled state of the create/save button based on form and directories modifications.
+        The button is enabled if there are modifications in either the form OR the directories.
+        """
         enabled = self._form_modified or self._directories_modified
         self.btn_create.setEnabled(enabled)
 
     def __get_btn_layout(self):
-        # Creo layout pulsanti
+        """
+        Create and configure the button layout for accepting or rejecting the dialog.
+
+        :return: A QVBoxLayout containing the primary action buttons.
+        """
+        # Create button layout
         btn_layout = QVBoxLayout()
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         btn_layout.setSpacing(5)
-        # Creo pulsante accetta
+        # Create accept button
         btn_create_text = tr("CREATE CONFIGURATION") if not self.edit_mode else tr("SAVE CHANGES")
         self.btn_create = PrimaryPushButton(btn_create_text, self)
         self.btn_create.setMaximumWidth(600)
         self.btn_create.setEnabled(False) if self.edit_mode else None
         self.btn_create.clicked.connect(self.__handle_accept)
         btn_layout.addWidget(self.btn_create)
-        # Creo pulsante chiudi
+        # Create close button
         btn_close = PushButton(tr("CLOSE"), self)
         btn_close.setMaximumWidth(600)
         btn_layout.addWidget(btn_close)
@@ -101,6 +133,9 @@ class DialogConfig(QDialog):
         return btn_layout
 
     def __handle_accept(self):
+        """
+        Validate input and emit the resulting payload data when the dialog is accepted.
+        """
         data = self.__tabs.get_actual_data()
         if data is None:
             UiUtils.show_message(tr("Error"), tr("An error occurred while creating the data."), self)

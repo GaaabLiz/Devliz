@@ -7,22 +7,35 @@ from devliz.view.splash import SplashWindow
 from devliz.application.i18n import tr
 
 class SplashController:
+    """
+    Controller for managing the application's splash screen.
+
+    This controller handles the initial loading sequence of the application,
+    including displaying the splash screen and verifying critical startup conditions
+    like the availability of the catalogue path.
+    """
+
     def __init__(self):
+        """
+        Initializes the SplashController.
+
+        Sets up the splash screen model and view.
+        """
         self.model = SplashModel()
         self.view = SplashWindow()
 
     def start(self):
         """
-        Avvia la logica dello splash screen:
-        1. Mostra la finestra.
-        2. Attende 1 secondo per visualizzare il logo.
-        3. Controlla l'esistenza del path del catalogo.
-        4. Mostra MessageBox d'errore se non esiste.
-        5. Chiude la splash screen e permette al chiamante di continuare.
+        Starts the splash screen logic:
+        1. Shows the splash window.
+        2. Waits for 1 second to display the logo.
+        3. Checks the existence of the catalogue path.
+        4. Shows an error MessageBox if it does not exist.
+        5. Closes the splash screen and allows the caller to continue.
         """
         self.view.show_splash()
 
-        # Attesa di 1 secondo (stessa logica originaria della view)
+        # Wait for 1 second (same logic as the original view)
         loop = QEventLoop()
         QTimer.singleShot(1000, loop.quit)
         loop.exec()
@@ -35,7 +48,7 @@ class SplashController:
 
     def __check_catalogue(self):
         """
-        Esegue il controllo sul percorso del catalogo ed eventualmente chiede all'utente come procedere.
+        Checks the catalogue path and prompts the user on how to proceed if it is invalid.
         """
         if not self.model.check_catalogue_path():
             catalogue_path_str = self.model.get_catalogue_path_str()

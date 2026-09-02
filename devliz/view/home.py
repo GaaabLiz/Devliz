@@ -13,9 +13,20 @@ from devliz.application.i18n import tr
 
 
 class StatCard(ElevatedCardWidget):
-    """Card che mostra una singola statistica con icona, titolo e valore."""
+    """A card widget that displays a single statistic with an icon, title, and value."""
 
     def __init__(self, icon: FluentIcon, title: str, tooltip_text: str = "", value: str = "—", subtitle: str = "", parent=None):
+        """
+        Initializes the StatCard widget.
+
+        Args:
+            icon (FluentIcon): The icon to display in the header.
+            title (str): The main title of the statistic.
+            tooltip_text (str, optional): The text to display as a tooltip. Defaults to "".
+            value (str, optional): The main value to display. Defaults to "—".
+            subtitle (str, optional): An optional subtitle below the value. Defaults to "".
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(parent)
         self.setFixedHeight(140)
         self.setMinimumWidth(200)
@@ -53,13 +64,30 @@ class StatCard(ElevatedCardWidget):
         vLayout.addWidget(self.subtitleLabel)
 
     def update_value(self, value: str, subtitle: str = ""):
+        """
+        Updates the displayed value and subtitle of the card.
+
+        Args:
+            value (str): The new value to display.
+            subtitle (str, optional): The new subtitle to display. Defaults to "".
+        """
         self.valueLabel.setText(value)
         self.subtitleLabel.setText(subtitle)
 
 
 class HomeView(DevlizQFrame):
+    """
+    The main home view frame that displays a dashboard of various statistics
+    regarding the application, catalogue, and snapshots.
+    """
 
     def __init__(self, parent=None):
+        """
+        Initializes the HomeView dashboard.
+
+        Args:
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(
             name=tr("Home"), 
             parent=parent, 
@@ -68,6 +96,10 @@ class HomeView(DevlizQFrame):
         self.__setup_ui()
 
     def __setup_ui(self):
+        """
+        Sets up the user interface elements for the dashboard, including instantiating
+        and laying out the various statistical cards in a scrollable grid.
+        """
         self.install_label_title()
 
         self.card_snap_count = StatCard(
@@ -138,6 +170,14 @@ class HomeView(DevlizQFrame):
         self.master_layout.addWidget(scroll_area, 1)
 
     def update_statistics(self, stats: HomeStatistics, backup_count: int = 0, catalogue_path: str = ""):
+        """
+        Updates the values displayed on all the stat cards in the home view.
+
+        Args:
+            stats (HomeStatistics): The statistics data object containing counts and sizes.
+            backup_count (int, optional): The current total number of backups. Defaults to 0.
+            catalogue_path (str, optional): The path to the current catalogue. Defaults to "".
+        """
         self.card_snap_count.update_value(str(stats.snapshot_count))
         self.card_total_size.update_value(stats.total_size_str)
         self.card_total_files.update_value(f"{stats.total_files:,}".replace(",", "."))

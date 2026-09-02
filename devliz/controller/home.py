@@ -8,11 +8,33 @@ from devliz.view.home import HomeView
 
 
 class HomeController:
+    """
+    Controller for the application's home screen.
+
+    This class manages the data displayed on the home view, particularly
+    computing and updating statistical information regarding snapshots
+    and backups based on the user's configured settings.
+    """
 
     def __init__(self):
+        """
+        Initializes the HomeController.
+
+        Creates the associated HomeView instance which handles the UI presentation.
+        """
         self.view = HomeView()
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
+        """
+        Updates the data presented on the home view.
+
+        Computes statistics from the given snapshot data, counts the number of
+        available backups in the configured backup directory, and fetches the
+        current catalogue path to update the view accordingly.
+
+        Args:
+            snapshot_data (DevlizSnapshotData): The current snapshot data used to compute statistics.
+        """
         logger.debug("Calculating Home statistics...")
         stats = snapshot_data.compute_home_statistics()
         logger.debug(f"Statistics calculated: {stats}")

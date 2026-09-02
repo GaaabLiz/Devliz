@@ -19,15 +19,35 @@ from devliz.application.i18n import tr
 
 
 class CatalogueController:
+    """
+    Controller for managing the snapshot catalogue view and its associated actions.
+
+    This class bridges the user interface (SnapshotCatalogueWidget) and the underlying
+    catalogue model, handling tasks such as creating, editing, installing, exporting,
+    and deleting snapshots.
+    """
 
     def __init__(self, dash_model: DashboardModel, search_page_opener=None):
+        """
+        Initializes the CatalogueController.
+
+        Args:
+            dash_model (DashboardModel): The dashboard model, required for tracking global state
+                and launching heavy operations.
+            search_page_opener (Callable, optional): A callback function used to navigate to the
+                search page, optionally scoped to a specific snapshot.
+        """
         self.dash_model = dash_model
         self.model = CatalogueModel()
         self.view = SnapshotCatalogueWidget(self.model)
         self.search_page_opener = search_page_opener
 
-
     def init(self):
+        """
+        Sets up signal-slot connections for the catalogue view.
+
+        Connects UI interactions (buttons, context menus) to their respective handler methods.
+        """
         self.view.signal_import_requested.connect(lambda: self.__open_config_dialog(False, None))
         self.view.signal_open_catalogue_folder_requested.connect(self.__open_catalogue_directory)
         self.view.signal_install_requested.connect(self.__install_snapshot)
@@ -45,11 +65,24 @@ class CatalogueController:
         self.view.signal_open_assoc_folder_requested.connect(self.__open_directory)
 
     def update_data(self, snapshot_data: DevlizSnapshotData):
+        """
+        Updates the catalogue view with new snapshot data.
+
+        Args:
+            snapshot_data (DevlizSnapshotData): The new snapshot data to display.
+        """
         self.model.set_snapshots(snapshot_data.snapshot_list)
         self.model.table_model.update_headers()
         self.view.reload_data()
 
     def __open_config_dialog(self, edit_mode: bool, snap: Snapshot | None = None):
+        """
+        Opens a dialog for creating or editing a snapshot configuration.
+
+        Args:
+            edit_mode (bool): True if editing an existing snapshot, False if creating a new one.
+            snap (Snapshot | None): The snapshot to edit if edit_mode is True, otherwise None.
+        """
         log_action(ActionCategory.CATALOGUE, ActionType.CATALOGUE_CONFIG_DIALOG_OPENED, "edit" if edit_mode else "create")
         dialog = DialogConfig(self.dash_model.cached_data, edit_mode, snap)
         try:
@@ -86,14 +119,32 @@ class CatalogueController:
             logger.error(f"Error executing dialog: {e}")
 
     def __open_snapshot_searcher(self):
+        """
+        Opens the search view to look for content across all snapshots.
+        """
         if self.search_page_opener:
             self.search_page_opener(None)
 
     def __open_snapshot_searcher_single(self, snapshot: Snapshot):
+        """
+        Opens the search view restricted to a specific snapshot.
+
+        Args:
+            snapshot (Snapshot): The snapshot to restrict the search context to.
+        """
         if self.search_page_opener:
             self.search_page_opener(snapshot)
 
     def __install_snapshot(self, snap: Snapshot):
+        """
+        Prompts the user to confirm, then installs a given snapshot.
+
+        Installs the snapshot by replacing the current environment's target directories
+        with the ones stored in the snapshot. This runs as a heavy operation.
+
+        Args:
+            snap (Snapshot): The snapshot to install.
+        """
         logger.debug(f"Installation requested for {snap.name}")
         try:
             w = MessageBox(tr("Install configuration"), tr("Are you sure you want to install the selected snapshot? All current directories will be replaced with those contained in the snapshot."), parent=self.view)
@@ -116,12 +167,24 @@ class CatalogueController:
             logger.error(f"Error during install process: {e}")
 
     def __edit_snapshot(self, snap: Snapshot):
+        """
+        Initiates the process to edit an existing snapshot configuration.
+
+        Args:
+            snap (Snapshot): The snapshot to edit.
+        """
         try:
             self.__open_config_dialog(True, snap)
         except Exception as e:
             UiUtils.show_message(tr("Edit error"), tr("An error occurred during editing: {error}", error=str(e)))
 
     def __delete_snapshot(self, snap: Snapshot):
+        """
+        Prompts the user to confirm, then deletes the specified snapshot.
+
+        Args:
+            snap (Snapshot): The snapshot to delete.
+        """
         logger.debug(f"Deletion requested for {snap.name}")
         try:
             w = MessageBox(tr("Delete configuration"), tr("Are you sure you want to delete the selected configuration? This operation cannot be undone."), parent=self.view)
@@ -143,10 +206,22 @@ class CatalogueController:
             logger.error(f"Error during delete process: {e}")
 
     def __open_snap_directory(self, snap: Snapshot):
+        """
+        Opens the file system directory corresponding to a given snapshot.
+
+        Args:
+            snap (Snapshot): The snapshot whose directory will be opened.
+        """
         path = self.dash_model.snap_catalogue.get_snap_directory_path(snap)
         self.__open_directory(path)
 
     def __duplicate_snapshot(self, snap: Snapshot):
+        """
+        Duplicates an existing snapshot as a new entry.
+
+        Args:
+            snap (Snapshot): The snapshot to duplicate.
+        """
         logger.debug(f"Duplication requested for {snap.name}")
         try:
             def action(task):
@@ -228,6 +303,14 @@ class CatalogueController:
         )
 
     def __delete_snap_installed_dirs(self, snap: Snapshot):
+        """
+        Deletes the currently installed folders associated with the given snapshot.
+
+        This affects the target directories on the system where the snapshot was installed.
+
+        Args:
+            snap (Snapshot): The snapshot whose installed folders will be deleted.
+        """
         logger.debug(f"Installed folders deletion requested for {snap.name}")
         try:
             w = MessageBox(tr("Delete installed folders"), tr("Are you sure you want to delete the currently installed folders for the selected snapshot?"), parent=self.view)
@@ -247,6 +330,12 @@ class CatalogueController:
             UiUtils.show_message(tr("Deletion error"), tr("An error occurred during deletion: {error}", error=str(e)))
 
     def __update_assoc_dirs_from_installed(self, snap: Snapshot):
+        """
+        Updates the snapshot's internal directories with the contents currently installed on the system.
+
+        Args:
+            snap (Snapshot): The snapshot to update.
+        """
         logger.debug(f"Associated folders update requested for {snap.name}")
         try:
             w = MessageBox(tr("Update associated folders"), tr("Are you sure you want to update the associated folders of the selected snapshot with the currently installed ones?"), parent=self.view)
@@ -266,10 +355,19 @@ class CatalogueController:
             UiUtils.show_message(tr("Update error"), tr("An error occurred during update: {error}", error=str(e)))
 
     def __open_catalogue_directory(self):
+        """
+        Opens the main catalogue directory in the system's file explorer.
+        """
         path = app_settings.get(AppSettings.catalogue_path)
         self.__open_directory(Path(path))
 
     def __open_directory(self, path: Path):
+        """
+        Opens the specified directory path in the system's file explorer.
+
+        Args:
+            path (Path): The directory path to open.
+        """
         logger.debug(f"Opening directory {path}")
         if path.exists():
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))

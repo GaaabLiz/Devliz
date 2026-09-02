@@ -11,6 +11,17 @@ from devliz.controller.splash import SplashController
 from devliz.model.action_history import init_action_history_db
 
 def main():
+    """
+    The main entry point for the Devliz application.
+    
+    This function initializes the application settings, sets the language,
+    initializes the action history database, and configures the main Qt 
+    application instance with necessary translators. Finally, it starts 
+    the splash and dashboard controllers and begins the Qt event loop.
+    
+    Returns:
+        int: The exit code of the Qt application.
+    """
     # Initialize language from settings
     lang = app_settings.get(AppSettings.language)
     set_language(lang)

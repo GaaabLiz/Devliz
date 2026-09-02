@@ -66,15 +66,45 @@ logger.info("{} Application Started. Version: {}", app.name, app.version)
 
 # TODO: MOve to lib
 class NetworkFolderValidator(ConfigValidator):
-    """ Validator that does not check if the folder exists, preventing automatic fallback for network drives. """
+    """
+    Validator that does not check if the folder exists, preventing automatic fallback for network drives.
+    
+    This is useful for configuration items that point to network paths which might not 
+    be immediately available when the application starts.
+    """
     def validate(self, value):
+        """
+        Validate that the provided value is a string.
+        
+        Args:
+            value: The value to validate.
+            
+        Returns:
+            bool: True if the value is a string, False otherwise.
+        """
         return isinstance(value, str)
 
     def correct(self, value):
+        """
+        Correct the value by converting it to a string.
+        
+        Args:
+            value: The input value.
+            
+        Returns:
+            str: The corrected string value or an empty string if None.
+        """
         return str(value) if value else ""
 
-# DEFINIZIONE DELLE IMPOSTAZIONI DELL'APPLICAZIONE
+# DEFINITION OF APPLICATION SETTINGS
 class AppSettings(QConfig):
+    """
+    Configuration class for the application settings.
+    
+    This class defines all the customizable settings for the application using 
+    qfluentwidgets configuration items. It covers configurations, scripts, 
+    favorites, backups, and general app settings.
+    """
     config_tags = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Tag configurazioni", DEFAULT_SETTING_CONFIGURATION_TAGS, TextListValidator())
     catalogue_path = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Catalogue Path", DEFAULT_SETTING_CATALOGUE_PATH, NetworkFolderValidator())
     backup_before_install = QtFwQConfigItem(True, SETTING_GROUP_BACKUPS, "Backup Before Install", DEFAULT_SETTING_CONFIG_BACKUP_BEFORE_INSTALL, BoolValidator())
@@ -90,6 +120,7 @@ class AppSettings(QConfig):
     debug_test_mode = QtFwQConfigItem(False, SETTING_GROUP_APP, "DebugTestMode", False, BoolValidator())
     clear_snap_attached_folders_before_install = QtFwQConfigItem(True, SETTING_GROUP_CONFIGS, "Clear snap attached folders before install", DEFAULT_SETTING_CLEAR_SNAP_ATTACHED_FOLDERS_BEFORE_INSTALL, BoolValidator())
     language = OptionsConfigItem(SETTING_GROUP_APP, "Language", DEFAULT_SETTING_LANGUAGE, OptionsValidator(["en", "it"]))
+
 
 
 # CARICAMENTO IMPOSTAZIONI

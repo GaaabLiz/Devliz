@@ -20,8 +20,21 @@ from devliz.view.dashboard import DashboardView
 
 
 class DashboardController:
+    """
+    Main controller for the application dashboard.
+
+    This class serves as the central hub of the application, initializing and
+    coordinating all other major controllers (Home, Catalogue, Search, Backup, etc.).
+    It manages the main navigation interface and coordinates global data updates.
+    """
 
     def __init__(self, /):
+        """
+        Initializes the DashboardController.
+
+        Sets up the main view, model, and all child controllers, and adds their
+        respective views as sub-interfaces to the main dashboard navigation.
+        """
         super().__init__()
 
         self.view = DashboardView()
@@ -49,6 +62,15 @@ class DashboardController:
 
 
     def __handle_data_updated(self, data: DevlizData):
+        """
+        Handles the event when new dashboard data is loaded.
+
+        Distributes the updated data to the child controllers (Catalogue, Home, Backup, etc.)
+        so they can refresh their respective views.
+
+        Args:
+            data (DevlizData): The newly updated application data.
+        """
         logger.debug("Updated dashboard data received in controller. Updating view...")
         logger.debug(data)
         snap_data = DevlizSnapshotData(snapshot_list=data.snapshots) # TODO: sistemare
@@ -64,6 +86,11 @@ class DashboardController:
 
 
     def __handle_update_started(self):
+        """
+        Handles the event when a global data refresh starts.
+
+        Sets all child views to an 'UPDATING' state to display progress indicators.
+        """
         log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_REFRESH_STARTED, "F5/dashboard refresh")
         self.home.view.set_state(UiWidgetMode.UPDATING)
         self.catalogue.view.set_state(UiWidgetMode.UPDATING)
@@ -73,6 +100,11 @@ class DashboardController:
         self.help.view.set_state(UiWidgetMode.UPDATING)
 
     def __handle_update_complete(self):
+        """
+        Handles the event when a global data refresh completes.
+
+        Restores all child views to a 'DISPLAYING' state.
+        """
         log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_REFRESH_COMPLETED, "")
         self.home.view.set_state(UiWidgetMode.DISPLAYING)
         self.catalogue.view.set_state(UiWidgetMode.DISPLAYING)
@@ -82,6 +114,12 @@ class DashboardController:
         self.help.view.set_state(UiWidgetMode.DISPLAYING)
 
     def __open_search_page(self, snapshot=None):
+        """
+        Opens the search page and optionally scopes the search to a specific snapshot.
+
+        Args:
+            snapshot: Optional snapshot to restrict the search context.
+        """
         self.searcher.open(snapshot)
         self.view.switchTo(self.searcher.view)
         if snapshot is None:
@@ -90,16 +128,28 @@ class DashboardController:
             log_action(ActionCategory.SEARCH, ActionType.SEARCH_PAGE_OPENED, f"scope=snapshot:{snapshot.name}")
 
     def __on_f5_pressed(self):
+        """
+        Handles the manual refresh action triggered by the F5 key.
+        """
         log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_F5_PRESSED, "")
         self.model.update()
 
     def __on_page_changed(self, index: int):
+        """
+        Logs an action whenever the user navigates to a different page in the dashboard.
+
+        Args:
+            index (int): The index of the newly selected page in the stacked widget.
+        """
         widget = self.view.stackedWidget.widget(index)
         page_name = getattr(widget, "window_name", "")
         if page_name:
             log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_PAGE_CHANGED, page_name)
 
     def __connect_signals(self):
+        """
+        Connects all UI and model signals to their respective handler slots.
+        """
         self.view.f5_pressed.connect(self.__on_f5_pressed)
         self.view.stackedWidget.currentChanged.connect(self.__on_page_changed)
         self.model.signal_on_update_started.connect(self.__handle_update_started)
@@ -113,6 +163,12 @@ class DashboardController:
         self.backup.signal_request_refresh.connect(self.model.update)
         
     def __handle_update_progress(self, progress: int):
+        """
+        Propagates the progress value of an ongoing heavy operation to all child views.
+
+        Args:
+            progress (int): The current progress percentage (0-100).
+        """
         self.home.view.set_updating_progress(progress)
         self.catalogue.view.set_updating_progress(progress)
         self.searcher.view.set_updating_progress(progress)
@@ -121,6 +177,12 @@ class DashboardController:
         self.help.view.set_updating_progress(progress)
 
     def __handle_update_text(self, text: str):
+        """
+        Propagates the main status text of an ongoing heavy operation to all child views.
+
+        Args:
+            text (str): The primary status message.
+        """
         self.home.view.set_updating_text(text)
         self.catalogue.view.set_updating_text(text)
         self.searcher.view.set_updating_text(text)
@@ -129,6 +191,12 @@ class DashboardController:
         self.help.view.set_updating_text(text)
         
     def __handle_update_detail_text(self, text: str):
+        """
+        Propagates the detailed status text of an ongoing heavy operation to all child views.
+
+        Args:
+            text (str): The secondary, detailed status message.
+        """
         self.home.view.set_updating_detail_text(text)
         self.catalogue.view.set_updating_detail_text(text)
         self.searcher.view.set_updating_detail_text(text)
@@ -137,6 +205,12 @@ class DashboardController:
         self.help.view.set_updating_detail_text(text)
 
     def start(self):
+        """
+        Starts the dashboard application flow.
+
+        Shows the main view, establishes signal connections, and initiates the
+        first data load for the catalogue, history, and dashboard models.
+        """
         logger.info("Application is starting...")
         log_action(ActionCategory.DASHBOARD, ActionType.DASHBOARD_APPLICATION_STARTED, "")
         self.view.show()

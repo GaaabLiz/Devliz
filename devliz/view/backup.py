@@ -8,11 +8,23 @@ from devliz.application.i18n import tr
 
 
 class BackupView(DevlizQFrame):
+    """
+    A view frame that displays a table of automatic backups.
+    It provides functionality to view, restore, or delete backups through a context menu.
+    Emits signals when open, restore, or delete actions are requested.
+    """
     signal_open_requested = Signal(object)
     signal_restore_requested = Signal(object)
     signal_delete_requested = Signal(object)
 
     def __init__(self, model: BackupModel, parent=None):
+        """
+        Initializes the BackupView.
+
+        Args:
+            model (BackupModel): The model providing the backup data for the table.
+            parent (QWidget, optional): The parent widget. Defaults to None.
+        """
         super().__init__(
             name=tr("Backups"), 
             parent=parent, 
@@ -22,11 +34,19 @@ class BackupView(DevlizQFrame):
         self.__setup_ui()
 
     def __setup_ui(self):
+        """
+        Sets up the main user interface for the backup view, including the title,
+        the table, and the footer.
+        """
         self.install_label_title()
         self.__setup_table()
         self.__setup_footer()
 
     def __setup_table(self):
+        """
+        Initializes and configures the backup table view.
+        Sets up styling, selection behavior, column resizing, and context menu policy.
+        """
         self.table = TableView(self)
         self.table.setModel(self.model.table_model)
 
@@ -48,6 +68,9 @@ class BackupView(DevlizQFrame):
         self.master_layout.addWidget(self.table)
 
     def __setup_footer(self):
+        """
+        Sets up the footer of the backup view, displaying the total number of backups.
+        """
         lay = QHBoxLayout()
         self.footer_label = BodyLabel(tr("Total backups: {count}", count=self.model.count()), self)
         setFont(self.footer_label, 12)
@@ -61,6 +84,13 @@ class BackupView(DevlizQFrame):
         self.master_layout.addWidget(container)
 
     def _show_context_menu(self, pos):
+        """
+        Displays a custom context menu when the user right-clicks on a row in the backup table.
+        The menu offers actions to open the backup in Finder, restore it, or delete it.
+
+        Args:
+            pos (QPoint): The position where the context menu was requested, relative to the table.
+        """
         index = self.table.indexAt(pos)
         if not index.isValid():
             return
@@ -78,6 +108,10 @@ class BackupView(DevlizQFrame):
         menu.exec(global_pos)
 
     def _distribuisci_colonne_perc(self):
+        """
+        Distributes the table column widths based on the predefined percentage values
+        and the current total width of the table viewport.
+        """
         total_width = self.table.viewport().width()
         if total_width > 0:
             for idx, perc in enumerate(self.column_percents):
@@ -85,9 +119,19 @@ class BackupView(DevlizQFrame):
                 self.table.setColumnWidth(idx, width)
 
     def _table_resize_event(self, event):
+        """
+        Handles the table resize event to adjust the column widths dynamically.
+
+        Args:
+            event (QResizeEvent): The resize event object.
+        """
         self._distribuisci_colonne_perc()
         super(type(self.table), self.table).resizeEvent(event)
 
     def reload_data(self):
+        """
+        Reloads and updates the view data, primarily updating the footer label
+        with the current total backup count and adjusting column sizes.
+        """
         self.footer_label.setText(tr("Total backups: {count}", count=self.model.count()))
         self._distribuisci_colonne_perc()

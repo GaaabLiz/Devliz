@@ -19,10 +19,24 @@ from devliz.view.util.frame import DevlizQFrame
 
 
 class HelpGuideCard(SimpleCardWidget):
+    """
+    Card widget representing a single help topic or guide.
+    Clicking the card emits a signal to open detailed help.
+    """
 
     signal_clicked = Signal(str)
 
     def __init__(self, card_id: str, icon: FluentIcon, title: str, subtitle: str, content: str, parent=None):
+        """
+        Initialize the help guide card.
+
+        :param card_id: Unique identifier for the help topic.
+        :param icon: FluentIcon to display on the card.
+        :param title: Main title of the card.
+        :param subtitle: Subtitle providing brief context.
+        :param content: Summary text of the help topic.
+        :param parent: Parent widget.
+        """
         super().__init__(parent)
         self.card_id = card_id
         self.setMinimumHeight(220)
@@ -50,14 +64,30 @@ class HelpGuideCard(SimpleCardWidget):
         root_layout.addStretch(1)
 
     def mousePressEvent(self, event: QMouseEvent):
+        """
+        Handle mouse press events on the card to emit the clicked signal.
+
+        :param event: The mouse event object.
+        """
         if event.button() == Qt.MouseButton.LeftButton:
             self.signal_clicked.emit(self.card_id)
         super().mousePressEvent(event)
 
 
 class HelpDetailDialog(QDialog):
+    """
+    Dialog window for displaying detailed help information for a specific topic.
+    """
 
     def __init__(self, title: str, subtitle: str, details: str, parent=None):
+        """
+        Initialize the detailed help dialog.
+
+        :param title: The title of the help topic.
+        :param subtitle: The subtitle of the help topic.
+        :param details: The full detailed text of the help guide.
+        :param parent: Parent widget.
+        """
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(860, 620)
@@ -96,8 +126,17 @@ class HelpDetailDialog(QDialog):
 
 
 class HelpView(DevlizQFrame):
+    """
+    Main view representing the Help module.
+    Displays a grid of help guide cards that users can click to see details.
+    """
 
     def __init__(self, parent=None):
+        """
+        Initialize the HelpView.
+
+        :param parent: Parent widget.
+        """
         super().__init__(
             name=tr("Help"), 
             parent=parent, 
@@ -106,6 +145,9 @@ class HelpView(DevlizQFrame):
         self.__setup_ui()
 
     def __setup_ui(self):
+        """
+        Set up the UI layout and populate it with help guide cards.
+        """
         self.install_label_title()
 
         scroll_layout = self.get_scroll_layout()
@@ -311,6 +353,11 @@ class HelpView(DevlizQFrame):
         self.install_scroll_on(self.master_layout)
 
     def __open_details(self, card_id: str):
+        """
+        Open the details dialog for the selected help card and log the action.
+
+        :param card_id: The unique identifier of the clicked help topic.
+        """
         title, subtitle, details = self._detail_payload[card_id]
         log_action(ActionCategory.HELP, ActionType.HELP_CARD_OPENED, title)
         dialog = HelpDetailDialog(title, subtitle, details, self)
