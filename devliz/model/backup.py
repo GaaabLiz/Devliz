@@ -37,9 +37,9 @@ class BackupTableModel(QAbstractTableModel):
                 return backup.snapshot_id or "-"
             elif col == 2:
                 if backup.backup_type == BackupType.ASSOCIATED_DIRECTORIES:
-                    return "Associated Directories"
+                    return tr("Associated Directories")
                 elif backup.backup_type == BackupType.SNAPSHOT_DIRECTORY:
-                    return "Snapshot Directory"
+                    return tr("Snapshot Directory")
                 return "-"
             elif col == 3:
                 if backup.created_at:

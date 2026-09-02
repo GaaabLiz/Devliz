@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from loguru import logger
 from pylizlib.core.os.snap import SnapshotCatalogue
 from pylizlib.core.os.utils import is_software_installed, WindowsOsUtils
 from pylizlib.qt.handler.operation_core import Task
@@ -16,7 +17,6 @@ class TaskGetMonitoredSoftware(Task):
         super().__init__(tr("Retrieving Monitored Software"))
 
     def execute(self):
-        from loguru import logger
         logger.debug("Fetching monitored software list...")
         data_list: list[str] = app_settings.get(AppSettings.starred_exes)
         data_objs: list[SoftwareData] = []
@@ -44,6 +44,5 @@ class TaskGetSnapshots(Task):
         self.catalogue = catalogue
 
     def execute(self):
-        from loguru import logger
         logger.debug("Fetching saved snapshots...")
         return self.catalogue.get_all()
