@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QStackedWidget
 from loguru import logger
 from pylizlib.core.data.gen import gen_random_string
 from pylizlib.core.os.snap import Snapshot, SnapDirAssociation
+from pylizlib.core.os.snap.domain import SnapshotSettings
 from pylizlib.core.os.utils import get_system_username
 from pylizlib.qtfw.util.ui import UiUtils
 from qfluentwidgets import SegmentedWidget
@@ -55,7 +56,6 @@ class DialogConfigTabs(QWidget):
 
     def get_actual_data(self) -> Snapshot | None:
         try:
-            from pylizlib.core.os.snap.domain import SnapshotSettings
             settings = SnapshotSettings()
 
             assoc: list[SnapDirAssociation] = []

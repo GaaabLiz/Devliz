@@ -1,9 +1,9 @@
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QEvent
 from PySide6.QtWidgets import QFormLayout, QVBoxLayout, QWidget
 from pylizlib.core.data.gen import gen_random_string
 from pylizlib.core.os.snap import Snapshot
 from pylizlib.qtfw.widgets.input import MultiSelectionComboBox
-from qfluentwidgets import BodyLabel, LineEdit
+from qfluentwidgets import BodyLabel, LineEdit, MessageBox
 
 from devliz.application.app import snap_settings
 from devliz.application.i18n import tr
@@ -86,10 +86,8 @@ class TabDetails(QWidget):
             self.custom_data_inputs[key] = line_edit
             
     def eventFilter(self, obj, event):
-        from PySide6.QtCore import QEvent
         if obj == self.form_tags_input and event.type() == QEvent.Type.MouseButtonPress:
             if not self.tags:
-                from qfluentwidgets import MessageBox
                 w = MessageBox(tr("No tags"), tr("No tags found. Please create them in the Settings."), self)
                 w.yesButton.hide()
                 w.cancelButton.setText(tr("Close"))

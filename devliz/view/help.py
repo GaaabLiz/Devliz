@@ -13,7 +13,7 @@ from qfluentwidgets import (
     StrongBodyLabel,
 )
 
-from devliz.application.action_history import log_action, ActionCategory, ActionType
+from devliz.model.action_history import log_action, ActionCategory, ActionType
 from devliz.application.i18n import tr
 from devliz.view.util.frame import DevlizQFrame
 

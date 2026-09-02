@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QWidget
 from qfluentwidgets import (
@@ -147,7 +149,6 @@ class HomeView(DevlizQFrame):
         self.card_avg_size.update_value(stats.average_snapshot_size_str)
 
         if stats.heaviest_file_path:
-            from pathlib import Path
             name = Path(stats.heaviest_file_path).name
             self.card_heaviest_file.update_value(
                 stats.heaviest_file_size_str,

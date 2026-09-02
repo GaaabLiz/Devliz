@@ -1,3 +1,5 @@
+import re
+
 from PySide6.QtCore import Signal, Qt
 from PySide6.QtWidgets import QDialog, QVBoxLayout
 from pylizlib.core.os.snap import Snapshot
@@ -107,7 +109,6 @@ class DialogConfig(QDialog):
             UiUtils.show_message(tr("Error"), tr("The 'Name' field cannot be empty."), self)
             return
             
-        import re
         invalid_chars = r'[<>:"/\\|?*]'
         if re.search(invalid_chars, data.name):
             UiUtils.show_message(tr("Error"), tr("The name contains invalid characters for a folder."), self)

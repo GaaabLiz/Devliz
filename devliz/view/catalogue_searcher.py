@@ -350,8 +350,12 @@ class CatalogueSearcherView(DevlizQFrame):
         action_group.setExclusive(True)
 
         self.action_query_type_map = {}
+        query_type_names = {
+            QueryType.TEXT: tr("Text"),
+            QueryType.REGEX: tr("Regex"),
+        }
         for query_type in QueryType:
-            action = Action(query_type.name.title(), self, checkable=True)
+            action = Action(query_type_names.get(query_type, query_type.name.title()), self, checkable=True)
             action.setData(query_type)
             action.triggered.connect(self._update_search_bar_placeholder)
             self.action_query_type_map[query_type] = action
